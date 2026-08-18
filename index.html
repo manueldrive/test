@@ -90,7 +90,7 @@
   }
   .fs-toggle-btn:hover { transform: scale(1.08); background: rgba(13, 13, 13, 0.25); }
 
-  /* ================= UNIFIED PERSISTENT NAVIGATION ================= */
+  /* ================= MINIMAL BORDERLESS CHEVRON NAVIGATION ================= */
   .persistent-nav-shell {
     position: absolute;
     left: 0;
@@ -103,36 +103,39 @@
     padding: 0 clamp(16px, 4vw, 40px);
     pointer-events: none;
   }
-  .shell-nav-btn {
+  .minimal-arrow-btn {
     pointer-events: auto;
-    width: 46px;
-    height: 46px;
-    border-radius: 50%;
-    background: #FFF;
+    background: none;
+    border: none;
+    padding: 10px 14px;
     color: var(--ink);
-    border: 3px solid var(--ink);
-    box-shadow: 3px 3px 0 var(--ink);
-    font-size: 16px;
+    font-size: clamp(22px, 3vh, 28px);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.14s ease;
+    opacity: 0.55;
+    transition: opacity 0.2s ease, transform 0.2s ease, color 0.2s ease;
   }
-  .shell-nav-btn:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
-  .shell-nav-btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
-  .shell-nav-btn.disabled {
-    opacity: 0.25;
+  .app-viewport.tx-light .minimal-arrow-btn {
+    color: #FFF;
+  }
+  .minimal-arrow-btn:hover {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+  .minimal-arrow-btn.disabled {
+    opacity: 0.15;
     pointer-events: none;
-    box-shadow: none;
   }
-  .shell-nav-btn.ready {
-    background: var(--yellow) !important;
-    animation: gentlePulse 2s infinite ease-in-out;
+  .minimal-arrow-btn.ready {
+    opacity: 1;
+    color: var(--yellow) !important;
   }
-  .shell-nav-btn.shake-warn {
+  .minimal-arrow-btn.shake-warn {
     animation: shakeX 0.45s !important;
-    background: var(--yellow) !important;
+    opacity: 1;
+    color: var(--yellow) !important;
   }
 
   /* CONTEXTUAL FLOATING ISLAND (Word Work & Selection) */
@@ -766,12 +769,12 @@
 
   <div class="stage" id="stage"></div>
 
-  <!-- PERSISTENT SHELL FOR NAVIGATION -->
+  <!-- PERSISTENT MINIMAL CHEVRON NAVIGATION SHELL -->
   <div class="persistent-nav-shell">
-    <button class="shell-nav-btn" id="shellPrevBtn" onclick="goPrev()" aria-label="Previous">
+    <button class="minimal-arrow-btn" id="shellPrevBtn" onclick="goPrev()" aria-label="Previous">
       <i class="fa-solid fa-chevron-left"></i>
     </button>
-    <button class="shell-nav-btn" id="shellNextBtn" onclick="handleForwardAttempt()" aria-label="Next">
+    <button class="minimal-arrow-btn" id="shellNextBtn" onclick="handleForwardAttempt()" aria-label="Next">
       <i class="fa-solid fa-chevron-right"></i>
     </button>
   </div>
@@ -907,7 +910,7 @@ function passageWordsHTML(){
 
 function versePickHTML(){
   return passage.map((v,i)=>`
-    <div class="verse-tile" data-v="${i+21}" onclick="tapVerseTile(event, this, ${i+21})">
+    <div class="verse-tile" data-v="${i+21}" onclick="tapVerseTile(event, ${i+21})">
       <div class="vnum">${i+21}</div><div class="vtext">${v}</div>
     </div>`).join('');
 }
@@ -1177,21 +1180,21 @@ function updateHeaderMeta(){
   }
 }
 
-/* ================= UPDATE UI & CONTEXT ISLAND ================= */
+/* ================= UPDATE CONTEXT ISLAND & MINIMAL CHEVRONS ================= */
 function isVocabComplete(){
   return state.wordTaps.length > 0 && state.scrolledToEnd;
 }
 
-function updateContextIsland(){
-  const island = document.getElementById('floatingContextIsland');
+function updateNavShell(){
   const prevBtn = document.getElementById('shellPrevBtn');
   const nextBtn = document.getElementById('shellNextBtn');
+  const island = document.getElementById('floatingContextIsland');
   const b = beats[state.index];
 
   // Configure Previous Button
   prevBtn.classList.toggle('disabled', state.index === 0);
 
-  // Configure Next Intent
+  // Configure Next Intent (lights up yellow when ready)
   let ready = false;
   if (b.id === 'vocab-scan') ready = isVocabComplete();
   else if (b.id === 'char-verse-pick') ready = state.charVerse !== null;
@@ -1199,7 +1202,7 @@ function updateContextIsland(){
   else ready = !b.blockTap;
   nextBtn.classList.toggle('ready', ready);
 
-  // Slide specific islands
+  // Contextual Floating Tool Island for interaction slides
   if (b.id === 'vocab-scan') {
     island.style.display = 'flex';
     const isDone = isVocabComplete();
@@ -1253,7 +1256,7 @@ function renderBeat(i){
   }
 
   updateHeaderMeta();
-  updateContextIsland();
+  updateNavShell();
 
   if (b.id === 'char-coaching') {
     const activeVerse = state.charVerse || 21;
@@ -1299,7 +1302,7 @@ function setPassageHighlighter(color, btnEl){
   } else {
     state.activeTool.vocab = color;
   }
-  updateContextIsland();
+  updateNavShell();
 }
 
 function tapWord(e, el){
@@ -1332,14 +1335,14 @@ function tapWord(e, el){
       state.wordTaps.push({ el, word, def, isStop, key });
     }
   }
-  updateContextIsland();
+  updateNavShell();
 }
 
-function tapVerseTile(e, el, v){
+function tapVerseTile(e, v){
   e.stopPropagation();
   state.charVerse = v;
   document.querySelectorAll('.verse-tile').forEach(t=>t.classList.toggle('selected', Number(t.dataset.v)===v));
-  updateContextIsland();
+  updateNavShell();
 }
 
 function checkPassageScroll(){
@@ -1348,7 +1351,7 @@ function checkPassageScroll(){
   const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 45;
   if (atBottom && !state.scrolledToEnd) {
     state.scrolledToEnd = true;
-    updateContextIsland();
+    updateNavShell();
   }
 }
 
@@ -1390,7 +1393,7 @@ function renderVocabReview(){
 
 function handleCustomTrait(val){ 
   state.trait = val; 
-  updateContextIsland();
+  updateNavShell();
 }
 
 function renderFinalReflection(){
