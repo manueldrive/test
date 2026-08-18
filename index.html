@@ -60,7 +60,7 @@
     -webkit-touch-callout: none;
   }
 
-  /* FULLSCREEN BUTTON */
+  /* FULLSCREEN BUTTON (HIDDEN ON MOBILE) */
   .fs-toggle-btn {
     position: absolute;
     top: 14px;
@@ -79,6 +79,9 @@
     justify-content: center;
     backdrop-filter: blur(8px);
     transition: all 0.2s ease;
+  }
+  @media (max-width: 767px) {
+    .fs-toggle-btn { display: none !important; }
   }
   .app-viewport.tx-light .fs-toggle-btn {
     background: rgba(255, 255, 255, 0.15);
@@ -178,6 +181,25 @@
   @keyframes notchPulse{ 0%,100%{ transform:translate(-50%, -50%) scale(1); } 50%{ transform:translate(-50%, -50%) scale(1.25); } }
 
   .story-meta{ display:flex; justify-content:space-between; font-family:'Space Grotesk', sans-serif; font-size:12px; font-weight:800; letter-spacing:1.2px; text-transform:uppercase; opacity:.85; padding-right: 48px; }
+  @media (max-width: 767px) {
+    .story-meta { padding-right: 0; }
+  }
+  .story-meta .meta-link-btn{
+    background: none;
+    border: none;
+    padding: 0;
+    color: inherit;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    letter-spacing: inherit;
+    text-transform: inherit;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    opacity: 0.9;
+  }
+  .story-meta .meta-link-btn:hover{ opacity: 1; }
 
   /* STAGE */
   .stage{ 
@@ -240,7 +262,7 @@
     .emoji{ font-size:56px; margin-bottom:10px; }
   }
 
-  /* SLIDE 1: TESTAMENT CARDS (OT BALANCED ~60/40 SPLIT ON DESKTOP) */
+  /* SLIDE 1: TESTAMENT CARDS */
   .testament-deck {
     display: flex;
     flex-direction: column;
@@ -336,7 +358,7 @@
     .testament-deck .deck-card { min-height: 380px; padding: 32px 28px; }
   }
 
-  /* SLIDE 3: RECAP (SCALED UP CIRCLE & MANILA FOLDER ON DESKTOP) */
+  /* SLIDE 3: RECAP */
   .set-scene-grid {
     display: flex;
     flex-direction: column;
@@ -386,7 +408,7 @@
     .blank-input{ font-size:clamp(24px, 3.2vh, 32px); border-bottom-width:4px; }
   }
 
-  /* SLIDE 4: PRAYER (NO CONCENTRIC RINGS) */
+  /* SLIDE 4: PRAYER */
   .breath-visual{ position:relative; width: clamp(200px, 30vh, 300px); height: clamp(200px, 30vh, 300px); margin: 0 auto; flex-shrink:0; }
   .breath-circle{ position:absolute; inset:0; border-radius:50%; background:#C9B8E8; border:4px solid var(--ink); box-shadow:0 0 26px rgba(168,85,247,0.25); transform:scale(0.8); z-index:2; }
   .beat.active .breath-circle{ animation:breathe 9s ease-in-out infinite; }
@@ -650,7 +672,7 @@
     .review-scroll .review-section-header:first-child{ margin-top:0; }
   }
 
-  /* SLIDE 8: CROSS REFS (ENLARGED ON DESKTOP) */
+  /* SLIDE 8: CROSS REFS */
   .xref-compact-list{ flex:1; display:flex; flex-direction:column; justify-content:center; gap:clamp(16px, 3vh, 26px); position:relative; z-index:2; width:100%; max-width:1200px; margin:0 auto; }
   .xref-item{ display:flex; gap:18px; align-items:center; position:relative; background:#FFF; padding: clamp(16px, 2.5vh, 24px); border-radius: 18px; border: 3px solid var(--ink); box-shadow:4px 4px 0 var(--ink); }
   .xref-icon-node{ width:54px; height:54px; border-radius:50%; background:var(--lime); color:var(--ink); display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; border:2.5px solid var(--ink); }
@@ -667,7 +689,7 @@
     .xref-body{ font-size:21px; line-height:1.65; }
   }
 
-  /* SLIDE 11: CHAR COACHING (DESKTOP ENLARGED) */
+  /* SLIDE 11: CHAR COACHING */
   .dark-scripture-card{ background:var(--ink); color:#FFF; border:3.5px solid var(--ink); border-radius:20px; padding:18px 22px; box-shadow:4px 4px 0 rgba(0,0,0,0.25); position:relative; z-index:2; }
   .dark-scripture-card .ref{ font-family:'Space Grotesk', sans-serif; font-size:12px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--lime); margin-bottom:6px; }
   .dark-scripture-card .vt{ font-style:normal; font-family:'Inter',sans-serif; font-weight:700; font-size:clamp(14px, 1.9vh, 16px); line-height:1.5; opacity:.95; }
@@ -677,7 +699,7 @@
     .dark-scripture-card .vt{ font-size:28px; line-height:1.65; }
   }
 
-  /* SLIDE 12: FINAL RESPONSE (DESKTOP FURTHER ENLARGED) */
+  /* SLIDE 12: FINAL RESPONSE */
   .final-reflection-grid {
     display: flex;
     flex-direction: column;
@@ -788,33 +810,6 @@
   .dev-bubble.active{ border:3px solid var(--ink); box-shadow:0 0 0 3px rgba(255,255,255,0.6); }
   .dev-bubble .note-dot{ position:absolute; top:-3px; right:-3px; width:9px; height:9px; border-radius:50%; background:var(--yellow); border:1.5px solid var(--ink); }
 
-  /* DEV CONTROLS TOP-LEFT UNCLUTTERED BAR */
-  .dev-controls-bar{
-    position: absolute;
-    top: 14px;
-    left: 18px;
-    z-index: 110;
-    display: none;
-    align-items: center;
-    gap: 12px;
-  }
-  .dev-icon-btn{
-    background: none;
-    border: none;
-    color: var(--ink);
-    font-size: 20px;
-    cursor: pointer;
-    padding: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0.7;
-    transition: all 0.15s ease;
-  }
-  .app-viewport.tx-light .dev-icon-btn { color: #FFF; }
-  .dev-icon-btn:hover { opacity: 1; transform: scale(1.15); }
-  .dev-close-icon { font-size: 19px; font-weight: 900; font-family: 'Space Grotesk', sans-serif; }
-
   /* DEV MODE: notes panel */
   .dev-notes-overlay{ position:absolute; inset:0; z-index:200; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; padding:24px; }
   .dev-notes-panel{ background:#fff; color:var(--ink); border:4px solid var(--ink); border-radius:20px; padding:20px; width:100%; max-width:520px; max-height:85vh; overflow-y:auto; box-shadow:6px 6px 0 var(--ink); display:flex; flex-direction:column; gap:12px; font-family:'Inter',sans-serif; }
@@ -835,14 +830,6 @@
     <i class="fa-solid fa-expand" id="fsIcon"></i>
   </button>
 
-  <!-- REPOSITIONED DEV MODE ICONS IN TOP-LEFT (NO OVERLAYS) -->
-  <div class="dev-controls-bar" id="devControlsBar">
-    <button class="dev-icon-btn dev-close-icon" onclick="exitDevMode()" title="Exit Dev Mode">✕</button>
-    <button class="dev-icon-btn" onclick="openDevNotesPanel()" title="Slide Notes">
-      <i class="fa-solid fa-pen-to-square"></i>
-    </button>
-  </div>
-
   <div class="bottom-nav-arrows" id="bottomNavArrows">
     <button class="corner-nav-btn prev" onclick="goPrev()" aria-label="Previous">
       <i class="fa-solid fa-chevron-left"></i>
@@ -860,7 +847,10 @@
       <div class="notches-layer" id="notchesLayer"></div>
     </div>
     <div class="dev-bubbles-bar" id="devBubblesBar" style="display:none;"></div>
-    <div class="story-meta" id="storyMetaRow"><span id="sectionLabel">Dwell</span><span>Mark 1:21–45</span></div>
+    <div class="story-meta" id="storyMetaRow">
+      <span id="sectionLabel">Dwell</span>
+      <span id="scriptureMeta">Mark 1:21–45</span>
+    </div>
   </div>
   <div class="stage" id="stage"></div>
 
@@ -1007,7 +997,7 @@ const beats = [
             <div class="intro-duration"><i class="fa-regular fa-clock"></i> Prep Duration: 5 min</div>
           </div>` },
 
-  /* 1. LOCATE MARK: TESTAMENT (OT ~60/40 ON DESKTOP) */
+  /* 1. LOCATE MARK: TESTAMENT */
   { id:'quest-testament', type:'input', blockTap:true, isInteractive:true, clue:'Pick an answer', bgGrad:'var(--bg-teal)', text:'light',
     html:`<div class="sketch-lead-title">Locate: Mark</div>
           <div class="testament-deck" id="questTestamentGrid">
@@ -1054,7 +1044,7 @@ const beats = [
             </div>
           </div>` },
 
-  /* 3. RECAP (GOD IS ON LEFT, MANILA FOLDER ON RIGHT) */
+  /* 3. RECAP */
   { id:'reveal-context', type:'tapAuto', isInteractive:false, bgGrad:'var(--bg-teal)', text:'light', align:'start',
     html:`<div class="sketch-lead-title" style="margin-bottom:12px;">Recap</div>
           <div class="set-scene-grid">
@@ -1172,7 +1162,7 @@ const beats = [
             </div>
           </div>` },
 
-  /* 10. VERSE PICK (NO ARROWS) */
+  /* 10. VERSE PICK */
   { id:'char-verse-pick', type:'input', blockTap:true, isInteractive:true, clue:'Select a verse', bgGrad:'var(--bg-cream)', text:'dark',
     html:`<div class="full-page">
             <div class="verse-pick-list">${versePickHTML()}</div>
@@ -1201,7 +1191,7 @@ const beats = [
             </div>
           </div>` },
 
-  /* 12. FINAL (TITLE: HOW SHOULD WE RESPOND?, HUD: LIVE) */
+  /* 12. FINAL (HOW SHOULD WE RESPOND?) */
   { id:'final', type:'input', blockTap:true, isInteractive:false, bgGrad:'var(--bg-cream)', text:'dark', align:'start',
     html:`<div class="sketch-lead-title" style="margin-bottom:8px;">How should we respond?</div>
           <div class="final-reflection-grid">
@@ -1273,6 +1263,20 @@ beats.forEach((b,i)=>{
   stage.appendChild(div);
 });
 
+function updateHeaderMeta(){
+  const labelEl = document.getElementById('sectionLabel');
+  const scriptureEl = document.getElementById('scriptureMeta');
+  if (!labelEl || !scriptureEl) return;
+
+  if (devMode) {
+    labelEl.innerHTML = `<button class="meta-link-btn" onclick="event.stopPropagation(); openDevNotesPanel();">Notes</button>`;
+    scriptureEl.innerHTML = `<button class="meta-link-btn" onclick="event.stopPropagation(); exitDevMode();">Close</button>`;
+  } else {
+    labelEl.textContent = sectionLabels[state.index] || '';
+    scriptureEl.textContent = 'Mark 1:21–45';
+  }
+}
+
 function renderBeat(i){
   document.querySelectorAll('.beat').forEach(el=>el.classList.remove('active'));
   document.getElementById(`beat-${i}`).classList.add('active');
@@ -1290,7 +1294,7 @@ function renderBeat(i){
     document.getElementById('hudHeader').className = 'hud-header tx-dark';
   }
 
-  document.getElementById('sectionLabel').textContent = sectionLabels[i] || '';
+  updateHeaderMeta();
 
   // Toggle navigation arrows visibility for passage & verse pick slides
   const navArrows = document.getElementById('bottomNavArrows');
@@ -1721,7 +1725,7 @@ function enterDevMode(){
   devMode = true;
   document.getElementById('normalProgressWrap').style.display = 'none';
   document.getElementById('devBubblesBar').style.display = 'flex';
-  document.getElementById('devControlsBar').style.display = 'flex';
+  updateHeaderMeta();
   renderDevBubbles();
 }
 
@@ -1729,7 +1733,7 @@ function exitDevMode(){
   devMode = false;
   document.getElementById('normalProgressWrap').style.display = 'block';
   document.getElementById('devBubblesBar').style.display = 'none';
-  document.getElementById('devControlsBar').style.display = 'none';
+  updateHeaderMeta();
   closeDevNotesPanel();
 }
 
