@@ -60,7 +60,7 @@
     -webkit-touch-callout: none;
   }
 
-  /* FULLSCREEN BUTTON (HIDDEN ON MOBILE) */
+  /* FULLSCREEN BUTTON (DESKTOP ONLY) */
   .fs-toggle-btn {
     position: absolute;
     top: 14px;
@@ -90,69 +90,163 @@
   }
   .fs-toggle-btn:hover { transform: scale(1.08); background: rgba(13, 13, 13, 0.25); }
 
-  /* CORNER CHEVRONS */
-  .bottom-nav-arrows {
+  /* ================= UNIFIED PERSISTENT NAVIGATION ================= */
+  .persistent-nav-shell {
     position: absolute;
-    left: 50%;
-    bottom: clamp(14px, 3vh, 24px);
-    transform: translateX(-50%);
+    left: 0;
+    right: 0;
+    bottom: clamp(14px, 2.5vh, 22px);
+    z-index: 90;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 clamp(16px, 4vw, 40px);
+    pointer-events: none;
+  }
+  .shell-nav-btn {
+    pointer-events: auto;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: #FFF;
+    color: var(--ink);
+    border: 3px solid var(--ink);
+    box-shadow: 3px 3px 0 var(--ink);
+    font-size: 16px;
+    cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 36px;
-    z-index: 90;
-    transition: opacity 0.2s ease, visibility 0.2s ease;
+    justify-content: center;
+    transition: all 0.14s ease;
   }
-  .bottom-nav-arrows.hidden-nav {
-    opacity: 0;
-    visibility: hidden;
+  .shell-nav-btn:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+  .shell-nav-btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+  .shell-nav-btn.disabled {
+    opacity: 0.25;
     pointer-events: none;
+    box-shadow: none;
   }
-  .corner-nav-btn {
-    position: static;
-    width: auto;
-    height: auto;
-    background: none;
-    border: none;
-    color: var(--ink);
-    font-size: 20px;
-    cursor: pointer;
-    padding: 10px;
-    opacity: .5;
-    transition: opacity 0.2s ease, transform 0.2s ease;
-    animation: none;
+  .shell-nav-btn.ready {
+    background: var(--yellow) !important;
+    animation: gentlePulse 2s infinite ease-in-out;
   }
-  .app-viewport.tx-light .corner-nav-btn {
-    background: none;
-    border: none;
-    color: #FFF;
+  .shell-nav-btn.shake-warn {
+    animation: shakeX 0.45s !important;
+    background: var(--yellow) !important;
   }
-  .corner-nav-btn:hover { transform: scale(1.15); opacity: 1; background:none; }
-  .corner-nav-btn.prev i{ animation: nudgeLeft 1.6s ease-in-out infinite; }
-  .corner-nav-btn.next i{ animation: nudgeRight 1.6s ease-in-out infinite; }
-  @keyframes nudgeLeft{ 0%,100%{ transform:translateX(0); opacity:.5; } 50%{ transform:translateX(-5px); opacity:1; } }
-  @keyframes nudgeRight{ 0%,100%{ transform:translateX(0); opacity:.5; } 50%{ transform:translateX(5px); opacity:1; } }
-  
-  .nav-subtle-caption{
+
+  /* CONTEXTUAL FLOATING ISLAND (Word Work & Selection) */
+  .floating-context-island {
     position: absolute;
     left: 50%;
-    bottom: clamp(-4px, 0.2vh, 2px);
+    bottom: clamp(14px, 2.5vh, 22px);
     transform: translateX(-50%);
-    font-family:'Space Grotesk', sans-serif; font-size:10px; font-weight:700; letter-spacing:.8px; text-transform:uppercase; opacity:.55;
-    white-space: nowrap;
-    z-index: 90;
-    pointer-events: none;
+    z-index: 95;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    pointer-events: auto;
   }
+  .tools-capsule {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 3px solid var(--ink);
+    border-radius: 100px;
+    padding: 5px 8px;
+    box-shadow: 3.5px 3.5px 0 var(--ink);
+    backdrop-filter: blur(8px);
+  }
+  .hl-mini-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #FFF;
+    color: var(--ink);
+    border: 2px solid var(--ink);
+    border-radius: 100px;
+    padding: 7px 11px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 11.5px;
+    cursor: pointer;
+    transition: all 0.12s ease;
+    white-space: nowrap;
+  }
+  .hl-mini-btn:hover { background: #F4F0E8; }
+  .hl-mini-btn.active {
+    border-width: 2.5px;
+    transform: scale(0.96);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.18);
+  }
+  .hl-mini-btn[data-color="blue"].active { background: rgba(56,189,248,0.3); }
+  .hl-mini-btn[data-color="green"].active { background: rgba(34,197,94,0.3); }
+  .hl-mini-btn[data-color="yellow"].active { background: rgba(255,199,44,0.4); }
+  .hl-mini-btn[data-color="pink"].active { background: rgba(244,63,94,0.3); }
+
+  .hl-swatch {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 1.5px solid var(--ink);
+    flex-shrink: 0;
+  }
+  .hl-swatch-blue{ background:var(--blue); }
+  .hl-swatch-green{ background:var(--green); }
+  .hl-swatch-yellow{ background:var(--yellow); }
+  .hl-swatch-pink{ background:var(--pink); }
+
+  .action-gate-pill {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    background: #FFF;
+    color: var(--ink);
+    border: 3px solid var(--ink);
+    border-radius: 100px;
+    padding: 10px 20px;
+    cursor: pointer;
+    box-shadow: 3.5px 3.5px 0 var(--ink);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+  }
+  .action-gate-pill:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+  .action-gate-pill.ready {
+    background: var(--yellow) !important;
+    color: var(--ink) !important;
+    animation: gentlePulse 2s infinite ease-in-out;
+  }
+  .action-gate-pill.shake-warn {
+    animation: shakeX 0.45s !important;
+    background: var(--yellow) !important;
+    color: var(--ink) !important;
+  }
+
+  @keyframes gentlePulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+  }
+  @keyframes shakeX{ 10%,90%{transform:translateX(-3px);} 20%,80%{transform:translateX(5px);} 30%,50%{transform:translateX(-8px);} 40%,60%{transform:translateX(8px);} }
+
+  /* FLOATING NOTICE BADGE */
   .clue-badge{
     position: absolute;
     left: 50%;
-    bottom: clamp(75px, 11vh, 95px);
+    bottom: clamp(76px, 12vh, 96px);
     transform: translateX(-50%);
     display: flex; align-items: center; gap: 8px;
     background: var(--ink); color: #FFF;
     font-family:'Space Grotesk', sans-serif; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: .4px;
     padding: 10px 18px; border-radius: 100px;
     box-shadow: 3px 3px 0 rgba(0,0,0,0.3);
-    z-index: 95;
+    z-index: 100;
     white-space: nowrap;
   }
   .clue-badge i{ color: var(--yellow); }
@@ -199,9 +293,8 @@
     text-underline-offset: 3px;
     opacity: 0.9;
   }
-  .story-meta .meta-link-btn:hover{ opacity: 1; }
 
-  /* STAGE */
+  /* STAGE & BEATS */
   .stage{ 
     position:relative; 
     flex:1; 
@@ -213,18 +306,18 @@
     display: flex;
     flex-direction: column;
   }
-
   .beat{ 
     position:absolute; 
     inset:0; 
     display:flex; 
     flex-direction:column; 
-    padding: clamp(12px, 2vh, 24px) clamp(20px, 4vw, 60px) clamp(60px, 8vh, 80px); 
+    padding: clamp(10px, 2vh, 24px) clamp(20px, 4vw, 60px) clamp(80px, 12vh, 100px); 
     opacity:0; 
     transform:translateY(10px) scale(0.98); 
     transition:opacity .25s ease, transform .25s ease; 
     pointer-events:none; 
     z-index:1; 
+    background: transparent !important;
   }
   .beat.active{ opacity:1; transform:translateY(0) scale(1); pointer-events:auto; z-index:2; }
   .tx-dark{ color:var(--ink); }
@@ -237,7 +330,8 @@
     letter-spacing: -0.5px;
     text-transform: uppercase;
     margin-bottom: clamp(10px, 1.8vh, 24px);
-    text-align: center;
+    text-align: left;
+    width: 100%;
   }
 
   /* INTRO SLIDE */
@@ -284,7 +378,7 @@
     }
   }
 
-  /* SLIDE 2: 5-COLUMN DECK (TIGHTENED MOBILE FIT) */
+  /* SLIDE 2: 5-COLUMN DECK */
   .sections-5-deck {
     display: flex;
     flex-direction: column;
@@ -350,7 +444,6 @@
   .deck-card.correct { background: var(--lime) !important; color: var(--ink) !important; box-shadow: 4px 4px 0 var(--ink) !important; }
   .deck-card.incorrect { background: var(--pink) !important; color: #FFF !important; }
   .deck-card.locked { pointer-events: none; }
-  @keyframes shakeX{ 10%,90%{transform:translateX(-3px);} 20%,80%{transform:translateX(5px);} 30%,50%,70%{transform:translateX(-8px);} 40%,60%{transform:translateX(8px);} }
   .deck-card.shake { animation: shakeX .45s; }
   @media (min-width: 768px) {
     .deck-card .dc-title{ font-size:clamp(22px, 3vh, 30px); }
@@ -445,7 +538,7 @@
 
   /* PASSAGE FULL WIDTH READ */
   .passage-scroll-wrap{ flex:1; position:relative; min-height:0; display:flex; width:100%; justify-content:center; }
-  .passage-scroll{ overflow-y:auto; -webkit-overflow-scrolling:touch; flex:1; padding:6px 20px 180px 0; color:var(--ink); width:100%; max-width:820px; }
+  .passage-scroll{ overflow-y:auto; -webkit-overflow-scrolling:touch; flex:1; padding:6px 20px 140px 0; color:var(--ink); width:100%; max-width:820px; }
   .flow-para{ margin:0 0 20px 0; font-size:clamp(17.5px, 2.2vh, 21px); line-height:1.75; font-family:'Inter',sans-serif; font-weight:400; max-width:820px; }
   @media (min-width: 768px) {
     .passage-scroll{ max-width:900px; }
@@ -454,9 +547,6 @@
   @media (min-width: 1400px) {
     .passage-scroll{ max-width:1600px; }
     .flow-para{ font-size:clamp(28px, 1.7vw, 36px); line-height:1.8; max-width:1600px; margin:0 0 30px 0; }
-  }
-  @media (min-width: 1024px) {
-    .passage-scroll{ padding-bottom:180px; }
   }
   .verse-num-inline{ font-family:'Space Grotesk', sans-serif; font-weight:700; color:var(--purple); font-size:.65em; vertical-align:super; margin:0 2px 0 6px; }
   
@@ -474,172 +564,6 @@
   .w.hl-green{ background: rgba(34, 197, 94, 0.40); font-weight: 700; }
   .w.hl-pink{ background: rgba(244, 63, 94, 0.40); font-weight: 700; }
 
-  /* SLIDE 6: OPTIMIZED PASSAGE BOTTOM TOOLBAR */
-  .passage-bottom-bar {
-    position: absolute;
-    left: 50%;
-    bottom: clamp(14px, 2.5vh, 24px);
-    transform: translateX(-50%);
-    z-index: 95;
-    width: auto;
-    max-width: 96vw;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 8px;
-    background: rgba(255, 255, 255, 0.95);
-    border: 3.5px solid var(--ink);
-    border-radius: 100px;
-    padding: 6px 10px;
-    box-shadow: 5px 5px 0 var(--ink);
-    backdrop-filter: blur(10px);
-  }
-  .passage-tools-group {
-    display: flex;
-    flex-direction: row;
-    gap: 6px;
-    align-items: center;
-  }
-  .passage-tools-divider {
-    width: 2px;
-    height: 26px;
-    background: rgba(13, 13, 13, 0.18);
-    margin: 0 4px;
-    flex-shrink: 0;
-  }
-  .hl-mini-btn {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: #FFF;
-    color: var(--ink);
-    border: 2px solid var(--ink);
-    border-radius: 100px;
-    padding: 8px 12px;
-    font-family: 'Space Grotesk', sans-serif;
-    font-weight: 700;
-    font-size: 12px;
-    cursor: pointer;
-    transition: all 0.12s ease;
-    white-space: nowrap;
-  }
-  .hl-mini-btn:hover { background: #F4F0E8; }
-  .hl-mini-btn.active {
-    border-width: 2.5px;
-    transform: scale(0.96);
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.18);
-  }
-  .hl-mini-btn[data-color="blue"].active { background: rgba(56,189,248,0.3); }
-  .hl-mini-btn[data-color="green"].active { background: rgba(34,197,94,0.3); }
-  .hl-mini-btn[data-color="yellow"].active { background: rgba(255,199,44,0.4); }
-  .hl-mini-btn[data-color="pink"].active { background: rgba(244,63,94,0.3); }
-
-  .hl-swatch {
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    border: 1.5px solid var(--ink);
-    flex-shrink: 0;
-  }
-  .hl-swatch-blue{ background:var(--blue); }
-  .hl-swatch-green{ background:var(--green); }
-  .hl-swatch-yellow{ background:var(--yellow); }
-  .hl-swatch-pink{ background:var(--pink); }
-
-  .passage-action-btn {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 14px;
-    font-weight: 800;
-    letter-spacing: 0.4px;
-    text-transform: uppercase;
-    background: #FFF;
-    color: var(--ink);
-    border: 2.5px solid var(--ink);
-    border-radius: 100px;
-    padding: 9px 18px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    white-space: nowrap;
-    transition: all 0.2s cubic-bezier(0.2, 0.8, 0.25, 1);
-  }
-  .passage-action-btn:active { transform: translate(2px, 2px); }
-  .passage-action-btn.ready {
-    background: var(--yellow) !important;
-    color: var(--ink) !important;
-    box-shadow: 2px 2px 0 var(--ink);
-  }
-  .passage-action-btn.shake-warn {
-    animation: shakeX 0.45s !important;
-    background: var(--yellow) !important;
-    color: var(--ink) !important;
-  }
-
-  /* MOBILE FLOATING COMPACT TOOLBAR */
-  @media (max-width: 767px) {
-    .passage-bottom-bar {
-      flex-direction: column;
-      border-radius: 24px;
-      padding: 8px 10px;
-      bottom: 12px;
-      gap: 8px;
-      width: calc(100vw - 32px);
-      max-width: 380px;
-    }
-    .passage-tools-group {
-      width: 100%;
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 4px;
-    }
-    .passage-tools-divider { display: none; }
-    .hl-mini-btn {
-      padding: 6px 4px;
-      justify-content: center;
-      font-size: 11px;
-      border-radius: 12px;
-    }
-    .hl-mini-btn .hl-swatch { width: 10px; height: 10px; }
-    .passage-action-btn {
-      width: 100%;
-      justify-content: center;
-      padding: 10px 14px;
-      font-size: 13px;
-    }
-  }
-
-  /* DOCKED ACTION PILL */
-  .docked-action-container {
-    position: absolute;
-    left: 50%;
-    bottom: clamp(20px, 4vh, 32px);
-    transform: translateX(-50%);
-    z-index: 80;
-  }
-  .focus-pill-dock{ 
-    border:3.5px solid var(--ink); 
-    border-radius:100px; 
-    padding:12px 24px; 
-    text-align:center; 
-    background:rgba(255,255,255,0.85); 
-    opacity:.7; 
-    box-shadow:3px 3px 0 rgba(13,13,13,0.3); 
-    cursor:pointer; 
-    transition:all .2s ease; 
-    display:flex; 
-    align-items:center; 
-    justify-content:center; 
-    font-family:'Space Grotesk',sans-serif; 
-    font-size:15px; 
-    font-weight:800; 
-    text-transform:uppercase; 
-    color:var(--ink); 
-    backdrop-filter: blur(8px);
-  }
-  .focus-pill-dock.ready{ opacity:1; background:var(--lime); box-shadow:4px 4px 0 var(--ink); }
-  .focus-pill-dock.warn{ animation:shakeX .45s; background:var(--yellow) !important; opacity:1 !important; color:var(--ink) !important; }
-
   .verse-pick-list{ overflow-y:auto; -webkit-overflow-scrolling:touch; flex:1; min-height:0; margin-top:0; position:relative; z-index:2; padding:4px 12px 130px 0; width:100%; max-width:860px; margin-left:auto; margin-right:auto; }
   .verse-tile{ display:flex; gap:16px; align-items:flex-start; padding:14px 16px; cursor:pointer; transition:background .13s ease; color:var(--ink); border-radius:16px; width:100%; max-width:820px; }
   .verse-tile.selected{ background:var(--lime); }
@@ -648,9 +572,6 @@
   @media (min-width: 768px) {
     .verse-pick-list{ max-width:900px; }
     .verse-tile{ max-width:900px; padding:16px 18px; }
-  }
-  @media (min-width: 1024px) {
-    .verse-pick-list{ padding-bottom:140px; }
   }
   @media (min-width: 1400px) {
     .verse-pick-list{ max-width:1600px; }
@@ -802,7 +723,7 @@
 
   .full-page{ flex:1; display:flex; flex-direction:column; min-height:0; width:100%; }
 
-  /* DEV MODE: bubble progress bar */
+  /* DEV MODE */
   .dev-bubbles-bar{ display:flex; gap:8px; overflow-x:auto; overflow-y:hidden; padding:2px 40px 6px 2px; scrollbar-width:none; }
   .dev-bubbles-bar::-webkit-scrollbar{ display:none; }
   .dev-bubble{ flex-shrink:0; width:30px; height:30px; border-radius:50%; border:2px solid rgba(0,0,0,0.25); display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk',sans-serif; font-weight:800; font-size:12px; cursor:pointer; position:relative; transition:transform .12s ease; }
@@ -810,7 +731,6 @@
   .dev-bubble.active{ border:3px solid var(--ink); box-shadow:0 0 0 3px rgba(255,255,255,0.6); }
   .dev-bubble .note-dot{ position:absolute; top:-3px; right:-3px; width:9px; height:9px; border-radius:50%; background:var(--yellow); border:1.5px solid var(--ink); }
 
-  /* DEV MODE: notes panel */
   .dev-notes-overlay{ position:absolute; inset:0; z-index:200; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; padding:24px; }
   .dev-notes-panel{ background:#fff; color:var(--ink); border:4px solid var(--ink); border-radius:20px; padding:20px; width:100%; max-width:520px; max-height:85vh; overflow-y:auto; box-shadow:6px 6px 0 var(--ink); display:flex; flex-direction:column; gap:12px; font-family:'Inter',sans-serif; }
   .dev-notes-panel h3{ font-family:'Space Grotesk',sans-serif; margin:0; font-size:16px; text-transform:uppercase; }
@@ -830,16 +750,7 @@
     <i class="fa-solid fa-expand" id="fsIcon"></i>
   </button>
 
-  <div class="bottom-nav-arrows" id="bottomNavArrows">
-    <button class="corner-nav-btn prev" onclick="goPrev()" aria-label="Previous">
-      <i class="fa-solid fa-chevron-left"></i>
-    </button>
-    <button class="corner-nav-btn next" onclick="goNext()" aria-label="Next">
-      <i class="fa-solid fa-chevron-right"></i>
-    </button>
-  </div>
   <div class="clue-badge" id="clueBadge" style="display:none;"><i class="fa-solid fa-circle-exclamation"></i><span id="clueBadgeText"></span></div>
-  <div class="nav-subtle-caption" id="navCaption"></div>
 
   <div class="hud-header" id="hudHeader">
     <div class="progress-container" id="normalProgressWrap">
@@ -852,7 +763,21 @@
       <span id="scriptureMeta">Mark 1:21–45</span>
     </div>
   </div>
+
   <div class="stage" id="stage"></div>
+
+  <!-- PERSISTENT SHELL FOR NAVIGATION -->
+  <div class="persistent-nav-shell">
+    <button class="shell-nav-btn" id="shellPrevBtn" onclick="goPrev()" aria-label="Previous">
+      <i class="fa-solid fa-chevron-left"></i>
+    </button>
+    <button class="shell-nav-btn" id="shellNextBtn" onclick="handleForwardAttempt()" aria-label="Next">
+      <i class="fa-solid fa-chevron-right"></i>
+    </button>
+  </div>
+
+  <!-- FLOATING CONTEXT ISLAND FOR INTERACTION SLIDES -->
+  <div class="floating-context-island" id="floatingContextIsland" style="display:none;"></div>
 
   <div class="dev-notes-overlay" id="devNotesOverlay" style="display:none;">
     <div class="dev-notes-panel">
@@ -998,7 +923,7 @@ const beats = [
           </div>` },
 
   /* 1. LOCATE MARK: TESTAMENT */
-  { id:'quest-testament', type:'input', blockTap:true, isInteractive:true, clue:'Pick an answer', bgGrad:'var(--bg-teal)', text:'light',
+  { id:'quest-testament', type:'input', blockTap:true, isInteractive:true, clue:'Pick an answer to continue', bgGrad:'var(--bg-teal)', text:'light',
     html:`<div class="sketch-lead-title">Locate: Mark</div>
           <div class="testament-deck" id="questTestamentGrid">
             <div class="deck-card" data-correct="false" onclick="questAnswer(event,this,'questTestamentGrid')">
@@ -1014,7 +939,7 @@ const beats = [
           </div>` },
 
   /* 2. LOCATE MARK: SECTION */
-  { id:'quest-section', type:'input', blockTap:true, isInteractive:true, clue:'Pick an answer', bgGrad:'var(--bg-teal)', text:'light',
+  { id:'quest-section', type:'input', blockTap:true, isInteractive:true, clue:'Pick an answer to continue', bgGrad:'var(--bg-teal)', text:'light',
     html:`<div class="sketch-lead-title">Locate: Mark</div>
           <div class="sections-5-deck" id="questSectionGrid">
             <div class="deck-card" data-correct="true" onclick="questAnswer(event,this,'questSectionGrid')">
@@ -1101,26 +1026,6 @@ const beats = [
             <div class="passage-scroll-wrap">
               <div class="passage-scroll" id="passageScrollEl">${passageWordsHTML()}</div>
             </div>
-            <div class="passage-bottom-bar" id="passageBottomBar">
-              <div class="passage-tools-group">
-                <button class="hl-mini-btn" data-color="blue" onclick="event.stopPropagation(); setPassageHighlighter('blue', this);">
-                  <span class="hl-swatch hl-swatch-blue"></span>Characters
-                </button>
-                <button class="hl-mini-btn" data-color="green" onclick="event.stopPropagation(); setPassageHighlighter('green', this);">
-                  <span class="hl-swatch hl-swatch-green"></span>Setting
-                </button>
-                <button class="hl-mini-btn" data-color="yellow" onclick="event.stopPropagation(); setPassageHighlighter('yellow', this);">
-                  <span class="hl-swatch hl-swatch-yellow"></span>Tricky
-                </button>
-                <button class="hl-mini-btn" data-color="pink" onclick="event.stopPropagation(); setPassageHighlighter('pink', this);">
-                  <span class="hl-swatch hl-swatch-pink"></span>Repeated
-                </button>
-              </div>
-              <div class="passage-tools-divider"></div>
-              <button class="passage-action-btn" id="bibleKeyBtn" onclick="event.stopPropagation(); handleBibleNavClick();">
-                <span id="bibleKeyBtnText">Highlight Key Words</span>
-              </button>
-            </div>
           </div>` },
 
   /* 7. GLOSSARY REVIEW */
@@ -1163,18 +1068,13 @@ const beats = [
           </div>` },
 
   /* 10. VERSE PICK */
-  { id:'char-verse-pick', type:'input', blockTap:true, isInteractive:true, clue:'Select a verse', bgGrad:'var(--bg-cream)', text:'dark',
+  { id:'char-verse-pick', type:'input', blockTap:true, isInteractive:true, clue:'Select a verse to continue', bgGrad:'var(--bg-cream)', text:'dark',
     html:`<div class="full-page">
             <div class="verse-pick-list">${versePickHTML()}</div>
-            <div class="docked-action-container">
-              <div class="focus-pill-dock" id="charPill" onclick="event.stopPropagation(); tryAdvanceChar();">
-                <span id="charPillText">Spot a God Shot</span>
-              </div>
-            </div>
           </div>` },
 
   /* 11. GOD SHOT COACHING */
-  { id:'char-coaching', type:'input', blockTap:true, isInteractive:true, clue:'Fill in the blank', bgGrad:'var(--bg-orange)', text:'dark',
+  { id:'char-coaching', type:'input', blockTap:true, isInteractive:true, clue:'Fill in the blank to continue', bgGrad:'var(--bg-orange)', text:'dark',
     html:`<div class="set-scene-grid">
             <div style="display:flex; flex-direction:column; gap:14px; width:100%;">
               <div class="dark-scripture-card">
@@ -1254,11 +1154,11 @@ function updateProgressBar(){
 
 const stage = document.getElementById('stage');
 const phoneEl = document.getElementById('phone');
+
 beats.forEach((b,i)=>{
   const div=document.createElement('div');
   div.className = `beat ${b.text === 'light' ? 'tx-light' : 'tx-dark'}`;
   div.id = `beat-${i}`;
-  div.style.background = b.bgGrad;
   div.innerHTML = b.html;
   stage.appendChild(div);
 });
@@ -1274,6 +1174,64 @@ function updateHeaderMeta(){
   } else {
     labelEl.textContent = sectionLabels[state.index] || '';
     scriptureEl.textContent = 'Mark 1:21–45';
+  }
+}
+
+/* ================= UPDATE UI & CONTEXT ISLAND ================= */
+function isVocabComplete(){
+  return state.wordTaps.length > 0 && state.scrolledToEnd;
+}
+
+function updateContextIsland(){
+  const island = document.getElementById('floatingContextIsland');
+  const prevBtn = document.getElementById('shellPrevBtn');
+  const nextBtn = document.getElementById('shellNextBtn');
+  const b = beats[state.index];
+
+  // Configure Previous Button
+  prevBtn.classList.toggle('disabled', state.index === 0);
+
+  // Configure Next Intent
+  let ready = false;
+  if (b.id === 'vocab-scan') ready = isVocabComplete();
+  else if (b.id === 'char-verse-pick') ready = state.charVerse !== null;
+  else if (b.id === 'char-coaching') ready = Boolean(state.trait && state.trait.trim());
+  else ready = !b.blockTap;
+  nextBtn.classList.toggle('ready', ready);
+
+  // Slide specific islands
+  if (b.id === 'vocab-scan') {
+    island.style.display = 'flex';
+    const isDone = isVocabComplete();
+    island.innerHTML = `
+      <div class="tools-capsule">
+        <button class="hl-mini-btn ${state.activeTool.vocab === 'blue' ? 'active' : ''}" data-color="blue" onclick="event.stopPropagation(); setPassageHighlighter('blue', this);">
+          <span class="hl-swatch hl-swatch-blue"></span>Char
+        </button>
+        <button class="hl-mini-btn ${state.activeTool.vocab === 'green' ? 'active' : ''}" data-color="green" onclick="event.stopPropagation(); setPassageHighlighter('green', this);">
+          <span class="hl-swatch hl-swatch-green"></span>Set
+        </button>
+        <button class="hl-mini-btn ${state.activeTool.vocab === 'yellow' ? 'active' : ''}" data-color="yellow" onclick="event.stopPropagation(); setPassageHighlighter('yellow', this);">
+          <span class="hl-swatch hl-swatch-yellow"></span>Tricky
+        </button>
+        <button class="hl-mini-btn ${state.activeTool.vocab === 'pink' ? 'active' : ''}" data-color="pink" onclick="event.stopPropagation(); setPassageHighlighter('pink', this);">
+          <span class="hl-swatch hl-swatch-pink"></span>Repeat
+        </button>
+      </div>
+      <button class="action-gate-pill ${isDone ? 'ready' : ''}" id="vocabActionPill" onclick="event.stopPropagation(); handleForwardAttempt();">
+        ${isDone ? '<i class="fa-solid fa-check"></i> Continue' : 'Highlight Key Words'}
+      </button>
+    `;
+  } else if (b.id === 'char-verse-pick') {
+    island.style.display = 'flex';
+    const isPicked = state.charVerse !== null;
+    island.innerHTML = `
+      <button class="action-gate-pill ${isPicked ? 'ready' : ''}" id="verseActionPill" onclick="event.stopPropagation(); handleForwardAttempt();">
+        ${isPicked ? '<i class="fa-solid fa-check"></i> Continue' : 'Spot a God Shot'}
+      </button>
+    `;
+  } else {
+    island.style.display = 'none';
   }
 }
 
@@ -1295,13 +1253,7 @@ function renderBeat(i){
   }
 
   updateHeaderMeta();
-
-  // Toggle navigation arrows visibility for passage & verse pick slides
-  const navArrows = document.getElementById('bottomNavArrows');
-  if (navArrows) {
-    if (b.id === 'vocab-scan' || b.id === 'char-verse-pick') navArrows.classList.add('hidden-nav');
-    else navArrows.classList.remove('hidden-nav');
-  }
+  updateContextIsland();
 
   if (b.id === 'char-coaching') {
     const activeVerse = state.charVerse || 21;
@@ -1313,16 +1265,13 @@ function renderBeat(i){
     if (inp) inp.value = state.trait || '';
   } else if (b.id === 'char-verse-pick') {
     document.querySelectorAll('#beat-'+i+' .verse-tile').forEach(t=>t.classList.toggle('selected', state.charVerse !== null && Number(t.dataset.v)===state.charVerse));
-    updateCharPill();
   } else if (b.id === 'vocab-scan') {
-    updateWordUI();
     checkPassageScroll();
   }
 
   if (b.id === 'final') renderFinalReflection();
   if (b.id === 'vocab-review') renderVocabReview();
   updateProgressBar();
-  resetArrows();
   if (devMode) renderDevBubbles();
 }
 
@@ -1347,12 +1296,10 @@ function questAnswer(e, el, gridId){
 function setPassageHighlighter(color, btnEl){
   if (state.activeTool.vocab === color) {
     state.activeTool.vocab = null;
-    btnEl.classList.remove('active');
   } else {
     state.activeTool.vocab = color;
-    document.querySelectorAll('#passageBottomBar .hl-mini-btn').forEach(b => b.classList.remove('active'));
-    btnEl.classList.add('active');
   }
+  updateContextIsland();
 }
 
 function tapWord(e, el){
@@ -1385,68 +1332,14 @@ function tapWord(e, el){
       state.wordTaps.push({ el, word, def, isStop, key });
     }
   }
-  updateWordUI();
+  updateContextIsland();
 }
 
 function tapVerseTile(e, el, v){
   e.stopPropagation();
-  pickCharVerse(e, v);
-}
-
-function updateWordUI(){
-  checkVocabComplete();
-}
-
-function isVocabComplete(){
-  return state.wordTaps.length > 0 && state.scrolledToEnd;
-}
-
-function checkVocabComplete(){
-  const btn = document.getElementById('bibleKeyBtn');
-  const txt = document.getElementById('bibleKeyBtnText');
-  if (!btn || !txt) return;
-
-  const ready = isVocabComplete();
-  btn.classList.toggle('ready', ready);
-  
-  if (ready) {
-    txt.innerHTML = 'Continue <i class="fa-solid fa-arrow-right"></i>';
-  } else {
-    txt.innerHTML = 'Highlight Key Words';
-  }
-}
-
-let noticeTimeout = null;
-function handleBibleNavClick(){
-  const btn = document.getElementById('bibleKeyBtn');
-  const txt = document.getElementById('bibleKeyBtnText');
-
-  if (isVocabComplete()) {
-    goNext();
-  } else {
-    if (btn && txt) {
-      btn.classList.remove('shake-warn');
-      void btn.offsetWidth;
-      btn.classList.add('shake-warn');
-      
-      let noticeMsg = 'Highlight key words to continue!';
-      if (state.wordTaps.length === 0 && !state.scrolledToEnd) {
-        noticeMsg = 'Highlight a word & scroll down!';
-      } else if (state.wordTaps.length === 0) {
-        noticeMsg = 'Highlight at least 1 word!';
-      } else if (!state.scrolledToEnd) {
-        noticeMsg = 'Scroll to the bottom first!';
-      }
-
-      txt.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> ${noticeMsg}`;
-
-      clearTimeout(noticeTimeout);
-      noticeTimeout = setTimeout(() => {
-        btn.classList.remove('shake-warn');
-        checkVocabComplete();
-      }, 2000);
-    }
-  }
+  state.charVerse = v;
+  document.querySelectorAll('.verse-tile').forEach(t=>t.classList.toggle('selected', Number(t.dataset.v)===v));
+  updateContextIsland();
 }
 
 function checkPassageScroll(){
@@ -1455,7 +1348,7 @@ function checkPassageScroll(){
   const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 45;
   if (atBottom && !state.scrolledToEnd) {
     state.scrolledToEnd = true;
-    checkVocabComplete();
+    updateContextIsland();
   }
 }
 
@@ -1495,28 +1388,10 @@ function renderVocabReview(){
   box.innerHTML = html;
 }
 
-function pickCharVerse(e, v){
-  e.stopPropagation();
-  state.charVerse = v;
-  document.querySelectorAll('.verse-tile').forEach(t=>t.classList.toggle('selected', Number(t.dataset.v)===v));
-  updateCharPill();
+function handleCustomTrait(val){ 
+  state.trait = val; 
+  updateContextIsland();
 }
-
-function updateCharPill(){
-  const pill = document.getElementById('charPill');
-  const textEl = document.getElementById('charPillText');
-  if (!pill || !textEl) return;
-  const ready = state.charVerse !== null;
-  pill.classList.toggle('ready', ready);
-  if (ready) textEl.innerHTML = '<i class="fa-solid fa-check"></i> Continue';
-  else textEl.textContent = "Spot a God Shot";
-}
-
-function tryAdvanceChar(){
-  if (state.charVerse !== null) goNext();
-}
-
-function handleCustomTrait(val){ state.trait = val; }
 
 function renderFinalReflection(){
   const trait = state.trait && state.trait.trim() ? state.trait.trim() : 'Holy';
@@ -1575,50 +1450,59 @@ function showBadgeClue(text){
   }, 2200);
 }
 
-function triggerSelectionClue(){
-  const b = beats[state.index];
-
-  if (b.id === 'vocab-scan') {
-    handleBibleNavClick();
-    return;
+function triggerGateShake(msg, elementId){
+  const el = document.getElementById(elementId) || document.getElementById('shellNextBtn');
+  if (el) {
+    el.classList.remove('shake-warn');
+    void el.offsetWidth;
+    el.classList.add('shake-warn');
+    setTimeout(() => el.classList.remove('shake-warn'), 600);
   }
-
-  if (b.id === 'char-verse-pick') {
-    const pill = document.getElementById('charPill');
-    const txt = document.getElementById('charPillText');
-    if (pill && txt) {
-      pill.classList.add('warn');
-      txt.textContent = 'Tap a verse to select!';
-      setTimeout(() => { pill.classList.remove('warn'); updateCharPill(); }, 1800);
-      return;
-    }
-  }
-
-  showBadgeClue(b.clue || 'Make a selection');
+  showBadgeClue(msg);
 }
 
-function resetArrows(){
-  const badge = document.getElementById('clueBadge');
-  if (badge) badge.style.display = 'none';
-  clearTimeout(clueTimeout);
-  const caption = document.getElementById('navCaption');
-  if (caption) caption.textContent = state.index === 0 ? 'Swipe to navigate' : '';
+function handleForwardAttempt(){
+  const b = beats[state.index];
+  if (b.blockTap) {
+    if ((b.id === 'quest-testament' || b.id === 'quest-section') && !answeredBeats.has(state.index)) { 
+      triggerGateShake('Pick an answer to continue'); 
+      return; 
+    }
+    if (b.id === 'vocab-scan') {
+      if (!state.wordTaps.length && !state.scrolledToEnd) {
+        triggerGateShake('Highlight at least 1 word & scroll down!', 'vocabActionPill');
+        return;
+      } else if (!state.wordTaps.length) {
+        triggerGateShake('Highlight at least 1 word!', 'vocabActionPill');
+        return;
+      } else if (!state.scrolledToEnd) {
+        triggerGateShake('Scroll to the bottom first!', 'vocabActionPill');
+        return;
+      }
+    }
+    if (b.id === 'char-verse-pick' && state.charVerse === null) { 
+      triggerGateShake('Tap a verse to select!', 'verseActionPill'); 
+      return; 
+    }
+    if (b.id === 'char-coaching' && !(state.trait && state.trait.trim())) { 
+      triggerGateShake('Fill in the blank to continue!'); 
+      return; 
+    }
+  }
+  goNext();
 }
 
 function goNext(){
-  const b = beats[state.index];
-  if (b.blockTap) {
-    if ((b.id === 'quest-testament' || b.id === 'quest-section') && !answeredBeats.has(state.index)) { triggerSelectionClue(); return; }
-    if (b.id === 'vocab-scan' && !isVocabComplete()) { triggerSelectionClue(); return; }
-    if (b.id === 'char-verse-pick' && state.charVerse === null) { triggerSelectionClue(); return; }
-    if (b.id === 'char-coaching' && !(state.trait && state.trait.trim())) { triggerSelectionClue(); return; }
-  }
   if (state.index < beats.length - 1) {
     state.index++; renderBeat(state.index);
   }
 }
 
-function goPrev(){ if (state.index > 0) { state.index--; renderBeat(state.index); } }
+function goPrev(){ 
+  if (state.index > 0) { 
+    state.index--; renderBeat(state.index); 
+  } 
+}
 
 function toggleFullScreen() {
   if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(err => console.log(err));
@@ -1640,7 +1524,7 @@ document.addEventListener('keydown', (e) => {
       return;
     }
   }
-  if (e.key === 'ArrowRight') goNext();
+  if (e.key === 'ArrowRight') handleForwardAttempt();
   if (e.key === 'ArrowLeft') goPrev();
   if (e.key.toLowerCase() === 'f' && e.target.tagName !== 'INPUT') toggleFullScreen();
 });
