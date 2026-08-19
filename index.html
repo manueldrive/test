@@ -30,6 +30,7 @@
     --bg-terracotta: linear-gradient(145deg, #e48d75 0%, #a15844 100%);
     --bg-sage: linear-gradient(145deg, #729e8f 0%, #42665a 100%);
     --bg-orange: linear-gradient(145deg, #f6af77 0%, #b07546 100%);
+    --bg-leather: linear-gradient(160deg, #7a4a2c 0%, #452817 100%);
   }
   *{box-sizing:border-box;}
   
@@ -210,6 +211,56 @@
   .hl-swatch-yellow{ background:var(--yellow); }
   .hl-swatch-pink{ background:var(--pink); }
 
+  /* FLANKING HIGHLIGHTER CONTROLS (no pill/button chrome) — sit either side of the action pill */
+  .hl-flank-row{
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .hl-flank-btn{
+    background: none;
+    border: none;
+    padding: 2px 2px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .hl-flank-btn .hl-swatch{
+    width: 13px;
+    height: 13px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .hl-flank-btn .hl-flank-label{
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 800;
+    font-size: 7px;
+    letter-spacing: 0.1px;
+    text-transform: uppercase;
+    color: var(--ink);
+    opacity: 0.65;
+    white-space: nowrap;
+  }
+  .hl-flank-btn.active .hl-swatch{
+    transform: scale(1.25);
+    box-shadow: 0 0 0 3px rgba(13,13,13,0.15);
+  }
+  .hl-flank-btn.active .hl-flank-label{ opacity: 1; }
+  .hl-flank-row .action-gate-pill{ padding: 9px 14px; font-size: 11.5px; }
+  @media (min-width: 480px) {
+    .hl-flank-row{ gap: 9px; }
+    .hl-flank-btn .hl-swatch{ width: 15px; height: 15px; }
+    .hl-flank-btn .hl-flank-label{ font-size: 8.5px; letter-spacing: 0.3px; }
+    .hl-flank-row .action-gate-pill{ padding: 10px 20px; font-size: 13px; }
+  }
+  @media (min-width: 1024px) {
+    .hl-flank-row{ gap: 16px; }
+    .hl-flank-btn .hl-swatch{ width: 20px; height: 20px; }
+    .hl-flank-btn .hl-flank-label{ font-size: 11px; }
+  }
+
   .action-gate-pill {
     font-family: 'Space Grotesk', sans-serif;
     font-size: 13px;
@@ -335,6 +386,18 @@
   .tx-dark{ color:var(--ink); }
   .tx-light{ color:#FFF; }
 
+  /* PAGE-FLIP TRANSITION — used when leaving a book-cover screen (reading-intro, character-prompt) */
+  .beat.page-flip-exit{
+    animation: pageFlipOut 0.42s cubic-bezier(.45,.05,.55,.95) forwards;
+    transform-origin: left center;
+    z-index: 6;
+    backface-visibility: hidden;
+  }
+  @keyframes pageFlipOut{
+    0%{ transform: rotateY(0deg); opacity:1; }
+    100%{ transform: rotateY(-100deg); opacity:0.1; }
+  }
+
   .sketch-lead-title {
     font-family:'Space Grotesk', sans-serif;
     font-size: clamp(24px, 3.8vw, 42px);
@@ -451,6 +514,9 @@
   }
   .deck-card:active { transform: translate(2px, 2px); box-shadow: 0 0 0 var(--ink); }
   .deck-card .dc-title { font-family: 'Space Grotesk', sans-serif; font-size: clamp(18px, 2.6vh, 24px); font-weight: 800; margin-bottom: 8px; }
+  .deck-card .dc-icon { font-size: clamp(22px, 3.4vh, 30px); color: var(--purple); margin-bottom: 8px; }
+  .deck-card.correct .dc-icon,
+  .deck-card.incorrect .dc-icon { color: inherit; }
   .deck-card .dc-badge { font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 700; background: var(--ink); color: #FFF; padding: 4px 12px; border-radius: 100px; margin-bottom: 10px; }
   .deck-card .dc-desc { font-family: 'Inter', sans-serif; font-size: clamp(12.5px, 1.7vh, 14.5px); font-weight: 700; opacity: 0.85; line-height: 1.45; }
   .deck-card.correct { background: var(--lime) !important; color: var(--ink) !important; box-shadow: 4px 4px 0 var(--ink) !important; }
@@ -461,6 +527,23 @@
     .deck-card .dc-title{ font-size:clamp(22px, 3vh, 30px); }
     .deck-card .dc-desc{ font-size:clamp(15px, 2vh, 17.5px); }
     .testament-deck .deck-card { min-height: 380px; padding: 32px 28px; }
+  }
+  @media (min-width: 1024px) {
+    .testament-deck { max-width: 1500px; max-height: min(64vh, 620px); gap: 40px; }
+    .testament-deck .deck-card { min-height: clamp(400px, 60vh, 600px); padding: 48px 40px; border-width: 4.5px; box-shadow: 7px 7px 0 var(--ink); }
+    .testament-deck .dc-title { font-size: clamp(34px, 4.4vh, 46px); margin-bottom: 16px; }
+    .testament-deck .dc-badge { font-size: 15px; padding: 8px 18px; margin-bottom: 18px; }
+    .testament-deck .dc-desc { font-size: clamp(19px, 2.4vh, 24px); line-height: 1.55; max-width: 480px; }
+  }
+  @media (min-width: 1500px) {
+    .testament-deck { max-width: 1700px; }
+    .testament-deck .dc-desc { max-width: 540px; }
+  }
+  @media (max-width: 767px) {
+    .sections-5-deck .dc-icon{ font-size: 18px; margin-bottom: 2px; color: var(--purple); }
+  }
+  @media (min-width: 1100px) {
+    .sections-5-deck .dc-icon{ font-size: clamp(42px, 6vh, 64px); margin-bottom: 16px; }
   }
 
   /* SLIDE 3: RECAP */
@@ -536,15 +619,25 @@
   .leather-cover{ flex:1; display:flex; border-radius:22px; overflow:hidden; min-height:0; position:relative; border:4px solid var(--ink); box-shadow:6px 6px 0 var(--ink); background: radial-gradient(circle at 28% 18%, rgba(255,255,255,0.10), transparent 42%), repeating-linear-gradient(135deg, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 2px, transparent 2px, transparent 7px), linear-gradient(160deg, #7a4a2c, #452817); width:100%; }
   .leather-spine{ width:22px; background:rgba(0,0,0,0.38); flex-shrink:0; border-right:2px solid rgba(0,0,0,0.3); }
   .leather-cover-inner{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap: clamp(14px, 2.5vh, 26px); padding:26px; color:#F1E3D3; text-align:center; }
-  .leather-emblem{ display:none; font-size:40px; color:rgba(241,227,211,0.5); margin-bottom:2px; }
   .leather-cover-inner .book-title{ color:#F1E3D3; font-family:'Space Grotesk',sans-serif; font-weight:800; font-size:clamp(28px, 5vh, 42px); text-transform:uppercase; }
   .focus-pill{ border-radius:24px; padding: clamp(14px, 2.2vh, 20px) clamp(18px, 3.5vw, 30px); text-align:center; position:relative; z-index:2; }
   .focus-pill-value{ font-family:'Space Grotesk',sans-serif; font-weight:800; font-size:clamp(19px, 3vh, 28px); text-transform:uppercase; letter-spacing:.3px; color:var(--ink); margin-top:3px; }
   .focus-pill.yellow{ background:var(--yellow); }
   .focus-pill.lime{ background:var(--lime); }
   .cover-note{ font-family:'Inter', sans-serif; font-size:clamp(13.5px, 1.9vh, 16px); font-weight:700; line-height:1.45; color:rgba(255,255,255,0.92); max-width:400px; }
+  @media (min-width: 1024px) {
+    /* Screen is too wide for a book-shaped card to read as a book — let the
+       leather texture become the full-bleed page background instead. */
+    .leather-cover{
+      position:absolute;
+      inset:0;
+      border-radius:0;
+      border:none;
+      box-shadow:none;
+      width:auto;
+    }
+  }
   @media (min-width: 1100px) {
-    .leather-emblem{ display:block; font-size:64px; }
     .leather-cover-inner .book-title{ font-size:56px; letter-spacing:1px; }
     .focus-pill-value{ font-size:32px; }
     .focus-pill{ padding:26px 42px; }
@@ -599,6 +692,7 @@
   .w:hover{ background: rgba(255, 199, 44, 0.25); }
   .w.flagged,
   .w.hl-yellow{ background: rgba(255, 199, 44, 0.55); font-weight: 700; }
+  .w.flagged-light{ background: rgba(255, 199, 44, 0.22); font-weight: 700; }
   .w.hl-blue{ background: rgba(56, 189, 248, 0.45); font-weight: 700; }
   .w.hl-green{ background: rgba(34, 197, 94, 0.40); font-weight: 700; }
   .w.hl-pink{ background: rgba(244, 63, 94, 0.40); font-weight: 700; }
@@ -637,103 +731,124 @@
   .glossary-panel{
     background:#FFFDF6;
     border-radius:14px;
-    padding: clamp(18px, 3vh, 30px) clamp(18px, 3vw, 30px);
+    padding: clamp(12px, 1.6vh, 16px) clamp(12px, 1.8vw, 16px);
   }
-  .review-section-header{ font-family:'Space Grotesk', sans-serif; font-size:12px; font-weight:800; letter-spacing:1.2px; text-transform:uppercase; color:var(--ink); opacity:.55; margin:0 0 6px 0; display:flex; align-items:center; gap:8px; }
-  .review-section-header + .review-section-header{ margin-top:22px; }
+  .review-section-header{ font-family:'Space Grotesk', sans-serif; font-size:11.5px; font-weight:800; letter-spacing:1.2px; text-transform:uppercase; color:var(--ink); opacity:.55; margin:0 0 3px 0; display:flex; align-items:center; gap:8px; }
+  .review-section-header + .review-section-header{ margin-top:10px; }
   .review-def-entry{ 
-    padding: 15px 0; 
+    padding: 5px 0; 
     border-bottom: 1.5px solid rgba(13,13,13,0.14); 
     font-family: 'Inter', sans-serif; 
-    font-size: clamp(15px, 2vh, 18px); 
-    line-height: 1.55; 
+    font-size: clamp(13.5px, 1.8vh, 16px); 
+    line-height: 1.3; 
     color: var(--ink); 
   }
   .review-def-entry:last-child { border-bottom: none; }
-  .review-def-entry .term-word{ font-family: 'Space Grotesk', sans-serif; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: var(--ink); margin-right: 6px; }
+  .review-def-entry .gloss-num{ font-family:'Space Grotesk', sans-serif; font-weight:700; color:var(--purple); font-size:.65em; vertical-align:super; margin-right:3px; }
+  .review-def-entry .term-word{ font-family: 'Space Grotesk', sans-serif; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: var(--ink); margin-right: 6px; }
   .review-def-entry .term-word::after{ content:'—'; margin-left:6px; opacity:.4; font-weight:400; }
-  @media (min-width: 1100px) {
-    .glossary-panel{ padding:44px 48px; }
-    .review-section-header{ font-size:15px; }
-    .review-def-entry{ font-size:20px; padding:20px 0; line-height:1.65; }
+  @media (min-width: 900px) {
+    .review-scroll{ max-width:1300px; }
+    .glossary-panel{ padding:14px 22px; }
+    .review-def-entry{ display:grid; grid-template-columns:210px 1fr; gap:16px; padding:6px 0; align-items:baseline; }
+    .review-def-entry .term-word{ margin-right:0; }
+    .review-def-entry .term-word::after{ content:''; }
   }
-  .pill-cloud{ display:flex; flex-wrap:wrap; gap:10px; margin-top:8px; }
-  .research-pill{ font-family:'Space Grotesk', sans-serif; font-size:13px; font-weight:700; background:var(--ink); color:#FFF; padding:9px 16px; border-radius:100px; text-transform:capitalize; }
   @media (min-width: 1100px) {
-    .review-section-header{ font-size:16px; margin:24px 0 14px 0; }
-    .review-def-entry{ font-size:21px; padding:18px 0; line-height:1.65; }
-    .research-pill{ font-size:17px; padding:12px 22px; }
+    .glossary-panel{ padding:16px 26px; }
+    .review-section-header{ font-size:13px; }
+    .review-def-entry{ font-size:16.5px; grid-template-columns:240px 1fr; padding:7px 0; }
+  }
+  @media (min-width: 1400px) {
+    .review-scroll{ max-width:1700px; }
+    .glossary-panel{ padding:20px 32px; }
+    .review-def-entry{ font-size:18px; grid-template-columns:290px 1fr; gap:22px; padding:8px 0; }
+  }
+  .pill-cloud{ display:flex; flex-wrap:wrap; gap:6px; margin-top:4px; }
+  .research-pill{ font-family:'Space Grotesk', sans-serif; font-size:12.5px; font-weight:700; background:var(--ink); color:#FFF; padding:7px 14px; border-radius:100px; text-transform:capitalize; }
+  @media (min-width: 1100px) {
+    .research-pill{ font-size:15px; padding:10px 18px; }
   }
 
-  /* SLIDE 8: CROSS REFS (EDITORIAL ANNOTATION STYLE - NO BUTTON LOOK) */
-  .xref-compact-list{ flex:1; display:flex; flex-direction:column; justify-content:center; gap:clamp(16px, 3vh, 26px); position:relative; z-index:2; width:100%; max-width:1200px; margin:0 auto; }
-  /* CORKBOARD STRING & PIN — TWO PINNED CARDS PER CONNECTION, JOINED BY A SAGGING STRING */
+  /* SLIDE 8: CROSS REFS — SIMPLE SIDE-BY-SIDE CARDS JOINED BY A CHAIN LINK */
+  .xref-compact-list{ flex:1; display:flex; flex-direction:column; justify-content:center; gap:clamp(20px, 3.5vh, 32px); position:relative; z-index:2; width:100%; max-width:1200px; margin:0 auto; }
   .xref-pair{
     display:flex;
-    flex-direction:column;
-    align-items:center;
+    align-items:stretch;
     width:100%;
+    gap:0;
   }
   .xref-node-card{
-    position:relative;
-    width:100%;
+    flex:1;
+    min-width:0;
     background:#FBF7EC;
     color:var(--ink);
-    border:3px solid var(--ink);
-    border-radius:6px;
-    box-shadow:5px 5px 0 var(--ink);
+    border:1.5px solid rgba(13,13,13,0.22);
+    border-radius:12px;
     padding: 16px 18px;
-    z-index:2;
   }
-  .xref-node-card.from{ transform: rotate(-1.6deg); padding-bottom:24px; }
-  .xref-node-card.to{ transform: rotate(1.3deg); padding-top:24px; }
-  .xref-pin{
-    position:absolute;
-    left:50%;
-    transform:translateX(-50%);
-    width:20px; height:20px;
-    border-radius:50%;
-    background:var(--pink);
-    border:2.5px solid var(--ink);
-    box-shadow:0 2px 0 rgba(0,0,0,0.3);
-    z-index:4;
-  }
-  .xref-node-card.from .xref-pin{ bottom:-11px; }
-  .xref-node-card.to .xref-pin{ top:-11px; }
   .xref-ref-label{
     font-family:'Space Grotesk',sans-serif;
     font-size:11px;
     font-weight:800;
     letter-spacing:0.6px;
     text-transform:uppercase;
-    background:var(--ink);
-    color:#FFF;
-    border-radius:6px;
-    padding:4px 9px;
-    display:inline-block;
-    margin-bottom:8px;
+    color:var(--purple);
+    margin-bottom:6px;
   }
-  .xref-node-card.to .xref-ref-label{ background:var(--purple); }
-  .xref-node-note{ font-family:'Inter',sans-serif; font-size:clamp(14px, 1.9vh, 17px); font-weight:500; line-height:1.5; color:rgba(13,13,13,0.88); }
+  .xref-node-card.to .xref-ref-label{ color:var(--pink); }
+  .xref-node-note{ font-family:'Inter',sans-serif; font-size:clamp(13.5px, 1.8vh, 16px); font-weight:500; line-height:1.5; color:rgba(13,13,13,0.88); }
   .xref-node-note em{ font-style:normal; color:var(--ink); font-weight:800; background:rgba(244,63,94,0.18); padding:0 3px; border-radius:3px; }
-  .xref-string-wrap{
-    width:80px;
-    height:44px;
+  .xref-chain{
+    flex-shrink:0;
+    width:40px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:0;
+  }
+  .xref-chain-line{ flex:1; height:2px; background:rgba(13,13,13,0.28); }
+  .xref-chain-link{
     position:relative;
-    z-index:1;
+    width:26px; height:32px;
     flex-shrink:0;
   }
-  .xref-string-wrap svg{ position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
+  .xref-chain-link .bar-v{
+    position:absolute;
+    left:50%;
+    top:0; bottom:0;
+    width:6px;
+    margin-left:-3px;
+    background:var(--purple);
+    border-radius:3px;
+  }
+  .xref-chain-link .bar-h{
+    position:absolute;
+    left:50%;
+    top:9px;
+    width:22px; height:6px;
+    margin-left:-11px;
+    background:var(--purple);
+    border-radius:3px;
+  }
   .xref-content{ display:none; }
   .xref-topic{ display:none; }
   .xref-body{ display:none; }
   .xref-icon-node{ display:none; }
+  @media (max-width: 479px) {
+    .xref-pair{ flex-direction:column; align-items:stretch; }
+    .xref-chain{ width:100%; height:32px; flex-direction:row; }
+    .xref-chain-line{ height:2px; width:auto; }
+  }
   @media (min-width: 1024px) {
-    .xref-compact-list{ display:grid; grid-template-columns:1fr 1fr; align-items:start; max-width:1300px; gap:60px 56px; }
-    .xref-node-card{ padding:22px 26px 28px; }
-    .xref-node-card.to{ padding-top:30px; }
-    .xref-ref-label{ font-size:13px; padding:5px 12px; }
-    .xref-node-note{ font-size:19px; line-height:1.6; }
+    .xref-compact-list{ max-width:1300px; }
+    .xref-node-card{ padding:22px 26px; }
+    .xref-ref-label{ font-size:13px; }
+    .xref-node-note{ font-size:18px; line-height:1.6; }
+    .xref-chain{ width:56px; }
+    .xref-chain-link{ width:34px; height:42px; }
+    .xref-chain-link .bar-v{ width:8px; margin-left:-4px; }
+    .xref-chain-link .bar-h{ top:12px; width:30px; height:8px; margin-left:-15px; }
   }
 
   /* SLIDE 11: CHAR COACHING */
@@ -741,9 +856,21 @@
   .dark-scripture-card .ref{ font-family:'Space Grotesk', sans-serif; font-size:12px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--lime); margin-bottom:6px; }
   .dark-scripture-card .vt{ font-style:normal; font-family:'Inter',sans-serif; font-weight:700; font-size:clamp(14px, 1.9vh, 16px); line-height:1.5; opacity:.95; }
   @media (min-width: 1024px) {
-    .dark-scripture-card{ padding:44px 48px; border-radius:28px; border-width:4.5px; }
-    .dark-scripture-card .ref{ font-size:20px; margin-bottom:16px; }
-    .dark-scripture-card .vt{ font-size:28px; line-height:1.65; }
+    .dark-scripture-card{ padding:52px 56px; border-radius:28px; border-width:4.5px; }
+    .dark-scripture-card .ref{ font-size:23px; margin-bottom:18px; }
+    .dark-scripture-card .vt{ font-size:33px; line-height:1.65; }
+    .circle-hero.coaching-circle{ width:clamp(400px, 52vh, 520px); height:clamp(400px, 52vh, 520px); padding:44px; border-width:6px; box-shadow:9px 9px 0 var(--ink); }
+    .circle-hero.coaching-circle .arc-stem-text{ font-size:17px; letter-spacing:1.6px; margin-bottom:14px; }
+    .circle-hero.coaching-circle .label-god-is{ font-size:clamp(40px, 5vh, 50px); margin-bottom:16px; }
+    .circle-hero.coaching-circle .blank-input{ font-size:clamp(28px, 3.6vh, 36px); border-bottom-width:4.5px; }
+  }
+  @media (min-width: 1400px) {
+    .dark-scripture-card{ padding:60px 64px; }
+    .dark-scripture-card .ref{ font-size:26px; }
+    .dark-scripture-card .vt{ font-size:38px; }
+    .circle-hero.coaching-circle{ width:clamp(460px, 56vh, 580px); height:clamp(460px, 56vh, 580px); }
+    .circle-hero.coaching-circle .label-god-is{ font-size:clamp(46px, 5.6vh, 56px); }
+    .circle-hero.coaching-circle .blank-input{ font-size:clamp(32px, 4vh, 40px); }
   }
 
   /* SLIDE 12: FINAL RESPONSE */
@@ -1050,7 +1177,7 @@ const beats = [
 
   /* 1. LOCATE MARK: TESTAMENT */
   { id:'quest-testament', type:'input', blockTap:true, isInteractive:true, clue:'Pick an answer to continue', bgGrad:'var(--bg-teal)', text:'light',
-    html:`<div class="sketch-lead-title">Locate: Mark</div>
+    html:`<div class="sketch-lead-title">Bible Book Locator: Testament</div>
           <div class="testament-deck" id="questTestamentGrid">
             <div class="deck-card" data-correct="false" onclick="questAnswer(event,this,'questTestamentGrid')">
               <span class="dc-title">Old Testament</span>
@@ -1066,29 +1193,34 @@ const beats = [
 
   /* 2. LOCATE MARK: SECTION */
   { id:'quest-section', type:'input', blockTap:true, isInteractive:true, clue:'Pick an answer to continue', bgGrad:'var(--bg-teal)', text:'light',
-    html:`<div class="sketch-lead-title">Locate: Mark</div>
+    html:`<div class="sketch-lead-title">Bible Book Locator: Section</div>
           <div class="sections-5-deck" id="questSectionGrid">
             <div class="deck-card" data-correct="true" onclick="questAnswer(event,this,'questSectionGrid')">
+              <i class="fa-solid fa-cross dc-icon"></i>
               <span class="dc-title">Gospels</span>
               <span class="dc-badge">4 books</span>
               <span class="dc-desc">Accounts of Jesus's life, death, and resurrection</span>
             </div>
             <div class="deck-card" data-correct="false" onclick="questAnswer(event,this,'questSectionGrid')">
+              <i class="fa-solid fa-fire dc-icon"></i>
               <span class="dc-title">Church History</span>
               <span class="dc-badge">1 book</span>
               <span class="dc-desc">The Holy Spirit's arrival and church growth</span>
             </div>
             <div class="deck-card" data-correct="false" onclick="questAnswer(event,this,'questSectionGrid')">
+              <i class="fa-solid fa-envelope dc-icon"></i>
               <span class="dc-title">Paul's Letters</span>
               <span class="dc-badge">13 books</span>
               <span class="dc-desc">Helping churches live out the gospel</span>
             </div>
             <div class="deck-card" data-correct="false" onclick="questAnswer(event,this,'questSectionGrid')">
+              <i class="fa-solid fa-envelopes-bulk dc-icon"></i>
               <span class="dc-title">General Letters</span>
               <span class="dc-badge">8 books</span>
               <span class="dc-desc">Guidance for early believers</span>
             </div>
             <div class="deck-card" data-correct="false" onclick="questAnswer(event,this,'questSectionGrid')">
+              <i class="fa-solid fa-eye dc-icon"></i>
               <span class="dc-title">Prophecy</span>
               <span class="dc-badge">1 book</span>
               <span class="dc-desc">A visionary look at how it all ends</span>
@@ -1127,23 +1259,21 @@ const beats = [
             <div class="breath-visual">
               <div class="breath-circle"></div>
               <div class="breath-label-wrap">
-                <div class="pray-kicker-text">Prayer</div>
                 <div class="pray-center-text">PRAY</div>
               </div>
             </div>
           </div>` },
 
   /* 5. WORD WORK COVER */
-  { id:'reading-intro', type:'tapAuto', isInteractive:false, bgGrad:'var(--bg-cream)', text:'dark', align:'start',
+  { id:'reading-intro', type:'tapAuto', isInteractive:false, bgGrad:'var(--bg-leather)', text:'light', align:'start',
     html:`<div class="leather-cover">
             <div class="leather-spine"></div>
             <div class="leather-cover-inner">
-              <i class="fa-solid fa-book-bible leather-emblem"></i>
               <div class="book-title" style="margin-bottom:2px;">Holy Bible</div>
               <div class="focus-pill yellow">
                 <div class="focus-pill-value">Highlight Key Words</div>
               </div>
-              <div class="cover-note">Identity words that are confusing or that you see repeated in the text.</div>
+              <div class="cover-note">Grab a highlighter and mark words that are confusing or that you see repeated in the text.</div>
             </div>
           </div>` },
 
@@ -1168,15 +1298,13 @@ const beats = [
               <div class="xref-node-card from">
                 <div class="xref-ref-label">Mark 1:27</div>
                 <div class="xref-node-note">The crowd is stunned: Jesus teaches with real, unmistakable authority.</div>
-                <div class="xref-pin"></div>
               </div>
-              <div class="xref-string-wrap">
-                <svg viewBox="0 0 80 44" preserveAspectRatio="none">
-                  <path d="M40,0 C70,14 10,30 40,44" fill="none" stroke="#C11C3F" stroke-width="2.5" stroke-linecap="round"/>
-                </svg>
+              <div class="xref-chain">
+                <span class="xref-chain-line"></span>
+                <span class="xref-chain-link"><span class="bar-v"></span><span class="bar-h"></span></span>
+                <span class="xref-chain-line"></span>
               </div>
               <div class="xref-node-card to">
-                <div class="xref-pin"></div>
                 <div class="xref-ref-label">Matthew 28:18</div>
                 <div class="xref-node-note">Matthew writes that Jesus said, "<em>All authority</em> in heaven and earth has been given to me."</div>
               </div>
@@ -1185,15 +1313,13 @@ const beats = [
               <div class="xref-node-card from">
                 <div class="xref-ref-label">Mark 1:24</div>
                 <div class="xref-node-note">An impure spirit obeys Jesus instantly, the moment he speaks.</div>
-                <div class="xref-pin"></div>
               </div>
-              <div class="xref-string-wrap">
-                <svg viewBox="0 0 80 44" preserveAspectRatio="none">
-                  <path d="M40,0 C10,14 70,30 40,44" fill="none" stroke="#C11C3F" stroke-width="2.5" stroke-linecap="round"/>
-                </svg>
+              <div class="xref-chain">
+                <span class="xref-chain-line"></span>
+                <span class="xref-chain-link"><span class="bar-v"></span><span class="bar-h"></span></span>
+                <span class="xref-chain-line"></span>
               </div>
               <div class="xref-node-card to">
-                <div class="xref-pin"></div>
                 <div class="xref-ref-label">James 2:19</div>
                 <div class="xref-node-note">James writes that even demons <em>believe</em>, and <em>shudder</em>.</div>
               </div>
@@ -1201,11 +1327,10 @@ const beats = [
           </div>` },
 
   /* 9. GOD SHOT COVER */
-  { id:'character-prompt', type:'tapAuto', isInteractive:false, bgGrad:'var(--bg-cream)', text:'dark', align:'start',
+  { id:'character-prompt', type:'tapAuto', isInteractive:false, bgGrad:'var(--bg-leather)', text:'light', align:'start',
     html:`<div class="leather-cover">
             <div class="leather-spine"></div>
             <div class="leather-cover-inner">
-              <i class="fa-solid fa-book-bible leather-emblem"></i>
               <div class="book-title" style="margin-bottom:2px;">Holy Bible</div>
               <div class="focus-pill lime">
                 <div class="focus-pill-value">Spot a God Shot</div>
@@ -1225,15 +1350,15 @@ const beats = [
   /* 11. GOD SHOT COACHING (HEADER: CENTRAL TRUTH) */
   { id:'char-coaching', type:'input', blockTap:true, isInteractive:true, clue:'Fill in the blank to continue', bgGrad:'var(--bg-orange)', text:'dark',
     html:`<div class="sketch-lead-title" style="margin-bottom:14px;">Central Truth</div>
-          <div class="set-scene-grid">
+          <div class="set-scene-grid coaching-scene">
             <div style="display:flex; flex-direction:column; gap:14px; width:100%;">
-              <div class="dark-scripture-card">
+              <div class="dark-scripture-card coaching-card">
                 <div class="ref" id="charRef"></div>
                 <div class="vt" id="charText"></div>
               </div>
             </div>
             <div class="circle-hero-container">
-              <div class="circle-hero">
+              <div class="circle-hero coaching-circle">
                 <div class="arc-stem-text" id="arcStemText">GOD IS...</div>
                 <div class="label-god-is">GOD IS...</div>
                 <input class="blank-input" id="customTraitInput" placeholder="" oninput="handleCustomTrait(this.value)" onclick="event.stopPropagation();" />
@@ -1349,28 +1474,40 @@ function updateNavShell(){
   else ready = !b.blockTap;
   nextBtn.classList.toggle('ready', ready);
 
+  // Quest screens: replace the arrow nav entirely with a themed locator pill
+  const hideArrows = (b.id === 'quest-testament' || b.id === 'quest-section');
+  prevBtn.style.display = hideArrows ? 'none' : '';
+  nextBtn.style.display = hideArrows ? 'none' : '';
+
   // Contextual Floating Tool Island for interaction slides
-  if (b.id === 'vocab-scan') {
+  if (b.id === 'quest-testament' || b.id === 'quest-section') {
+    island.style.display = 'flex';
+    island.innerHTML = `
+      <button class="action-gate-pill" id="findBookPill" onclick="event.stopPropagation(); handleForwardAttempt();">
+        <i class="fa-solid fa-magnifying-glass"></i> Find Book: Mark
+      </button>
+    `;
+  } else if (b.id === 'vocab-scan') {
     island.style.display = 'flex';
     const isDone = isVocabComplete();
     island.innerHTML = `
-      <div class="tools-capsule">
-        <button class="hl-mini-btn ${state.activeTool.vocab === 'blue' ? 'active' : ''}" data-color="blue" onclick="event.stopPropagation(); setPassageHighlighter('blue', this);">
-          <span class="hl-swatch hl-swatch-blue"></span>Char
+      <div class="hl-flank-row">
+        <button class="hl-flank-btn ${state.activeTool.vocab === 'blue' ? 'active' : ''}" data-color="blue" onclick="event.stopPropagation(); setPassageHighlighter('blue', this);">
+          <span class="hl-swatch hl-swatch-blue"></span><span class="hl-flank-label">Characters</span>
         </button>
-        <button class="hl-mini-btn ${state.activeTool.vocab === 'green' ? 'active' : ''}" data-color="green" onclick="event.stopPropagation(); setPassageHighlighter('green', this);">
-          <span class="hl-swatch hl-swatch-green"></span>Set
+        <button class="hl-flank-btn ${state.activeTool.vocab === 'green' ? 'active' : ''}" data-color="green" onclick="event.stopPropagation(); setPassageHighlighter('green', this);">
+          <span class="hl-swatch hl-swatch-green"></span><span class="hl-flank-label">Setting</span>
         </button>
-        <button class="hl-mini-btn ${state.activeTool.vocab === 'yellow' ? 'active' : ''}" data-color="yellow" onclick="event.stopPropagation(); setPassageHighlighter('yellow', this);">
-          <span class="hl-swatch hl-swatch-yellow"></span>Tricky
+        <button class="action-gate-pill ${isDone ? 'ready' : ''}" id="vocabActionPill" onclick="event.stopPropagation(); handleForwardAttempt();">
+          ${isDone ? '<i class="fa-solid fa-check"></i> Continue' : 'Highlight Words'}
         </button>
-        <button class="hl-mini-btn ${state.activeTool.vocab === 'pink' ? 'active' : ''}" data-color="pink" onclick="event.stopPropagation(); setPassageHighlighter('pink', this);">
-          <span class="hl-swatch hl-swatch-pink"></span>Repeat
+        <button class="hl-flank-btn ${state.activeTool.vocab === 'yellow' ? 'active' : ''}" data-color="yellow" onclick="event.stopPropagation(); setPassageHighlighter('yellow', this);">
+          <span class="hl-swatch hl-swatch-yellow"></span><span class="hl-flank-label">Confusing</span>
+        </button>
+        <button class="hl-flank-btn ${state.activeTool.vocab === 'pink' ? 'active' : ''}" data-color="pink" onclick="event.stopPropagation(); setPassageHighlighter('pink', this);">
+          <span class="hl-swatch hl-swatch-pink"></span><span class="hl-flank-label">Repeated</span>
         </button>
       </div>
-      <button class="action-gate-pill ${isDone ? 'ready' : ''}" id="vocabActionPill" onclick="event.stopPropagation(); handleForwardAttempt();">
-        ${isDone ? '<i class="fa-solid fa-check"></i> Continue' : 'Highlight Key Words'}
-      </button>
     `;
   } else if (b.id === 'char-verse-pick') {
     island.style.display = 'flex';
@@ -1413,6 +1550,7 @@ function renderBeat(i){
     if (arcStem) arcStem.textContent = `BASED ON VERSE ${activeVerse}:`;
     const inp = document.getElementById('customTraitInput');
     if (inp) inp.value = state.trait || '';
+    requestAnimationFrame(() => requestAnimationFrame(fitCharVerseText));
   } else if (b.id === 'char-verse-pick') {
     document.querySelectorAll('#beat-'+i+' .verse-tile').forEach(t=>t.classList.toggle('selected', state.charVerse !== null && Number(t.dataset.v)===state.charVerse));
   } else if (b.id === 'vocab-scan') {
@@ -1463,7 +1601,7 @@ function tapWord(e, el){
   if (state.activeTool.vocab) {
     const cls = 'hl-' + state.activeTool.vocab;
     const alreadyThisColor = el.classList.contains(cls);
-    ['hl-blue','hl-green','hl-yellow','hl-pink','flagged'].forEach(c => el.classList.remove(c));
+    ['hl-blue','hl-green','hl-yellow','hl-pink','flagged','flagged-light'].forEach(c => el.classList.remove(c));
     
     if (!alreadyThisColor) {
       el.classList.add(cls);
@@ -1473,10 +1611,18 @@ function tapWord(e, el){
       state.wordTaps = state.wordTaps.filter(w => w.el !== el);
     }
   } else {
-    const already = el.classList.contains('flagged') || ['hl-blue','hl-green','hl-yellow','hl-pink'].some(c=>el.classList.contains(c));
-    if (already) {
-      ['hl-blue','hl-green','hl-yellow','hl-pink','flagged'].forEach(c => el.classList.remove(c));
+    const isColored = ['hl-blue','hl-green','hl-yellow','hl-pink'].some(c=>el.classList.contains(c));
+    if (isColored) {
+      ['hl-blue','hl-green','hl-yellow','hl-pink'].forEach(c => el.classList.remove(c));
       state.wordTaps = state.wordTaps.filter(w => w.el !== el);
+    } else if (el.classList.contains('flagged')) {
+      // second tap: lighten instead of removing the flag entirely
+      el.classList.remove('flagged');
+      el.classList.add('flagged-light');
+    } else if (el.classList.contains('flagged-light')) {
+      // third tap: back to full flag
+      el.classList.remove('flagged-light');
+      el.classList.add('flagged');
     } else {
       el.classList.add('flagged');
       state.wordTaps.push({ el, word, def, isStop, key });
@@ -1529,7 +1675,7 @@ function renderVocabReview(){
   let html = '<div class="glossary-panel">';
   if (defined.length > 0) {
     html += `<div class="review-section-header"><i class="fa-solid fa-book-bookmark"></i> Defined Terms</div>`;
-    html += defined.map(w => `<div class="review-def-entry"><span class="term-word">${w.word}</span>${w.def}</div>`).join('');
+    html += defined.map((w,i) => `<div class="review-def-entry"><span class="term-word"><span class="gloss-num">${i+1}</span>${w.word}</span>${w.def}</div>`).join('');
   }
   if (undefinedWords.length > 0) {
     html += `<div class="review-section-header"><i class="fa-solid fa-magnifying-glass"></i> Terms to Define</div>
@@ -1588,11 +1734,13 @@ function toggleTimer(){
 }
 
 let clueTimeout = null;
-function showBadgeClue(text){
+function showBadgeClue(text, iconClass){
   const badge = document.getElementById('clueBadge');
   const badgeText = document.getElementById('clueBadgeText');
+  const badgeIcon = badge ? badge.querySelector('i') : null;
   if (!badge || !badgeText) return;
   badgeText.textContent = text;
+  if (badgeIcon) badgeIcon.className = iconClass || 'fa-solid fa-circle-exclamation';
   badge.style.display = 'flex';
 
   clearTimeout(clueTimeout);
@@ -1601,7 +1749,7 @@ function showBadgeClue(text){
   }, 2200);
 }
 
-function triggerGateShake(msg, elementId){
+function triggerGateShake(msg, elementId, iconClass){
   const el = document.getElementById(elementId) || document.getElementById('shellNextBtn');
   if (el) {
     el.classList.remove('shake-warn');
@@ -1609,14 +1757,14 @@ function triggerGateShake(msg, elementId){
     el.classList.add('shake-warn');
     setTimeout(() => el.classList.remove('shake-warn'), 600);
   }
-  showBadgeClue(msg);
+  showBadgeClue(msg, iconClass);
 }
 
 function handleForwardAttempt(){
   const b = beats[state.index];
   if (b.blockTap) {
     if ((b.id === 'quest-testament' || b.id === 'quest-section') && !answeredBeats.has(state.index)) { 
-      triggerGateShake('Pick an answer to continue'); 
+      triggerGateShake('Pick an answer to continue', 'findBookPill', 'fa-solid fa-hand-point-up'); 
       return; 
     }
     if (b.id === 'vocab-scan') {
@@ -1643,8 +1791,38 @@ function handleForwardAttempt(){
   goNext();
 }
 
+function fitCharVerseText(){
+  const vt = document.getElementById('charText');
+  const card = vt ? vt.closest('.dark-scripture-card') : null;
+  const beatEl = card ? card.closest('.beat') : null;
+  if (!vt || !card || !beatEl) return;
+  vt.style.fontSize = '';
+  const maxFont = parseFloat(getComputedStyle(vt).fontSize);
+  let fontSize = maxFont;
+  const minFont = Math.max(11, maxFont * 0.5);
+  let guard = 0;
+  while (beatEl.scrollHeight > beatEl.clientHeight + 2 && fontSize > minFont && guard < 50) {
+    fontSize -= 0.5;
+    vt.style.fontSize = fontSize + 'px';
+    guard++;
+  }
+}
+
+const PAGE_FLIP_BEAT_IDS = ['reading-intro', 'character-prompt'];
 function goNext(){
   if (state.index < beats.length - 1) {
+    const leavingBeat = beats[state.index];
+    if (PAGE_FLIP_BEAT_IDS.includes(leavingBeat.id)) {
+      const el = document.getElementById('beat-' + state.index);
+      if (el) {
+        el.classList.add('page-flip-exit');
+        setTimeout(() => {
+          el.classList.remove('page-flip-exit');
+          state.index++; renderBeat(state.index);
+        }, 380);
+        return;
+      }
+    }
     state.index++; renderBeat(state.index);
   }
 }
