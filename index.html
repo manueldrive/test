@@ -108,7 +108,7 @@
     background: none;
     border: none;
     padding: 10px 14px;
-    color: var(--ink);
+    color: var(--ink); /* Strictly black on light backgrounds (WCAG AAA compliant) */
     font-size: clamp(22px, 3vh, 28px);
     cursor: pointer;
     display: flex;
@@ -118,7 +118,7 @@
     transition: opacity 0.2s ease, transform 0.2s ease, color 0.2s ease;
   }
   .app-viewport.tx-light .minimal-arrow-btn {
-    color: #FFF;
+    color: #FFFFFF; /* Strictly white on dark backgrounds (WCAG AA compliant) */
   }
   .minimal-arrow-btn:hover {
     opacity: 1;
@@ -128,14 +128,26 @@
     opacity: 0.15;
     pointer-events: none;
   }
+
+  /* PULSE ANIMATION WHEN ALLOWED TO CONTINUE (NEVER YELLOW) */
   .minimal-arrow-btn.ready {
     opacity: 1;
-    color: var(--yellow) !important;
+    animation: chevronPulse 1.6s infinite ease-in-out;
   }
+  @keyframes chevronPulse {
+    0%, 100% {
+      transform: translateX(0) scale(1);
+      opacity: 0.8;
+    }
+    50% {
+      transform: translateX(5px) scale(1.22);
+      opacity: 1;
+    }
+  }
+
   .minimal-arrow-btn.shake-warn {
     animation: shakeX 0.45s !important;
     opacity: 1;
-    color: var(--yellow) !important;
   }
 
   /* CONTEXTUAL FLOATING ISLAND (Word Work & Selection) */
@@ -1194,7 +1206,7 @@ function updateNavShell(){
   // Configure Previous Button
   prevBtn.classList.toggle('disabled', state.index === 0);
 
-  // Configure Next Intent (lights up yellow when ready)
+  // Configure Next Intent (pulses when ready to continue)
   let ready = false;
   if (b.id === 'vocab-scan') ready = isVocabComplete();
   else if (b.id === 'char-verse-pick') ready = state.charVerse !== null;
