@@ -7,7 +7,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800;900&family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
   :root{
     --ink:#0D0D0D;
@@ -108,7 +108,7 @@
     background: none;
     border: none;
     padding: 10px 14px;
-    color: var(--ink); /* Strictly black on light backgrounds (WCAG AAA compliant) */
+    color: var(--ink);
     font-size: clamp(22px, 3vh, 28px);
     cursor: pointer;
     display: flex;
@@ -118,7 +118,7 @@
     transition: opacity 0.2s ease, transform 0.2s ease, color 0.2s ease;
   }
   .app-viewport.tx-light .minimal-arrow-btn {
-    color: #FFFFFF; /* Strictly white on dark backgrounds (WCAG AA compliant) */
+    color: #FFFFFF;
   }
   .minimal-arrow-btn:hover {
     opacity: 1;
@@ -128,8 +128,6 @@
     opacity: 0.15;
     pointer-events: none;
   }
-
-  /* PULSE ANIMATION WHEN ALLOWED TO CONTINUE (NEVER YELLOW) */
   .minimal-arrow-btn.ready {
     opacity: 1;
     animation: chevronPulse 1.6s infinite ease-in-out;
@@ -144,13 +142,12 @@
       opacity: 1;
     }
   }
-
   .minimal-arrow-btn.shake-warn {
     animation: shakeX 0.45s !important;
     opacity: 1;
   }
 
-  /* CONTEXTUAL FLOATING ISLAND (Word Work & Selection) */
+  /* CONTEXTUAL FLOATING ISLAND */
   .floating-context-island {
     position: absolute;
     left: 50%;
@@ -326,7 +323,7 @@
     inset:0; 
     display:flex; 
     flex-direction:column; 
-    padding: clamp(10px, 2vh, 24px) clamp(20px, 4vw, 60px) clamp(80px, 12vh, 100px); 
+    padding: clamp(10px, 2vh, 24px) clamp(20px, 4vw, 60px) clamp(70px, 10vh, 85px); 
     opacity:0; 
     transform:translateY(10px) scale(0.98); 
     transition:opacity .25s ease, transform .25s ease; 
@@ -516,19 +513,22 @@
     .blank-input{ font-size:clamp(24px, 3.2vh, 32px); border-bottom-width:4px; }
   }
 
-  /* SLIDE 4: PRAYER */
+  /* SLIDE 4: PRAYER (KICKER IN CIRCLE: PRAYER) */
   .breath-visual{ position:relative; width: clamp(200px, 30vh, 300px); height: clamp(200px, 30vh, 300px); margin: 0 auto; flex-shrink:0; }
   .breath-circle{ position:absolute; inset:0; border-radius:50%; background:#C9B8E8; border:4px solid var(--ink); box-shadow:0 0 26px rgba(168,85,247,0.25); transform:scale(0.8); z-index:2; }
   .beat.active .breath-circle{ animation:breathe 9s ease-in-out infinite; }
   @keyframes breathe{ 0%,100%{ transform:scale(0.8); background:#C9B8E8; } 50%{ transform:scale(1.2); background:#DCEFA0; } }
-  .breath-label-wrap{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; z-index:3; pointer-events:none; }
-  .pray-center-text{ font-family:'Space Grotesk', sans-serif; font-weight:900; font-size:clamp(32px, 5vh, 48px); letter-spacing:3px; text-transform:uppercase; color:var(--ink); }
+  .breath-label-wrap{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; z-index:3; pointer-events:none; }
+  .pray-kicker-text{ font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--ink); opacity:0.65; margin-bottom:2px; }
+  .pray-center-text{ font-family:'Space Grotesk', sans-serif; font-weight:900; font-size:clamp(32px, 5vh, 48px); letter-spacing:3px; text-transform:uppercase; color:var(--ink); line-height:1; }
   @media (min-width: 768px) {
     .breath-visual{ width: clamp(260px, 34vh, 360px); height: clamp(260px, 34vh, 360px); }
+    .pray-kicker-text{ font-size:14px; letter-spacing:2.5px; }
     .pray-center-text{ font-size:clamp(36px, 5vh, 54px); }
   }
   @media (min-width: 1100px) {
     .breath-visual{ width: clamp(340px, 42vh, 480px); height: clamp(340px, 42vh, 480px); }
+    .pray-kicker-text{ font-size:16px; letter-spacing:3px; }
     .pray-center-text{ font-size:clamp(46px, 6vh, 66px); }
   }
 
@@ -551,17 +551,41 @@
     .cover-note{ font-size:20px; max-width:540px; }
   }
 
-  /* PASSAGE FULL WIDTH READ */
-  .passage-scroll-wrap{ flex:1; position:relative; min-height:0; display:flex; width:100%; justify-content:center; }
-  .passage-scroll{ overflow-y:auto; -webkit-overflow-scrolling:touch; flex:1; padding:6px 20px 140px 0; color:var(--ink); width:100%; max-width:820px; }
-  .flow-para{ margin:0 0 20px 0; font-size:clamp(17.5px, 2.2vh, 21px); line-height:1.75; font-family:'Inter',sans-serif; font-weight:400; max-width:820px; }
-  @media (min-width: 768px) {
-    .passage-scroll{ max-width:900px; }
-    .flow-para{ font-size:20px; max-width:900px; }
+  /* SLIDE 6 & 10: PASSAGE SCROLL WRAP WITH GRADIENT FADE-OUT */
+  .passage-scroll-wrap{ 
+    flex:1; 
+    position:relative; 
+    min-height:0; 
+    display:flex; 
+    width:100%; 
+    justify-content:center;
+    mask-image: linear-gradient(to bottom, black calc(100% - 40px), transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black calc(100% - 40px), transparent 100%);
   }
-  @media (min-width: 1400px) {
-    .passage-scroll{ max-width:1600px; }
-    .flow-para{ font-size:clamp(28px, 1.7vw, 36px); line-height:1.8; max-width:1600px; margin:0 0 30px 0; }
+  .passage-scroll{ 
+    overflow-y:auto; 
+    -webkit-overflow-scrolling:touch; 
+    flex:1; 
+    padding:6px 20px 30px 0; 
+    color:var(--ink); 
+    width:100%; 
+    max-width:820px; 
+  }
+  .flow-para{ 
+    margin:0 0 20px 0; 
+    font-size:clamp(18px, 2.3vh, 22px); 
+    line-height:1.75; 
+    font-family:'Inter',sans-serif; 
+    font-weight:400; 
+    max-width:820px; 
+  }
+  @media (min-width: 768px) {
+    .passage-scroll{ max-width:960px; padding-bottom:36px; }
+    .flow-para{ font-size:clamp(22px, 2.4vw, 26px); line-height:1.8; max-width:960px; margin-bottom:26px; }
+  }
+  @media (min-width: 1200px) {
+    .passage-scroll{ max-width:1300px; }
+    .flow-para{ font-size:clamp(25px, 2vw, 32px); line-height:1.85; max-width:1300px; }
   }
   .verse-num-inline{ font-family:'Space Grotesk', sans-serif; font-weight:700; color:var(--purple); font-size:.65em; vertical-align:super; margin:0 2px 0 6px; }
   
@@ -579,50 +603,137 @@
   .w.hl-green{ background: rgba(34, 197, 94, 0.40); font-weight: 700; }
   .w.hl-pink{ background: rgba(244, 63, 94, 0.40); font-weight: 700; }
 
-  .verse-pick-list{ overflow-y:auto; -webkit-overflow-scrolling:touch; flex:1; min-height:0; margin-top:0; position:relative; z-index:2; padding:4px 12px 130px 0; width:100%; max-width:860px; margin-left:auto; margin-right:auto; }
-  .verse-tile{ display:flex; gap:16px; align-items:flex-start; padding:14px 16px; cursor:pointer; transition:background .13s ease; color:var(--ink); border-radius:16px; width:100%; max-width:820px; }
-  .verse-tile.selected{ background:var(--lime); }
-  .verse-tile .vnum{ font-family:'Space Grotesk', sans-serif; font-weight:800; color:var(--purple); flex-shrink:0; width:30px; font-size:18px; }
-  .verse-tile .vtext{ font-size:clamp(16.5px, 2.1vh, 19.5px); line-height:1.55; font-family:'Inter',sans-serif; font-weight:400; }
-  @media (min-width: 768px) {
-    .verse-pick-list{ max-width:900px; }
-    .verse-tile{ max-width:900px; padding:16px 18px; }
+  /* SLIDE 10: VERSE PICK SCROLL WITH MATCHED TYPOGRAPHY & FADE */
+  .verse-pick-list{ 
+    overflow-y:auto; 
+    -webkit-overflow-scrolling:touch; 
+    flex:1; 
+    min-height:0; 
+    position:relative; 
+    z-index:2; 
+    padding:4px 12px 30px 0; 
+    width:100%; 
+    max-width:860px; 
+    margin:0 auto; 
   }
-  @media (min-width: 1400px) {
-    .verse-pick-list{ max-width:1600px; }
-    .verse-tile{ max-width:1600px; gap:24px; padding:22px 26px; }
-    .verse-tile .vnum{ font-size:30px; width:52px; }
-    .verse-tile .vtext{ font-size:clamp(26px, 1.6vw, 34px); line-height:1.7; }
+  .verse-tile{ display:flex; gap:16px; align-items:flex-start; padding:14px 16px; cursor:pointer; transition:background .13s ease; color:var(--ink); border-radius:16px; width:100%; }
+  .verse-tile.selected{ background:var(--lime); }
+  .verse-tile .vnum{ font-family:'Space Grotesk', sans-serif; font-weight:800; color:var(--purple); flex-shrink:0; width:34px; font-size:clamp(18px, 2.2vh, 22px); }
+  .verse-tile .vtext{ font-size:clamp(18px, 2.3vh, 22px); line-height:1.75; font-family:'Inter',sans-serif; font-weight:400; }
+  @media (min-width: 768px) {
+    .verse-pick-list{ max-width:960px; }
+    .verse-tile{ padding:18px 22px; gap:20px; }
+    .verse-tile .vnum{ font-size:24px; width:40px; }
+    .verse-tile .vtext{ font-size:clamp(22px, 2.4vw, 26px); line-height:1.8; }
+  }
+  @media (min-width: 1200px) {
+    .verse-pick-list{ max-width:1300px; }
+    .verse-tile .vnum{ font-size:28px; width:48px; }
+    .verse-tile .vtext{ font-size:clamp(25px, 2vw, 32px); line-height:1.85; }
   }
 
-  .review-section-header{ font-family:'Space Grotesk', sans-serif; font-size:12px; font-weight:800; letter-spacing:1px; text-transform:uppercase; color:var(--ink); opacity:.8; margin:16px 0 8px 0; display:flex; align-items:center; gap:8px; }
-  .review-card{ background:#FFF; border:3.5px solid var(--ink); border-radius:16px; padding:16px 20px; margin-bottom:12px; font-family:'Inter', sans-serif; font-size:14.5px; font-weight:700; line-height:1.45; box-shadow:3px 3px 0 var(--ink); color:var(--ink); }
-  .review-card b{ color:var(--purple); text-transform:capitalize; }
-  .review-scroll{ flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; position:relative; z-index:2; padding:4px 8px 8px 4px; width:100%; max-width:1200px; margin:0 auto; display:flex; flex-direction:column; justify-content:center; }
+  /* SLIDE 7: VOCAB REVIEW (EDITORIAL LIST STYLE - NO BUTTON LOOK) */
+  .review-scroll{ flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; position:relative; z-index:2; padding:4px 8px 12px 4px; width:100%; max-width:1100px; margin:0 auto; display:flex; flex-direction:column; justify-content:flex-start; }
+  .glossary-panel{
+    background:#FFFDF6;
+    border-radius:14px;
+    padding: clamp(18px, 3vh, 30px) clamp(18px, 3vw, 30px);
+  }
+  .review-section-header{ font-family:'Space Grotesk', sans-serif; font-size:12px; font-weight:800; letter-spacing:1.2px; text-transform:uppercase; color:var(--ink); opacity:.55; margin:0 0 6px 0; display:flex; align-items:center; gap:8px; }
+  .review-section-header + .review-section-header{ margin-top:22px; }
+  .review-def-entry{ 
+    padding: 15px 0; 
+    border-bottom: 1.5px solid rgba(13,13,13,0.14); 
+    font-family: 'Inter', sans-serif; 
+    font-size: clamp(15px, 2vh, 18px); 
+    line-height: 1.55; 
+    color: var(--ink); 
+  }
+  .review-def-entry:last-child { border-bottom: none; }
+  .review-def-entry .term-word{ font-family: 'Space Grotesk', sans-serif; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: var(--ink); margin-right: 6px; }
+  .review-def-entry .term-word::after{ content:'—'; margin-left:6px; opacity:.4; font-weight:400; }
+  @media (min-width: 1100px) {
+    .glossary-panel{ padding:44px 48px; }
+    .review-section-header{ font-size:15px; }
+    .review-def-entry{ font-size:20px; padding:20px 0; line-height:1.65; }
+  }
   .pill-cloud{ display:flex; flex-wrap:wrap; gap:10px; margin-top:8px; }
   .research-pill{ font-family:'Space Grotesk', sans-serif; font-size:13px; font-weight:700; background:var(--ink); color:#FFF; padding:9px 16px; border-radius:100px; text-transform:capitalize; }
   @media (min-width: 1100px) {
-    .review-section-header{ font-size:16px; margin:26px 0 14px 0; }
-    .review-card{ font-size:20px; padding:26px 30px; margin-bottom:18px; border-radius:20px; }
-    .research-pill{ font-size:18px; padding:14px 24px; }
-    .review-scroll .review-section-header:first-child{ margin-top:0; }
+    .review-section-header{ font-size:16px; margin:24px 0 14px 0; }
+    .review-def-entry{ font-size:21px; padding:18px 0; line-height:1.65; }
+    .research-pill{ font-size:17px; padding:12px 22px; }
   }
 
-  /* SLIDE 8: CROSS REFS */
+  /* SLIDE 8: CROSS REFS (EDITORIAL ANNOTATION STYLE - NO BUTTON LOOK) */
   .xref-compact-list{ flex:1; display:flex; flex-direction:column; justify-content:center; gap:clamp(16px, 3vh, 26px); position:relative; z-index:2; width:100%; max-width:1200px; margin:0 auto; }
-  .xref-item{ display:flex; gap:18px; align-items:center; position:relative; background:#FFF; padding: clamp(16px, 2.5vh, 24px); border-radius: 18px; border: 3px solid var(--ink); box-shadow:4px 4px 0 var(--ink); }
-  .xref-icon-node{ width:54px; height:54px; border-radius:50%; background:var(--lime); color:var(--ink); display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; border:2.5px solid var(--ink); }
-  .xref-content{ flex:1; display:flex; flex-direction:column; gap:4px; }
-  .xref-topic{ font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:800; letter-spacing:0.8px; text-transform:uppercase; color:var(--ink); }
-  .xref-body{ font-family:'Inter',sans-serif; font-size:clamp(14.5px, 1.9vh, 17px); font-weight:700; line-height:1.5; color:rgba(13,13,13,0.82); }
-  .xref-body em{ font-style:normal; color:var(--purple); font-weight:800; }
+  /* CORKBOARD STRING & PIN — TWO PINNED CARDS PER CONNECTION, JOINED BY A SAGGING STRING */
+  .xref-pair{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    width:100%;
+  }
+  .xref-node-card{
+    position:relative;
+    width:100%;
+    background:#FBF7EC;
+    color:var(--ink);
+    border:3px solid var(--ink);
+    border-radius:6px;
+    box-shadow:5px 5px 0 var(--ink);
+    padding: 16px 18px;
+    z-index:2;
+  }
+  .xref-node-card.from{ transform: rotate(-1.6deg); padding-bottom:24px; }
+  .xref-node-card.to{ transform: rotate(1.3deg); padding-top:24px; }
+  .xref-pin{
+    position:absolute;
+    left:50%;
+    transform:translateX(-50%);
+    width:20px; height:20px;
+    border-radius:50%;
+    background:var(--pink);
+    border:2.5px solid var(--ink);
+    box-shadow:0 2px 0 rgba(0,0,0,0.3);
+    z-index:4;
+  }
+  .xref-node-card.from .xref-pin{ bottom:-11px; }
+  .xref-node-card.to .xref-pin{ top:-11px; }
+  .xref-ref-label{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:11px;
+    font-weight:800;
+    letter-spacing:0.6px;
+    text-transform:uppercase;
+    background:var(--ink);
+    color:#FFF;
+    border-radius:6px;
+    padding:4px 9px;
+    display:inline-block;
+    margin-bottom:8px;
+  }
+  .xref-node-card.to .xref-ref-label{ background:var(--purple); }
+  .xref-node-note{ font-family:'Inter',sans-serif; font-size:clamp(14px, 1.9vh, 17px); font-weight:500; line-height:1.5; color:rgba(13,13,13,0.88); }
+  .xref-node-note em{ font-style:normal; color:var(--ink); font-weight:800; background:rgba(244,63,94,0.18); padding:0 3px; border-radius:3px; }
+  .xref-string-wrap{
+    width:80px;
+    height:44px;
+    position:relative;
+    z-index:1;
+    flex-shrink:0;
+  }
+  .xref-string-wrap svg{ position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
+  .xref-content{ display:none; }
+  .xref-topic{ display:none; }
+  .xref-body{ display:none; }
+  .xref-icon-node{ display:none; }
   @media (min-width: 1024px) {
-    .xref-compact-list{ display:grid; grid-template-columns:1fr 1fr; align-items:stretch; max-width:1400px; gap:42px; }
-    .xref-item{ flex-direction:column; align-items:flex-start; justify-content:center; text-align:left; padding:44px 38px; gap:24px; border-width:4px; border-radius:24px; box-shadow:6px 6px 0 var(--ink); }
-    .xref-content{ flex:none; }
-    .xref-icon-node{ width:72px; height:72px; font-size:30px; border-width:3.5px; }
-    .xref-topic{ font-size:24px; letter-spacing:1px; margin-bottom:6px; }
-    .xref-body{ font-size:21px; line-height:1.65; }
+    .xref-compact-list{ display:grid; grid-template-columns:1fr 1fr; align-items:start; max-width:1300px; gap:60px 56px; }
+    .xref-node-card{ padding:22px 26px 28px; }
+    .xref-node-card.to{ padding-top:30px; }
+    .xref-ref-label{ font-size:13px; padding:5px 12px; }
+    .xref-node-note{ font-size:19px; line-height:1.6; }
   }
 
   /* SLIDE 11: CHAR COACHING */
@@ -1010,12 +1121,13 @@ const beats = [
             </div>
           </div>` },
 
-  /* 4. PRAYER */
+  /* 4. PRAYER (KICKER IN CIRCLE: PRAYER) */
   { id:'breath-prayer', type:'tapAuto', isInteractive:false, bgGrad:'var(--bg-cream)', text:'dark', align:'center',
     html:`<div style="flex:1; display:flex; align-items:center; justify-content:center; width:100%;">
             <div class="breath-visual">
               <div class="breath-circle"></div>
               <div class="breath-label-wrap">
+                <div class="pray-kicker-text">Prayer</div>
                 <div class="pray-center-text">PRAY</div>
               </div>
             </div>
@@ -1035,7 +1147,7 @@ const beats = [
             </div>
           </div>` },
 
-  /* 6. PASSAGE SCAN */
+  /* 6. PASSAGE SCAN (WITH MASK GRADIENT FADE-OUT) */
   { id:'vocab-scan', type:'input', blockTap:true, isInteractive:true, clue:'Highlight key words & scroll to bottom', bgGrad:'var(--bg-cream)', text:'dark',
     html:`<div class="full-page">
             <div class="passage-scroll-wrap">
@@ -1043,27 +1155,47 @@ const beats = [
             </div>
           </div>` },
 
-  /* 7. GLOSSARY REVIEW */
+  /* 7. GLOSSARY REVIEW (EDITORIAL DEFINITIONS) */
   { id:'vocab-review', type:'input', blockTap:false, isInteractive:false, bgGrad:'var(--bg-terracotta)', text:'dark',
     html:`<div class="sketch-lead-title">Glossary Review</div>
           <div class="review-scroll" id="vocabReviewBox"></div>` },
 
-  /* 8. CROSS REFERENCES */
+  /* 8. CROSS REFERENCES (EDITORIAL ANNOTATIONS) */
   { id:'expand-cross-refs', type:'tapAuto', isInteractive:false, bgGrad:'var(--bg-sage)', text:'dark', align:'start',
     html:`<div class="sketch-lead-title">Make Connections</div>
           <div class="xref-compact-list">
-            <div class="xref-item">
-              <div class="xref-icon-node"><i class="fa-solid fa-quote-right"></i></div>
-              <div class="xref-content">
-                <div class="xref-topic">Matthew 28:18</div>
-                <div class="xref-body">Mark shows Jesus teaching with real authority. Matthew writes that Jesus said, "<em>All authority</em> in heaven and earth has been given to me."</div>
+            <div class="xref-pair">
+              <div class="xref-node-card from">
+                <div class="xref-ref-label">Mark 1:27</div>
+                <div class="xref-node-note">The crowd is stunned: Jesus teaches with real, unmistakable authority.</div>
+                <div class="xref-pin"></div>
+              </div>
+              <div class="xref-string-wrap">
+                <svg viewBox="0 0 80 44" preserveAspectRatio="none">
+                  <path d="M40,0 C70,14 10,30 40,44" fill="none" stroke="#C11C3F" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div class="xref-node-card to">
+                <div class="xref-pin"></div>
+                <div class="xref-ref-label">Matthew 28:18</div>
+                <div class="xref-node-note">Matthew writes that Jesus said, "<em>All authority</em> in heaven and earth has been given to me."</div>
               </div>
             </div>
-            <div class="xref-item">
-              <div class="xref-icon-node"><i class="fa-solid fa-ghost"></i></div>
-              <div class="xref-content">
-                <div class="xref-topic">James 2:19</div>
-                <div class="xref-body">Mark shows a demon obeying Jesus on the spot. James writes that even demons <em>believe</em>, and <em>shudder</em>.</div>
+            <div class="xref-pair">
+              <div class="xref-node-card from">
+                <div class="xref-ref-label">Mark 1:24</div>
+                <div class="xref-node-note">An impure spirit obeys Jesus instantly, the moment he speaks.</div>
+                <div class="xref-pin"></div>
+              </div>
+              <div class="xref-string-wrap">
+                <svg viewBox="0 0 80 44" preserveAspectRatio="none">
+                  <path d="M40,0 C10,14 70,30 40,44" fill="none" stroke="#C11C3F" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div class="xref-node-card to">
+                <div class="xref-pin"></div>
+                <div class="xref-ref-label">James 2:19</div>
+                <div class="xref-node-note">James writes that even demons <em>believe</em>, and <em>shudder</em>.</div>
               </div>
             </div>
           </div>` },
@@ -1082,15 +1214,18 @@ const beats = [
             </div>
           </div>` },
 
-  /* 10. VERSE PICK */
+  /* 10. VERSE PICK (WITH MASK GRADIENT FADE-OUT) */
   { id:'char-verse-pick', type:'input', blockTap:true, isInteractive:true, clue:'Select a verse to continue', bgGrad:'var(--bg-cream)', text:'dark',
     html:`<div class="full-page">
-            <div class="verse-pick-list">${versePickHTML()}</div>
+            <div class="passage-scroll-wrap">
+              <div class="verse-pick-list">${versePickHTML()}</div>
+            </div>
           </div>` },
 
-  /* 11. GOD SHOT COACHING */
+  /* 11. GOD SHOT COACHING (HEADER: CENTRAL TRUTH) */
   { id:'char-coaching', type:'input', blockTap:true, isInteractive:true, clue:'Fill in the blank to continue', bgGrad:'var(--bg-orange)', text:'dark',
-    html:`<div class="set-scene-grid">
+    html:`<div class="sketch-lead-title" style="margin-bottom:14px;">Central Truth</div>
+          <div class="set-scene-grid">
             <div style="display:flex; flex-direction:column; gap:14px; width:100%;">
               <div class="dark-scripture-card">
                 <div class="ref" id="charRef"></div>
@@ -1106,9 +1241,9 @@ const beats = [
             </div>
           </div>` },
 
-  /* 12. FINAL (HOW SHOULD WE RESPOND?) */
+  /* 12. FINAL (HEADER: CENTRAL TRUTH) */
   { id:'final', type:'input', blockTap:true, isInteractive:false, bgGrad:'var(--bg-cream)', text:'dark', align:'start',
-    html:`<div class="sketch-lead-title" style="margin-bottom:8px;">How should we respond?</div>
+    html:`<div class="sketch-lead-title" style="margin-bottom:14px;">Central Truth</div>
           <div class="final-reflection-grid">
             <div class="circle-hero-container">
               <div class="circle-hero expanded-god-is">
@@ -1131,7 +1266,7 @@ const beats = [
 const sectionLabels = [
   'Dwell Guide', 'Discover', 'Discover', 'Recap',
   'Prayer', 'Word Work', 'Word Work', 'Word Work', 'Expand',
-  'Learn', 'Learn', 'Learn', 'Live'
+  'Learn', 'Learn', 'Central Truth', 'Central Truth'
 ];
 
 function initNotches(){
@@ -1206,7 +1341,7 @@ function updateNavShell(){
   // Configure Previous Button
   prevBtn.classList.toggle('disabled', state.index === 0);
 
-  // Configure Next Intent (pulses when ready to continue)
+  // Configure Next Intent
   let ready = false;
   if (b.id === 'vocab-scan') ready = isVocabComplete();
   else if (b.id === 'char-verse-pick') ready = state.charVerse !== null;
@@ -1370,7 +1505,7 @@ function checkPassageScroll(){
 function renderVocabReview(){
   const box = document.getElementById('vocabReviewBox');
   if (state.wordTaps.length === 0) {
-    box.innerHTML = `<div class="review-card">No words highlighted!</div>`;
+    box.innerHTML = `<div class="glossary-panel"><div class="review-def-entry" style="border:none; opacity:0.7;">No words highlighted yet!</div></div>`;
     return;
   }
   
@@ -1391,15 +1526,16 @@ function renderVocabReview(){
     }
   });
 
-  let html = '';
+  let html = '<div class="glossary-panel">';
   if (defined.length > 0) {
     html += `<div class="review-section-header"><i class="fa-solid fa-book-bookmark"></i> Defined Terms</div>`;
-    html += defined.map(w => `<div class="review-card"><b>${w.word}:</b> ${w.def}</div>`).join('');
+    html += defined.map(w => `<div class="review-def-entry"><span class="term-word">${w.word}</span>${w.def}</div>`).join('');
   }
   if (undefinedWords.length > 0) {
     html += `<div class="review-section-header"><i class="fa-solid fa-magnifying-glass"></i> Terms to Define</div>
              <div class="pill-cloud">${undefinedWords.map(word => `<div class="research-pill">${word}</div>`).join('')}</div>`;
   }
+  html += '</div>';
   box.innerHTML = html;
 }
 
