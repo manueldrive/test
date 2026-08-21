@@ -7,30 +7,54 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --ink:#0D0D0D;
-    --paper:#FFFFFF;
-    --cream:#EAE6DF;
-    --lime:#C3F53C;
-    --pink:#F43F5E;
-    --blue:#38BDF8;
-    --yellow:#FFC72C;
-    --purple:#A855F7;
-    --green:#22C55E;
+    --ink: #1C1D21;
+    --paper: #FFFFFF;
+    --cream: #F4F1EA;
 
-    --bg-lime: linear-gradient(145deg, #d2f860 0%, #a2e014 100%);
-    --bg-purple: linear-gradient(145deg, #b862f8 0%, #7e22ce 100%);
-    --bg-pink: linear-gradient(145deg, #fb5672 0%, #be123c 100%);
-    --bg-dark: linear-gradient(145deg, #262626 0%, #050505 100%);
-    --bg-cream: linear-gradient(145deg, #f4f0e8 0%, #d8d2c7 100%);
-    --bg-yellow: linear-gradient(145deg, #ffd452 0%, #eab308 100%);
-    --bg-teal: linear-gradient(145deg, #49737d 0%, #1f424b 100%);
-    --bg-terracotta: linear-gradient(145deg, #e48d75 0%, #a15844 100%);
-    --bg-sage: linear-gradient(145deg, #729e8f 0%, #42665a 100%);
-    --bg-orange: linear-gradient(145deg, #f6af77 0%, #b07546 100%);
-    --bg-leather: linear-gradient(160deg, #7a4a2c 0%, #452817 100%);
+    /* Baseline: Golden Hour Horizon */
+    --d-discover:     #e28a5c;
+    --d-wordwork:     #d76b65;
+    --d-expand:       #9e6488;
+    --d-learn:        #5d587e;
+    --d-live:         #2d324f;
+
+    /* Semantic Accents & Status */
+    --teal:           #2A9D8F;  /* Success / active interactive states */
+    --yellow:         #E9A024;  /* Attention / pulse */
+    --coral:          #D85A50;  /* Error / warnings */
+    --purple-deep:    #542893;  /* High contrast verse numbers / Kickers */
+    --trait-purple:   #6A43B8;  /* Accessible trait text (WCAG AA pass on white) */
+
+    /* Highlighter specific tints */
+    --hl-char:        #3A86C8;  /* Characters (Sky blue) */
+    --hl-setting:     #2E9352;  /* Setting (True leaf green, distinct from teal) */
+    --hl-confuse:     #E9A024;  /* Confusing (Amber) */
+    --hl-repeat:      #D85A50;  /* Repeated (Coral) */
+
+    --bg-cream: #F4F1EA;
+    --bg-discover:  var(--d-discover);
+    --bg-wordwork:  var(--d-wordwork);
+    --bg-expand:    var(--d-expand);
+    --bg-learn:     var(--d-learn);
+    --bg-live:      var(--d-live);
+
+    /* Skeuomorphic tactile shadow tokens */
+    --shadow-subtle: 0 4px 12px rgba(13, 13, 29, 0.06), 0 1px 3px rgba(13, 13, 29, 0.04);
+    --shadow-card: 0 12px 28px -4px rgba(28, 29, 33, 0.12), 0 4px 10px -2px rgba(28, 29, 33, 0.06);
+    --shadow-floating: 0 16px 36px -6px rgba(28, 29, 33, 0.22), 0 6px 14px -2px rgba(28, 29, 33, 0.1);
+    --shadow-tactile: inset 0 1px 0 rgba(255,255,255,0.7), 0 6px 16px rgba(0,0,0,0.12);
+  }
+
+  :root[data-theme="northern"] {
+    --bg-discover:  #2dd7b2;
+    --bg-wordwork:  #23bcdf;
+    --bg-expand:    #4576ee;
+    --bg-learn:     #5666e1;
+    --bg-live:      #212a73;
+    --bg-cream:     #eaf2f5;
   }
   *{box-sizing:border-box;}
   
@@ -48,6 +72,7 @@
 
   .app-viewport {
     position: relative;
+    z-index: 0;
     width: 100vw;
     height: 100vh;
     height: 100dvh;
@@ -55,48 +80,108 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    transition: background .4s ease;
+    transition: background .4s cubic-bezier(0.16, 1, 0.3, 1);
     -webkit-user-select: none;
     user-select: none;
-    -webkit-touch-callout: none;
   }
 
-  /* FULLSCREEN BUTTON (DESKTOP ONLY) */
+  /* SKEUOMORPHIC AMBIENT GLOW SYSTEM */
+  .app-viewport.intro-glow::before{
+    content:'';
+    position:absolute;
+    inset:-20%;
+    background:
+      radial-gradient(circle at 20% 25%, rgba(255,255,255,0.45) 0%, transparent 45%),
+      radial-gradient(circle at 75% 18%, var(--d-wordwork) 0%, transparent 55%),
+      radial-gradient(circle at 80% 75%, var(--d-expand) 0%, transparent 55%),
+      radial-gradient(circle at 25% 80%, var(--d-live) 0%, transparent 50%),
+      linear-gradient(155deg, var(--d-discover) 0%, var(--d-wordwork) 100%);
+    filter: blur(65px) saturate(1.2);
+    z-index: -2;
+  }
+  .app-viewport.intro-glow::after{
+    content:'';
+    position:absolute;
+    inset:0;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    opacity: 0.16;
+    mix-blend-mode: overlay;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  .app-viewport.quest-glow::before{
+    content:'';
+    position:absolute;
+    inset:-20%;
+    background:
+      radial-gradient(circle at 15% 85%, #b862d6 0%, transparent 45%),
+      radial-gradient(circle at 88% 30%, rgba(255,255,255,0.3) 0%, transparent 45%),
+      linear-gradient(155deg, var(--d-discover) 0%, var(--d-wordwork) 100%);
+    filter: blur(65px) saturate(1.15);
+    z-index: -2;
+  }
+  .app-viewport.quest-glow.variant-b::before{
+    background:
+      radial-gradient(circle at 85% 82%, #e0568a 0%, transparent 46%),
+      radial-gradient(circle at 12% 20%, rgba(255,255,255,0.32) 0%, transparent 42%),
+      linear-gradient(200deg, var(--d-discover) 0%, var(--d-expand) 100%);
+  }
+  .app-viewport.quest-glow::after{
+    content:'';
+    position:absolute;
+    inset:0;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    opacity: 0.16;
+    mix-blend-mode: overlay;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  .app-viewport.beat-glow::before{
+    content:'';
+    position:absolute;
+    inset:-20%;
+    background:
+      radial-gradient(circle at var(--glow-p1, 15% 85%), var(--glow-a1, rgba(255,255,255,0)) 0%, transparent 45%),
+      radial-gradient(circle at var(--glow-p2, 88% 20%), var(--glow-a2, rgba(255,255,255,0.22)) 0%, transparent 42%),
+      linear-gradient(155deg, var(--glow-base, var(--bg-cream)) 0%, var(--glow-base2, var(--bg-cream)) 100%);
+    filter: blur(65px) saturate(1.15);
+    z-index: -2;
+  }
+  .app-viewport.beat-glow::after{
+    content:'';
+    position:absolute;
+    inset:0;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    opacity: 0.14;
+    mix-blend-mode: overlay;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  /* FULLSCREEN CLICK ZONE */
   .fs-toggle-btn {
     position: absolute;
-    top: 14px;
-    right: 18px;
+    top: 0;
+    right: 0;
     z-index: 100;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: rgba(13, 13, 13, 0.12);
-    border: 1.5px solid rgba(13, 13, 13, 0.2);
-    color: var(--ink);
-    font-size: 15px;
+    width: 72px;
+    height: 64px;
+    background: transparent;
+    border: none;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    backdrop-filter: blur(8px);
-    transition: all 0.2s ease;
   }
   @media (max-width: 767px) {
     .fs-toggle-btn { display: none !important; }
   }
-  .app-viewport.tx-light .fs-toggle-btn {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 255, 255, 0.3);
-    color: #FFF;
-  }
-  .fs-toggle-btn:hover { transform: scale(1.08); background: rgba(13, 13, 13, 0.25); }
 
-  /* ================= MINIMAL BORDERLESS CHEVRON NAVIGATION ================= */
+  /* NAVIGATION & FLOATING CONTROLS */
   .persistent-nav-shell {
     position: absolute;
     left: 0;
     right: 0;
-    bottom: clamp(14px, 2.5vh, 22px);
+    bottom: clamp(16px, 3vh, 26px);
     z-index: 90;
     display: flex;
     justify-content: space-between;
@@ -106,53 +191,55 @@
   }
   .minimal-arrow-btn {
     pointer-events: auto;
-    background: none;
-    border: none;
-    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.65);
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
     color: var(--ink);
-    font-size: clamp(22px, 3vh, 28px);
+    font-size: 18px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    opacity: 0.55;
-    transition: opacity 0.2s ease, transform 0.2s ease, color 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .app-viewport.tx-light .minimal-arrow-btn {
+    background: rgba(255, 255, 255, 0.18);
+    border-color: rgba(255, 255, 255, 0.28);
     color: #FFFFFF;
   }
   .minimal-arrow-btn:hover {
-    opacity: 1;
-    transform: scale(1.15);
+    background: rgba(255, 255, 255, 0.85);
+    transform: scale(1.08) translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.14);
+  }
+  .app-viewport.tx-light .minimal-arrow-btn:hover {
+    background: rgba(255, 255, 255, 0.32);
   }
   .minimal-arrow-btn.disabled {
-    opacity: 0.15;
+    opacity: 0.2;
     pointer-events: none;
+    transform: none !important;
   }
   .minimal-arrow-btn.ready {
-    opacity: 1;
-    animation: chevronPulse 1.6s infinite ease-in-out;
+    background: var(--yellow);
+    border-color: rgba(255, 255, 255, 0.8);
+    color: #FFF;
+    animation: softGlowPulse 1.8s infinite ease-in-out;
   }
-  @keyframes chevronPulse {
-    0%, 100% {
-      transform: translateX(0) scale(1);
-      opacity: 0.8;
-    }
-    50% {
-      transform: translateX(5px) scale(1.22);
-      opacity: 1;
-    }
-  }
-  .minimal-arrow-btn.shake-warn {
-    animation: shakeX 0.45s !important;
-    opacity: 1;
+  @keyframes softGlowPulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 4px 14px rgba(233,160,36,0.35); }
+    50% { transform: scale(1.1); box-shadow: 0 8px 26px rgba(233,160,36,0.65); }
   }
 
-  /* CONTEXTUAL FLOATING ISLAND */
+  /* FLOATING CONTEXT TOOLBAR */
   .floating-context-island {
     position: absolute;
     left: 50%;
-    bottom: clamp(14px, 2.5vh, 22px);
+    bottom: clamp(16px, 3vh, 26px);
     transform: translateX(-50%);
     z-index: 95;
     display: flex;
@@ -161,209 +248,166 @@
     gap: 8px;
     pointer-events: auto;
   }
-  .tools-capsule {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: rgba(255, 255, 255, 0.95);
-    border: 3px solid var(--ink);
-    border-radius: 100px;
-    padding: 5px 8px;
-    box-shadow: 3.5px 3.5px 0 var(--ink);
-    backdrop-filter: blur(8px);
-  }
-  .hl-mini-btn {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: #FFF;
-    color: var(--ink);
-    border: 2px solid var(--ink);
-    border-radius: 100px;
-    padding: 7px 11px;
-    font-family: 'Space Grotesk', sans-serif;
-    font-weight: 700;
-    font-size: 11.5px;
-    cursor: pointer;
-    transition: all 0.12s ease;
-    white-space: nowrap;
-  }
-  .hl-mini-btn:hover { background: #F4F0E8; }
-  .hl-mini-btn.active {
-    border-width: 2.5px;
-    transform: scale(0.96);
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.18);
-  }
-  .hl-mini-btn[data-color="blue"].active { background: rgba(56,189,248,0.3); }
-  .hl-mini-btn[data-color="green"].active { background: rgba(34,197,94,0.3); }
-  .hl-mini-btn[data-color="yellow"].active { background: rgba(255,199,44,0.4); }
-  .hl-mini-btn[data-color="pink"].active { background: rgba(244,63,94,0.3); }
-
-  .hl-swatch {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    border: 1.5px solid var(--ink);
-    flex-shrink: 0;
-  }
-  .hl-swatch-blue{ background:var(--blue); }
-  .hl-swatch-green{ background:var(--green); }
-  .hl-swatch-yellow{ background:var(--yellow); }
-  .hl-swatch-pink{ background:var(--pink); }
-
-  /* FLANKING HIGHLIGHTER CONTROLS (no pill/button chrome) — sit either side of the action pill */
   .hl-flank-row{
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 6px;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,0.9);
+    border-radius: 100px;
+    padding: 6px 8px;
+    box-shadow: var(--shadow-floating);
   }
   .hl-flank-btn{
-    background: none;
+    background: transparent;
     border: none;
-    padding: 2px 2px;
+    padding: 6px 8px;
+    border-radius: 100px;
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 2px;
+    gap: 6px;
     cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
+    transition: all 0.2s ease;
   }
+  .hl-flank-btn:hover { background: rgba(0,0,0,0.04); }
   .hl-flank-btn .hl-swatch{
-    width: 13px;
-    height: 13px;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.25), 0 1px 2px rgba(255,255,255,0.8);
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
+  .hl-swatch-blue{ background: var(--hl-char); }
+  .hl-swatch-green{ background: var(--hl-setting); }
+  .hl-swatch-yellow{ background: var(--hl-confuse); }
+  .hl-swatch-pink{ background: var(--hl-repeat); }
+
   .hl-flank-btn .hl-flank-label{
     font-family: 'Space Grotesk', sans-serif;
-    font-weight: 800;
-    font-size: 7px;
-    letter-spacing: 0.1px;
-    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 11.5px;
+    letter-spacing: 0.2px;
     color: var(--ink);
-    opacity: 0.65;
-    white-space: nowrap;
+    opacity: 0.75;
+    display: none;
   }
-  .hl-flank-btn.active .hl-swatch{
-    transform: scale(1.25);
-    box-shadow: 0 0 0 3px rgba(13,13,13,0.15);
+  .hl-flank-btn.active{
+    background: #FFFFFF;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   }
-  .hl-flank-btn.active .hl-flank-label{ opacity: 1; }
-  .hl-flank-row .action-gate-pill{ padding: 9px 14px; font-size: 11.5px; }
-  @media (min-width: 480px) {
-    .hl-flank-row{ gap: 9px; }
-    .hl-flank-btn .hl-swatch{ width: 15px; height: 15px; }
-    .hl-flank-btn .hl-flank-label{ font-size: 8.5px; letter-spacing: 0.3px; }
-    .hl-flank-row .action-gate-pill{ padding: 10px 20px; font-size: 13px; }
-  }
-  @media (min-width: 1024px) {
-    .hl-flank-row{ gap: 16px; }
-    .hl-flank-btn .hl-swatch{ width: 20px; height: 20px; }
-    .hl-flank-btn .hl-flank-label{ font-size: 11px; }
-  }
+  .hl-flank-btn.active .hl-swatch{ transform: scale(1.18); }
+  .hl-flank-btn.active .hl-flank-label{ display: block; opacity: 1; }
 
   .action-gate-pill {
     font-family: 'Space Grotesk', sans-serif;
-    font-size: 13px;
-    font-weight: 800;
-    letter-spacing: 0.4px;
-    text-transform: uppercase;
-    background: #FFF;
+    font-size: 13.5px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    background: #FFFFFF;
     color: var(--ink);
-    border: 3px solid var(--ink);
+    border: 1px solid rgba(0,0,0,0.08);
     border-radius: 100px;
-    padding: 10px 20px;
+    padding: 10px 22px;
     cursor: pointer;
-    box-shadow: 3.5px 3.5px 0 var(--ink);
+    box-shadow: var(--shadow-tactile);
     display: inline-flex;
     align-items: center;
     gap: 8px;
     white-space: nowrap;
-    transition: all 0.15s ease;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   }
-  .action-gate-pill:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+  .action-gate-pill:hover { transform: translateY(-1px); box-shadow: 0 8px 18px rgba(0,0,0,0.1); }
+  .action-gate-pill:active { transform: translateY(1px); }
   .action-gate-pill.ready {
-    background: var(--yellow) !important;
-    color: var(--ink) !important;
-    animation: gentlePulse 2s infinite ease-in-out;
-  }
-  .action-gate-pill.shake-warn {
-    animation: shakeX 0.45s !important;
-    background: var(--yellow) !important;
-    color: var(--ink) !important;
+    background: linear-gradient(135deg, #F5B638, #E9A024);
+    color: #FFFFFF;
+    border-color: rgba(255,255,255,0.4);
+    box-shadow: 0 6px 20px rgba(233,160,36,0.45);
   }
 
-  @keyframes gentlePulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.02); }
-  }
-  @keyframes shakeX{ 10%,90%{transform:translateX(-3px);} 20%,80%{transform:translateX(5px);} 30%,50%{transform:translateX(-8px);} 40%,60%{transform:translateX(8px);} }
-
-  /* FLOATING NOTICE BADGE */
+  /* NOTIFICATION CLUE BADGE */
   .clue-badge{
     position: absolute;
     left: 50%;
-    bottom: clamp(76px, 12vh, 96px);
+    bottom: clamp(80px, 12vh, 100px);
     transform: translateX(-50%);
     display: flex; align-items: center; gap: 8px;
-    background: var(--ink); color: #FFF;
-    font-family:'Space Grotesk', sans-serif; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: .4px;
-    padding: 10px 18px; border-radius: 100px;
-    box-shadow: 3px 3px 0 rgba(0,0,0,0.3);
+    background: rgba(28, 29, 33, 0.9);
+    backdrop-filter: blur(12px);
+    color: #FFF;
+    font-family:'Space Grotesk', sans-serif; font-size: 13px; font-weight: 700;
+    padding: 10px 20px; border-radius: 100px;
+    box-shadow: var(--shadow-floating);
     z-index: 100;
     white-space: nowrap;
   }
   .clue-badge i{ color: var(--yellow); }
 
-  /* HEADER & HUD */
+  /* HEADER & PROGRESS */
   .hud-header{ 
     position:relative; 
     z-index:50; 
-    padding: clamp(14px, 2.5vh, 22px) clamp(20px, 4vw, 60px) 6px; 
+    padding: clamp(16px, 2.5vh, 24px) clamp(20px, 4vw, 60px) 8px; 
     width: 100%;
     margin: 0 auto;
     display:flex; 
     flex-direction:column; 
-    gap:8px; 
+    gap:10px; 
   }
-  .progress-container{ position:relative; width:100%; height:7px; background:rgba(13,13,29,0.18); border-radius:100px; }
-  .tx-light .progress-container{ background:rgba(255,255,255,0.25); }
-  .progress-bar-fill{ position:absolute; left:0; top:0; bottom:0; width:0%; background:var(--ink); border-radius:100px; transition:width .3s cubic-bezier(.2,.8,.25,1); }
-  .tx-light .progress-bar-fill{ background:#FFF; }
-  
+  .progress-container{ 
+    position:relative; 
+    width:100%; 
+    height:6px; 
+    background:rgba(28, 29, 33, 0.08); 
+    border-radius:100px;
+    overflow: visible;
+  }
+  .tx-light .progress-container{ background:rgba(255,255,255,0.2); }
+  .progress-bar-fill{ 
+    position:absolute; 
+    left:0; top:0; bottom:0; width:0%; 
+    background: linear-gradient(90deg, var(--teal), var(--yellow)); 
+    border-radius:100px; 
+    transition:width .35s cubic-bezier(0.16, 1, 0.3, 1); 
+  }
   .notches-layer{ position:absolute; inset:0; pointer-events:none; }
-  .prog-notch{ position:absolute; top:50%; transform:translate(-50%, -50%); width:9px; height:9px; border-radius:50%; background:rgba(13,13,29,0.3); border:1.5px solid rgba(255,255,255,0.6); transition:all .25s ease; }
-  .tx-light .prog-notch{ background:rgba(255,255,255,0.4); border-color:rgba(0,0,0,0.3); }
-  .prog-notch.passed{ background:var(--lime); border-color:var(--ink); }
-  .prog-notch.active{ width:13px; height:13px; background:var(--yellow); border-color:var(--ink); box-shadow:0 0 8px rgba(0,0,0,0.3); animation:notchPulse 1.2s infinite ease-in-out; }
-  @keyframes notchPulse{ 0%,100%{ transform:translate(-50%, -50%) scale(1); } 50%{ transform:translate(-50%, -50%) scale(1.25); } }
-
-  .story-meta{ display:flex; justify-content:space-between; font-family:'Space Grotesk', sans-serif; font-size:12px; font-weight:800; letter-spacing:1.2px; text-transform:uppercase; opacity:.85; padding-right: 48px; }
-  @media (max-width: 767px) {
-    .story-meta { padding-right: 0; }
+  .prog-notch{ 
+    position:absolute; 
+    top:50%; 
+    transform:translate(-50%, -50%); 
+    width:8px; height:8px; 
+    border-radius:50%; 
+    background: rgba(28, 29, 33, 0.25); 
+    border: 2px solid #FFF; 
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    transition:all .25s ease; 
   }
-  .story-meta .meta-link-btn{
-    background: none;
-    border: none;
-    padding: 0;
-    color: inherit;
-    font-family: inherit;
-    font-size: inherit;
-    font-weight: inherit;
-    letter-spacing: inherit;
-    text-transform: inherit;
-    cursor: pointer;
-    text-decoration: underline;
-    text-underline-offset: 3px;
-    opacity: 0.9;
+  .prog-notch.passed{ background: var(--teal); }
+  .prog-notch.active{ 
+    width:12px; height:12px; 
+    background: var(--yellow); 
+    box-shadow: 0 0 12px rgba(233,160,36,0.8); 
   }
 
-  /* STAGE & BEATS */
+  .story-meta{ 
+    display:flex; 
+    align-items:center; 
+    justify-content:space-between; 
+    font-family:'Space Grotesk', sans-serif; 
+    font-size:12px; 
+    font-weight:700; 
+    letter-spacing:1px; 
+    text-transform:uppercase; 
+    opacity:.75; 
+  }
+
+  /* STAGE & SLIDES */
   .stage{ 
     position:relative; 
     flex:1; 
     overflow:hidden; 
     z-index:1; 
-    perspective:1400px; 
     width: 100%;
     margin: 0 auto;
     display: flex;
@@ -374,65 +418,57 @@
     inset:0; 
     display:flex; 
     flex-direction:column; 
-    padding: clamp(10px, 2vh, 24px) clamp(20px, 4vw, 60px) clamp(70px, 10vh, 85px); 
+    padding: clamp(12px, 2vh, 24px) clamp(20px, 4vw, 60px) clamp(75px, 11vh, 95px); 
     opacity:0; 
-    transform:translateY(10px) scale(0.98); 
-    transition:opacity .25s ease, transform .25s ease; 
+    transform:translateY(12px) scale(0.99); 
+    transition:opacity .3s ease, transform .3s cubic-bezier(0.16, 1, 0.3, 1); 
     pointer-events:none; 
     z-index:1; 
-    background: transparent !important;
   }
   .beat.active{ opacity:1; transform:translateY(0) scale(1); pointer-events:auto; z-index:2; }
   .tx-dark{ color:var(--ink); }
   .tx-light{ color:#FFF; }
 
-  /* PAGE-FLIP TRANSITION — used when leaving a book-cover screen (reading-intro, character-prompt) */
-  .beat.page-flip-exit{
-    animation: pageFlipOut 0.42s cubic-bezier(.45,.05,.55,.95) forwards;
-    transform-origin: left center;
-    z-index: 6;
-    backface-visibility: hidden;
-  }
-  @keyframes pageFlipOut{
-    0%{ transform: rotateY(0deg); opacity:1; }
-    100%{ transform: rotateY(-100deg); opacity:0.1; }
-  }
-
   .sketch-lead-title {
     font-family:'Space Grotesk', sans-serif;
-    font-size: clamp(24px, 3.8vw, 42px);
-    font-weight: 800;
-    letter-spacing: -0.5px;
-    text-transform: uppercase;
-    margin-bottom: clamp(10px, 1.8vh, 24px);
+    font-size: clamp(26px, 3.8vw, 40px);
+    font-weight: 700;
+    letter-spacing: -0.4px;
+    margin-bottom: clamp(12px, 2vh, 24px);
     text-align: left;
     width: 100%;
   }
+  .pop-mark{
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.95);
+    color: var(--ink);
+    padding: 2px 14px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    margin: 0 2px;
+  }
+  .beat-kicker{
+    font-family:'Space Grotesk', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: .7;
+    margin-bottom: 6px;
+  }
 
   /* INTRO SLIDE */
-  .intro-top-title{ font-family:'Space Grotesk', sans-serif; font-size:16px; font-weight:700; letter-spacing:2px; text-transform:uppercase; opacity:.85; margin-bottom:12px; }
-  .intro-duration{ font-family:'Space Grotesk', sans-serif; font-size:13.5px; font-weight:700; letter-spacing:.5px; text-transform:uppercase; opacity:.6; margin-top:16px; display:flex; align-items:center; gap:8px; }
-  @media (min-width: 768px) {
-    .intro-duration { display: none; }
-  }
   .hero-wrap{ flex:1; display:flex; flex-direction:column; justify-content:center; position:relative; z-index:2; width:100%; max-width:800px; margin:0 auto; }
-
+  .intro-top-title{ font-family:'Space Grotesk', sans-serif; font-size:16px; font-weight:700; letter-spacing:2px; text-transform:uppercase; opacity:.85; margin-bottom:12px; }
   .kline{ overflow:hidden; margin-bottom:2px; }
-  .kline:last-child{ margin-bottom:0; }
-  .kword{ display:inline-block; opacity:0; transform:translateY(16px) scale(0.92); font-family:'Space Grotesk', sans-serif; font-weight:700; letter-spacing:-0.3px; text-transform:uppercase; }
-  .beat.active .kword{ animation:kwIn .5s cubic-bezier(.2,.85,.25,1) forwards; }
-  @keyframes kwIn{ to{ opacity:1; transform:translateY(0) scale(1); } }
-  .hero-title.xl .kword{ font-size:clamp(42px, 8vw, 76px); line-height:1.05; }
-  .emoji{ font-size:42px; line-height:1; margin-bottom:6px; position:relative; z-index:2; }
-  @media (min-width: 768px) {
-    .hero-wrap{ max-width:960px; }
-    .hero-title.xl .kword{ font-size:clamp(56px, 8vw, 140px); }
-    .intro-top-title{ font-size:19px; letter-spacing:3px; }
-    .emoji{ font-size:56px; margin-bottom:10px; }
-  }
+  .kword{ display:inline-block; opacity:0; transform:translateY(20px); font-family:'Space Grotesk', sans-serif; font-weight:700; letter-spacing:-0.4px; }
+  .beat.active .kword{ animation:kwIn .5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+  @keyframes kwIn{ to{ opacity:1; transform:translateY(0); } }
+  .hero-title.xl .kword{ font-size:clamp(44px, 8vw, 84px); line-height:1.05; }
+  .emoji{ font-size:46px; line-height:1; margin-bottom:12px; }
 
-  /* SLIDE 1: TESTAMENT CARDS */
-  .testament-deck {
+  /* SKEUOMORPHIC SOFT CARDS */
+  .testament-deck, .sections-5-deck {
     display: flex;
     flex-direction: column;
     gap: 16px;
@@ -446,116 +482,101 @@
   @media (min-width: 768px) {
     .testament-deck {
       display: grid;
-      grid-template-columns: 1.85fr 1.15fr;
+      grid-template-columns: 1.6fr 1.2fr;
       gap: 28px;
-      align-items: stretch;
-      max-height: 480px;
+      align-items: center;
     }
-  }
-
-  /* SLIDE 2: 5-COLUMN DECK */
-  .sections-5-deck {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    flex: 1;
-    overflow-y: auto;
-    max-width: 1300px;
-    margin: 0 auto;
-    width: 100%;
-    justify-content: space-evenly;
-  }
-  @media (max-width: 767px) {
-    .sections-5-deck {
-      gap: 6px;
-      padding: 0 4px 10px 4px;
-    }
-    .sections-5-deck .deck-card {
-      padding: 8px 12px;
-      border-width: 2.5px;
-      border-radius: 14px;
-      box-shadow: 3px 3px 0 var(--ink);
-    }
-    .sections-5-deck .dc-title { font-size: 15px; margin-bottom: 2px; }
-    .sections-5-deck .dc-badge { font-size: 9.5px; padding: 2px 8px; margin-bottom: 4px; }
-    .sections-5-deck .dc-desc { font-size: 11px; line-height: 1.3; }
-  }
-  @media (min-width: 768px) {
     .sections-5-deck {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-template-columns: repeat(5, 1fr);
       gap: 16px;
       align-items: center;
-      overflow-y: visible;
-      align-content: center;
     }
-  }
-  @media (min-width: 1100px) {
-    .sections-5-deck {
-      grid-template-columns: repeat(5, 1fr);
-    }
-    .sections-5-deck .deck-card{ min-height: clamp(280px, 40vh, 420px); }
   }
 
   .deck-card {
-    background: #FFF;
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(16px);
     color: var(--ink);
-    border: 3.5px solid var(--ink);
-    border-radius: 20px;
-    padding: clamp(16px, 2.5vh, 28px);
+    border: 1px solid rgba(255, 255, 255, 0.95);
+    border-radius: 24px;
+    padding: clamp(18px, 2.5vh, 28px);
     cursor: pointer;
-    transition: all .14s ease;
-    box-shadow: 5px 5px 0 var(--ink);
+    transition: all .24s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: var(--shadow-card);
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
     justify-content: center;
+    position: relative;
   }
-  .deck-card:active { transform: translate(2px, 2px); box-shadow: 0 0 0 var(--ink); }
-  .deck-card .dc-title { font-family: 'Space Grotesk', sans-serif; font-size: clamp(18px, 2.6vh, 24px); font-weight: 800; margin-bottom: 8px; }
-  .deck-card .dc-icon { font-size: clamp(22px, 3.4vh, 30px); color: var(--purple); margin-bottom: 8px; }
-  .deck-card.correct .dc-icon,
-  .deck-card.incorrect .dc-icon { color: inherit; }
-  .deck-card .dc-badge { font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 700; background: var(--ink); color: #FFF; padding: 4px 12px; border-radius: 100px; margin-bottom: 10px; }
-  .deck-card .dc-desc { font-family: 'Inter', sans-serif; font-size: clamp(12.5px, 1.7vh, 14.5px); font-weight: 700; opacity: 0.85; line-height: 1.45; }
-  .deck-card.correct { background: var(--lime) !important; color: var(--ink) !important; box-shadow: 4px 4px 0 var(--ink) !important; }
-  .deck-card.incorrect { background: var(--pink) !important; color: #FFF !important; }
-  .deck-card.locked { pointer-events: none; }
-  .deck-card.shake { animation: shakeX .45s; }
-  @media (min-width: 768px) {
-    .deck-card .dc-title{ font-size:clamp(22px, 3vh, 30px); }
-    .deck-card .dc-desc{ font-size:clamp(15px, 2vh, 17.5px); }
-    .testament-deck .deck-card { min-height: 380px; padding: 32px 28px; }
+  .deck-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-floating);
+    background: rgba(255, 255, 255, 0.96);
   }
-  @media (min-width: 1024px) {
-    .testament-deck { max-width: 1500px; max-height: min(64vh, 620px); gap: 40px; }
-    .testament-deck .deck-card { min-height: clamp(400px, 60vh, 600px); padding: 48px 40px; border-width: 4.5px; box-shadow: 7px 7px 0 var(--ink); }
-    .testament-deck .dc-title { font-size: clamp(34px, 4.4vh, 46px); margin-bottom: 16px; }
-    .testament-deck .dc-badge { font-size: 15px; padding: 8px 18px; margin-bottom: 18px; }
-    .testament-deck .dc-desc { font-size: clamp(19px, 2.4vh, 24px); line-height: 1.55; max-width: 480px; }
+  .deck-card:active { transform: translateY(0); }
+  .deck-card .dc-title { font-family: 'Space Grotesk', sans-serif; font-size: clamp(18px, 2.4vh, 24px); font-weight: 700; margin-bottom: 8px; }
+  .deck-card .dc-icon { font-size: clamp(24px, 3vh, 32px); color: var(--ink); opacity: 0.8; margin-bottom: 12px; }
+  .deck-card .dc-badge { 
+    font-family: 'Inter', sans-serif; 
+    font-size: 11.5px; 
+    font-weight: 600; 
+    background: rgba(28, 29, 33, 0.08); 
+    color: var(--ink); 
+    padding: 4px 12px; 
+    border-radius: 100px; 
+    margin-bottom: 10px; 
   }
-  @media (min-width: 1500px) {
-    .testament-deck { max-width: 1700px; }
-    .testament-deck .dc-desc { max-width: 540px; }
-  }
-  @media (max-width: 767px) {
-    .sections-5-deck .dc-icon{ font-size: 18px; margin-bottom: 2px; color: var(--purple); }
-  }
-  @media (min-width: 1100px) {
-    .sections-5-deck .dc-icon{ font-size: clamp(42px, 6vh, 64px); margin-bottom: 16px; }
+  .deck-card .dc-desc { 
+    font-family: 'Inter', sans-serif; 
+    font-size: clamp(13px, 1.6vh, 14.5px); 
+    font-weight: 500; 
+    opacity: 0.8; 
+    line-height: 1.45; 
   }
 
-  /* SLIDE 3: RECAP */
+  .deck-card.correct { 
+    background: linear-gradient(145deg, #32B39B, #248D7F) !important; 
+    color: #FFFFFF !important; 
+    border-color: rgba(255,255,255,0.4) !important;
+    box-shadow: 0 12px 30px rgba(42,157,143,0.38) !important;
+  }
+  .deck-card.correct .dc-badge { background: rgba(255, 255, 255, 0.25); color: #FFF; }
+  .deck-card.correct .dc-icon { color: #FFF; opacity: 1; }
+  .deck-card.incorrect { 
+    background: var(--coral) !important; 
+    color: #FFF !important; 
+    animation: shakeX 0.45s ease;
+  }
+
+  .book-pill{
+    font-family:'Space Grotesk', sans-serif;
+    font-size: 11.5px;
+    font-weight: 700;
+    background: rgba(255,255,255,0.3);
+    color: #FFF;
+    border-radius: 100px;
+    padding: 4px 12px;
+    backdrop-filter: blur(8px);
+  }
+  .book-pill.is-mark{
+    background: #FFFFFF;
+    color: var(--ink);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  }
+
+  /* RECAP SCREEN (SLIDE 3) - WARM INTEGRATED TONES */
   .set-scene-grid {
     display: flex;
     flex-direction: column;
     flex: 1;
     min-height: 0;
-    gap: 20px;
+    gap: 24px;
     align-items: center;
     justify-content: center;
-    max-width: 1300px;
+    max-width: 1200px;
     margin: 0 auto;
     width: 100%;
   }
@@ -563,88 +584,144 @@
     .set-scene-grid {
       display: grid;
       grid-template-columns: 0.9fr 1.1fr;
-      gap: 50px;
-      align-items: center;
+      gap: 40px;
     }
   }
 
-  .folder-wrap{ display:flex; flex-direction:column; justify-content:flex-start; width:100%; position:relative; z-index:2; }
-  .folder-tab{ align-self:flex-start; margin-left:8px; background:#E4B563; border:3.5px solid var(--ink); border-bottom:none; border-radius:10px 10px 0 0; padding:6px 18px 8px 18px; font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:13px; letter-spacing:1px; text-transform:uppercase; color:var(--ink); position:relative; z-index:3; margin-bottom:-4px; flex-shrink:0; }
-  .folder-body{ display:flex; flex-direction:column; justify-content:space-evenly; background:#F3D48B; border:3.5px solid var(--ink); border-radius:3px 18px 18px 18px; box-shadow:5px 5px 0 var(--ink); padding:18px 22px; position:relative; z-index:2; flex-shrink:0; gap:14px; }
-  .folder-bullet{ display:flex; flex-direction:column; gap:4px; font-family:'Inter', sans-serif; font-size:clamp(14px, 1.8vh, 16px); font-weight:800; line-height:1.45; color:var(--ink); }
-  .recap-tag{ align-self:flex-start; display:inline-block; font-family:'Space Grotesk', sans-serif; font-size:11px; font-weight:800; letter-spacing:0.6px; text-transform:uppercase; background:var(--ink); color:#fff; border-radius:6px; padding:3px 9px; margin-bottom:2px; }
-  @media (min-width: 1024px) {
-    .folder-body{ padding:38px 42px; gap:26px; border-width:4px; border-radius:4px 22px 22px 22px; }
-    .folder-bullet{ font-size:21px; line-height:1.5; }
-    .folder-tab{ font-size:16px; padding:10px 26px 12px 26px; border-width:4px; }
-    .recap-tag{ font-size:13px; padding:5px 12px; }
+  .folder-wrap{ display:flex; flex-direction:column; width:100%; }
+  .folder-tab{ 
+    align-self:flex-start; 
+    margin-left:12px; 
+    background: #E8A882; 
+    border-radius:12px 12px 0 0; 
+    padding:8px 20px; 
+    font-family:'Space Grotesk',sans-serif; 
+    font-weight:700; 
+    font-size:13px; 
+    letter-spacing:0.5px; 
+    color:#FFFFFF; 
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.04);
+  }
+  .folder-body{ 
+    display:flex; 
+    flex-direction:column; 
+    background: rgba(255, 255, 255, 0.9); 
+    backdrop-filter: blur(16px);
+    border-radius: 4px 24px 24px 24px; 
+    box-shadow: var(--shadow-card); 
+    padding: 24px 28px; 
+    gap: 16px; 
+  }
+  .folder-bullet{ 
+    display:flex; 
+    flex-direction:column; 
+    gap:4px; 
+    font-family:'Inter', sans-serif; 
+    font-size: clamp(14px, 1.7vh, 16px); 
+    font-weight: 500; 
+    line-height: 1.5; 
+    color: var(--ink); 
+  }
+  .recap-tag{ 
+    align-self:flex-start; 
+    font-family:'Space Grotesk', sans-serif; 
+    font-size:11px; 
+    font-weight:700; 
+    letter-spacing:0.5px; 
+    text-transform:uppercase; 
+    background: var(--d-discover); 
+    color:#fff; 
+    border-radius:6px; 
+    padding:3px 9px; 
   }
 
-  /* GOD SHOT CIRCLE DESIGN */
-  .circle-hero-container{ position:relative; z-index:2; flex-shrink:0; display:flex; justify-content:center; align-items:center; }
-  .circle-hero{ width: clamp(230px, 32vh, 300px); height: clamp(230px, 32vh, 300px); border-radius:50%; background:#FFF; color:var(--ink); border:4px solid var(--ink); box-shadow:6px 6px 0 var(--ink); display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px; flex-shrink:0; }
-  .circle-hero .arc-stem-text{ font-family:'Space Grotesk', sans-serif; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:1px; opacity:.65; margin-bottom:6px; }
-  .circle-hero .label-god-is{ font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:clamp(22px, 3vh, 28px); letter-spacing:-.5px; text-transform:uppercase; line-height:1; margin-bottom:8px; }
-  .circle-hero .static-trait{ font-family:'Inter', sans-serif; font-size:clamp(20px, 2.6vh, 26px); font-weight:900; color:var(--purple); text-transform:capitalize; border-bottom:3.5px solid var(--ink); padding:2px 14px; margin-bottom:6px; }
-  .blank-input{ width:88%; max-width:88%; border:none; border-bottom:3.5px solid var(--ink); background:transparent; font-family:'Inter', sans-serif; font-size:clamp(16px, 2.2vh, 20px); font-weight:800; text-align:center; outline:none; color:var(--purple); padding:2px 0; }
-  
-  @media (min-width: 1024px) {
-    .circle-hero{ width: clamp(340px, 46vh, 460px); height: clamp(340px, 46vh, 460px); padding:36px; border-width:5px; box-shadow:8px 8px 0 var(--ink); }
-    .circle-hero .arc-stem-text{ font-size:15px; letter-spacing:1.4px; margin-bottom:12px; }
-    .circle-hero .label-god-is{ font-size:clamp(34px, 4.4vh, 44px); margin-bottom:14px; }
-    .circle-hero .static-trait{ font-size:clamp(30px, 3.8vh, 38px); border-bottom-width:4px; padding:4px 18px; }
-    .blank-input{ font-size:clamp(24px, 3.2vh, 32px); border-bottom-width:4px; }
+  /* SKEUOMORPHIC CIRCULAR BADGE / GOD SHOT */
+  .circle-hero{ 
+    width: clamp(230px, 32vh, 310px); 
+    height: clamp(230px, 32vh, 310px); 
+    border-radius:50%; 
+    background: radial-gradient(circle at 35% 30%, #FFFFFF, #FAF7F2);
+    color:var(--ink); 
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    box-shadow: inset 0 2px 6px rgba(255,255,255,0.9), 0 16px 36px rgba(0,0,0,0.12);
+    display:flex; 
+    flex-direction:column; 
+    align-items:center; 
+    justify-content:center; 
+    text-align:center; 
+    padding:24px; 
   }
+  .circle-hero .arc-stem-text{ font-family:'Space Grotesk', sans-serif; font-size:11.5px; font-weight:700; letter-spacing:1px; opacity:.6; margin-bottom:6px; }
+  .circle-hero .label-god-is{ font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:clamp(22px, 3vh, 28px); letter-spacing:-.4px; line-height:1; margin-bottom:8px; }
+  .circle-hero .static-trait{ 
+    font-family:'Inter', sans-serif; 
+    font-size:clamp(20px, 2.6vh, 26px); 
+    font-weight:800; 
+    color: var(--trait-purple); /* Accessible AAA WCAG contrast on light background */
+    padding:2px 14px; 
+    margin-bottom:6px; 
+  }
+  .blank-input{ 
+    width:85%; 
+    border:none; 
+    border-bottom:2px solid rgba(28,29,33,0.3); 
+    background:transparent; 
+    font-family:'Inter', sans-serif; 
+    font-size:clamp(18px, 2.4vh, 22px); 
+    font-weight:700; 
+    text-align:center; 
+    outline:none; 
+    color: var(--trait-purple); 
+    padding:4px 0; 
+    transition: border-color 0.2s ease;
+  }
+  .blank-input:focus{ border-color: var(--trait-purple); }
 
-  /* SLIDE 4: PRAYER (KICKER IN CIRCLE: PRAYER) */
-  .breath-visual{ position:relative; width: clamp(200px, 30vh, 300px); height: clamp(200px, 30vh, 300px); margin: 0 auto; flex-shrink:0; }
-  .breath-circle{ position:absolute; inset:0; border-radius:50%; background:#C9B8E8; border:4px solid var(--ink); box-shadow:0 0 26px rgba(168,85,247,0.25); transform:scale(0.8); z-index:2; }
+  /* BREATHE & PRAYER */
+  .breath-visual{ position:relative; width: clamp(220px, 30vh, 320px); height: clamp(220px, 30vh, 320px); margin: 0 auto; }
+  .breath-circle{ 
+    position:absolute; 
+    inset:0; 
+    border-radius:50%; 
+    background: radial-gradient(circle at 35% 30%, #E8D3E0, #BD9EB3);
+    box-shadow: 0 14px 40px rgba(158,100,136,0.35), inset 0 2px 6px rgba(255,255,255,0.6);
+    transform:scale(0.85); 
+  }
   .beat.active .breath-circle{ animation:breathe 9s ease-in-out infinite; }
-  @keyframes breathe{ 0%,100%{ transform:scale(0.8); background:#C9B8E8; } 50%{ transform:scale(1.2); background:#DCEFA0; } }
-  .breath-label-wrap{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; z-index:3; pointer-events:none; }
-  .pray-kicker-text{ font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--ink); opacity:0.65; margin-bottom:2px; }
-  .pray-center-text{ font-family:'Space Grotesk', sans-serif; font-weight:900; font-size:clamp(32px, 5vh, 48px); letter-spacing:3px; text-transform:uppercase; color:var(--ink); line-height:1; }
-  @media (min-width: 768px) {
-    .breath-visual{ width: clamp(260px, 34vh, 360px); height: clamp(260px, 34vh, 360px); }
-    .pray-kicker-text{ font-size:14px; letter-spacing:2.5px; }
-    .pray-center-text{ font-size:clamp(36px, 5vh, 54px); }
+  @keyframes breathe{ 
+    0%,100%{ transform:scale(0.85); background: radial-gradient(circle at 35% 30%, #E8D3E0, #BD9EB3); } 
+    50%{ transform:scale(1.18); background: radial-gradient(circle at 35% 30%, #F5CECA, #E09E98); box-shadow: 0 20px 50px rgba(215,107,101,0.45); } 
   }
-  @media (min-width: 1100px) {
-    .breath-visual{ width: clamp(340px, 42vh, 480px); height: clamp(340px, 42vh, 480px); }
-    .pray-kicker-text{ font-size:16px; letter-spacing:3px; }
-    .pray-center-text{ font-size:clamp(46px, 6vh, 66px); }
-  }
+  .pray-center-text{ font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:clamp(34px, 5vh, 48px); letter-spacing:4px; color:var(--ink); }
 
-  /* BIBLE COVER */
-  .leather-cover{ flex:1; display:flex; border-radius:22px; overflow:hidden; min-height:0; position:relative; border:4px solid var(--ink); box-shadow:6px 6px 0 var(--ink); background: radial-gradient(circle at 28% 18%, rgba(255,255,255,0.10), transparent 42%), repeating-linear-gradient(135deg, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 2px, transparent 2px, transparent 7px), linear-gradient(160deg, #7a4a2c, #452817); width:100%; }
-  .leather-spine{ width:22px; background:rgba(0,0,0,0.38); flex-shrink:0; border-right:2px solid rgba(0,0,0,0.3); }
-  .leather-cover-inner{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap: clamp(14px, 2.5vh, 26px); padding:26px; color:#F1E3D3; text-align:center; }
-  .leather-cover-inner .book-title{ color:#F1E3D3; font-family:'Space Grotesk',sans-serif; font-weight:800; font-size:clamp(28px, 5vh, 42px); text-transform:uppercase; }
-  .focus-pill{ border-radius:24px; padding: clamp(14px, 2.2vh, 20px) clamp(18px, 3.5vw, 30px); text-align:center; position:relative; z-index:2; }
-  .focus-pill-value{ font-family:'Space Grotesk',sans-serif; font-weight:800; font-size:clamp(19px, 3vh, 28px); text-transform:uppercase; letter-spacing:.3px; color:var(--ink); margin-top:3px; }
-  .focus-pill.yellow{ background:var(--yellow); }
-  .focus-pill.lime{ background:var(--lime); }
-  .cover-note{ font-family:'Inter', sans-serif; font-size:clamp(13.5px, 1.9vh, 16px); font-weight:700; line-height:1.45; color:rgba(255,255,255,0.92); max-width:400px; }
-  @media (min-width: 1024px) {
-    /* Screen is too wide for a book-shaped card to read as a book — let the
-       leather texture become the full-bleed page background instead. */
-    .leather-cover{
-      position:absolute;
-      inset:0;
-      border-radius:0;
-      border:none;
-      box-shadow:none;
-      width:auto;
-    }
+  /* LEATHER COVER - SKEUOMORPHIC DEPTH */
+  .leather-cover{ 
+    flex:1; 
+    display:flex; 
+    border-radius:24px; 
+    overflow:hidden; 
+    position:relative; 
+    box-shadow: 0 20px 48px rgba(0,0,0,0.35), inset 0 1px 1px rgba(255,255,255,0.2); 
+    background: 
+      radial-gradient(circle at 25% 20%, rgba(255,255,255,0.12), transparent 50%),
+      linear-gradient(150deg, #5C3822 0%, #361E11 100%); 
+    width:100%; 
   }
-  @media (min-width: 1100px) {
-    .leather-cover-inner .book-title{ font-size:56px; letter-spacing:1px; }
-    .focus-pill-value{ font-size:32px; }
-    .focus-pill{ padding:26px 42px; }
-    .cover-note{ font-size:20px; max-width:540px; }
+  .leather-spine{ width:20px; background:rgba(0,0,0,0.3); border-right:1px solid rgba(255,255,255,0.08); }
+  .leather-cover-inner{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap: 20px; padding:28px; color:#F5ECE3; text-align:center; }
+  .leather-cover-inner .book-title{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(30px, 5vh, 44px); }
+  .focus-pill{ 
+    border-radius:100px; 
+    padding: 14px 28px; 
+    background: rgba(255,255,255,0.15); 
+    backdrop-filter: blur(12px); 
+    border: 1px solid rgba(255,255,255,0.3);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
   }
+  .focus-pill-value{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(18px, 2.6vh, 24px); color:#FFF; }
+  .cover-note{ font-family:'Inter', sans-serif; font-size:clamp(14px, 1.8vh, 16px); font-weight:500; opacity:0.9; max-width:440px; line-height:1.5; }
 
-  /* SLIDE 6 & 10: PASSAGE SCROLL WRAP WITH GRADIENT FADE-OUT */
+  /* PASSAGE READING & REFINED LINE HEIGHT */
   .passage-scroll-wrap{ 
     flex:1; 
     position:relative; 
@@ -657,351 +734,165 @@
   }
   .passage-scroll{ 
     overflow-y:auto; 
-    -webkit-overflow-scrolling:touch; 
     flex:1; 
-    padding:6px 20px 30px 0; 
+    padding:6px 20px 40px 0; 
     color:var(--ink); 
     width:100%; 
     max-width:820px; 
   }
   .flow-para{ 
-    margin:0 0 20px 0; 
-    font-size:clamp(18px, 2.3vh, 22px); 
-    line-height:1.75; 
+    margin:0 0 24px 0; 
+    font-size:clamp(18px, 2.2vh, 21px); 
+    line-height:1.6; /* Refined optical line height */
     font-family:'Inter',sans-serif; 
     font-weight:400; 
-    max-width:820px; 
   }
   @media (min-width: 768px) {
-    .passage-scroll{ max-width:960px; padding-bottom:36px; }
-    .flow-para{ font-size:clamp(22px, 2.4vw, 26px); line-height:1.8; max-width:960px; margin-bottom:26px; }
+    .passage-scroll{ max-width:940px; }
+    .flow-para{ font-size:clamp(20px, 2vw, 24px); line-height:1.6; margin-bottom:28px; }
   }
-  @media (min-width: 1200px) {
-    .passage-scroll{ max-width:1300px; }
-    .flow-para{ font-size:clamp(25px, 2vw, 32px); line-height:1.85; max-width:1300px; }
+
+  .verse-num-inline{ 
+    font-family:'Space Grotesk', sans-serif; 
+    font-weight:700; 
+    color: var(--purple-deep); /* Accessible WCAG 2.1 AA pass */
+    font-size:.7em; 
+    vertical-align:super; 
+    margin:0 2px 0 6px; 
   }
-  .verse-num-inline{ font-family:'Space Grotesk', sans-serif; font-weight:700; color:var(--purple); font-size:.65em; vertical-align:super; margin:0 2px 0 6px; }
   
-  /* UNIFIED SOFT MARKER HIGHLIGHT STYLE */
+  /* ACCESSIBLE HIGHLIGHTERS (Subtle background tints for black text legibility) */
   .w{ 
     cursor:pointer; 
     padding:2px 4px; 
     border-radius:6px; 
-    transition:background .15s ease, color .15s ease; 
+    transition:background .15s ease; 
   }
-  .w:hover{ background: rgba(255, 199, 44, 0.25); }
   .w.flagged,
-  .w.hl-yellow{ background: rgba(255, 199, 44, 0.55); font-weight: 700; }
-  .w.flagged-light{ background: rgba(255, 199, 44, 0.22); font-weight: 700; }
-  .w.hl-blue{ background: rgba(56, 189, 248, 0.45); font-weight: 700; }
-  .w.hl-green{ background: rgba(34, 197, 94, 0.40); font-weight: 700; }
-  .w.hl-pink{ background: rgba(244, 63, 94, 0.40); font-weight: 700; }
+  .w.hl-yellow{ background: rgba(233, 160, 36, 0.22); font-weight: 600; border-bottom: 2px solid var(--hl-confuse); }
+  .w.hl-blue{ background: rgba(58, 134, 200, 0.18); font-weight: 600; border-bottom: 2px solid var(--hl-char); }
+  .w.hl-green{ background: rgba(46, 147, 82, 0.18); font-weight: 600; border-bottom: 2px solid var(--hl-setting); }
+  .w.hl-pink{ background: rgba(216, 90, 80, 0.18); font-weight: 600; border-bottom: 2px solid var(--hl-repeat); }
 
-  /* SLIDE 10: VERSE PICK SCROLL WITH MATCHED TYPOGRAPHY & FADE */
+  /* VERSE PICK LIST */
   .verse-pick-list{ 
     overflow-y:auto; 
-    -webkit-overflow-scrolling:touch; 
     flex:1; 
-    min-height:0; 
-    position:relative; 
-    z-index:2; 
-    padding:4px 12px 30px 0; 
+    padding:4px 12px 40px 0; 
     width:100%; 
     max-width:860px; 
     margin:0 auto; 
   }
-  .verse-tile{ display:flex; gap:16px; align-items:flex-start; padding:14px 16px; cursor:pointer; transition:background .13s ease; color:var(--ink); border-radius:16px; width:100%; }
-  .verse-tile.selected{ background:var(--lime); }
-  .verse-tile .vnum{ font-family:'Space Grotesk', sans-serif; font-weight:800; color:var(--purple); flex-shrink:0; width:34px; font-size:clamp(18px, 2.2vh, 22px); }
-  .verse-tile .vtext{ font-size:clamp(18px, 2.3vh, 22px); line-height:1.75; font-family:'Inter',sans-serif; font-weight:400; }
-  @media (min-width: 768px) {
-    .verse-pick-list{ max-width:960px; }
-    .verse-tile{ padding:18px 22px; gap:20px; }
-    .verse-tile .vnum{ font-size:24px; width:40px; }
-    .verse-tile .vtext{ font-size:clamp(22px, 2.4vw, 26px); line-height:1.8; }
+  .verse-tile{ 
+    display:flex; 
+    gap:16px; 
+    align-items:flex-start; 
+    padding:16px 20px; 
+    cursor:pointer; 
+    border-radius:18px; 
+    transition:all .2s ease; 
+    color:var(--ink); 
+    margin-bottom: 8px;
   }
-  @media (min-width: 1200px) {
-    .verse-pick-list{ max-width:1300px; }
-    .verse-tile .vnum{ font-size:28px; width:48px; }
-    .verse-tile .vtext{ font-size:clamp(25px, 2vw, 32px); line-height:1.85; }
+  .verse-tile:hover{ background: rgba(255,255,255,0.5); }
+  .verse-tile.selected{ 
+    background: #FFFFFF; 
+    box-shadow: var(--shadow-card); 
   }
+  .verse-tile .vnum{ font-family:'Space Grotesk', sans-serif; font-weight:700; color:var(--purple-deep); flex-shrink:0; width:34px; font-size:20px; }
+  .verse-tile .vtext{ font-size:clamp(17px, 2.1vh, 20px); line-height:1.55; font-family:'Inter',sans-serif; }
 
-  /* SLIDE 7: VOCAB REVIEW (EDITORIAL LIST STYLE - NO BUTTON LOOK) */
-  .review-scroll{ flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; position:relative; z-index:2; padding:4px 8px 12px 4px; width:100%; max-width:1100px; margin:0 auto; display:flex; flex-direction:column; justify-content:flex-start; }
+  /* VOCAB REVIEW EDITORIAL CARD */
+  .review-scroll{ flex:1; overflow-y:auto; padding:4px 8px 16px 4px; width:100%; max-width:1100px; margin:0 auto; }
   .glossary-panel{
-    background:#FFFDF6;
-    border-radius:14px;
-    padding: clamp(12px, 1.6vh, 16px) clamp(12px, 1.8vw, 16px);
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(16px);
+    border-radius: 20px;
+    padding: clamp(16px, 2.5vh, 24px);
+    box-shadow: var(--shadow-card);
   }
-  .review-section-header{ font-family:'Space Grotesk', sans-serif; font-size:11.5px; font-weight:800; letter-spacing:1.2px; text-transform:uppercase; color:var(--ink); opacity:.55; margin:0 0 3px 0; display:flex; align-items:center; gap:8px; }
-  .review-section-header + .review-section-header{ margin-top:10px; }
+  .review-section-header{ font-family:'Space Grotesk', sans-serif; font-size:12px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--ink); opacity:.6; margin:0 0 8px 0; display:flex; align-items:center; gap:8px; }
   .review-def-entry{ 
-    padding: 5px 0; 
-    border-bottom: 1.5px solid rgba(13,13,13,0.14); 
+    padding: 10px 0; 
+    border-bottom: 1px solid rgba(28,29,33,0.08); 
     font-family: 'Inter', sans-serif; 
-    font-size: clamp(13.5px, 1.8vh, 16px); 
-    line-height: 1.3; 
+    font-size: 15px; 
+    line-height: 1.5; 
     color: var(--ink); 
   }
   .review-def-entry:last-child { border-bottom: none; }
-  .review-def-entry .gloss-num{ font-family:'Space Grotesk', sans-serif; font-weight:700; color:var(--purple); font-size:.65em; vertical-align:super; margin-right:3px; }
-  .review-def-entry .term-word{ font-family: 'Space Grotesk', sans-serif; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: var(--ink); margin-right: 6px; }
-  .review-def-entry .term-word::after{ content:'—'; margin-left:6px; opacity:.4; font-weight:400; }
-  @media (min-width: 900px) {
-    .review-scroll{ max-width:1300px; }
-    .glossary-panel{ padding:14px 22px; }
-    .review-def-entry{ display:grid; grid-template-columns:210px 1fr; gap:16px; padding:6px 0; align-items:baseline; }
-    .review-def-entry .term-word{ margin-right:0; }
-    .review-def-entry .term-word::after{ content:''; }
-  }
-  @media (min-width: 1100px) {
-    .glossary-panel{ padding:16px 26px; }
-    .review-section-header{ font-size:13px; }
-    .review-def-entry{ font-size:16.5px; grid-template-columns:240px 1fr; padding:7px 0; }
-  }
-  @media (min-width: 1400px) {
-    .review-scroll{ max-width:1700px; }
-    .glossary-panel{ padding:20px 32px; }
-    .review-def-entry{ font-size:18px; grid-template-columns:290px 1fr; gap:22px; padding:8px 0; }
-  }
-  .pill-cloud{ display:flex; flex-wrap:wrap; gap:6px; margin-top:4px; }
-  .research-pill{ font-family:'Space Grotesk', sans-serif; font-size:12.5px; font-weight:700; background:var(--ink); color:#FFF; padding:7px 14px; border-radius:100px; text-transform:capitalize; }
-  @media (min-width: 1100px) {
-    .research-pill{ font-size:15px; padding:10px 18px; }
+  .review-def-entry .term-word{ font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: var(--purple-deep); margin-right: 8px; }
+  .pill-cloud{ display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+  .research-pill{ 
+    font-family:'Space Grotesk', sans-serif; 
+    font-size:13px; 
+    font-weight:600; 
+    background: rgba(28, 29, 33, 0.08); 
+    color:var(--ink); 
+    padding:6px 14px; 
+    border-radius:100px; 
   }
 
-  /* SLIDE 8: CROSS REFS — SIMPLE SIDE-BY-SIDE CARDS JOINED BY A CHAIN LINK */
-  .xref-compact-list{ flex:1; display:flex; flex-direction:column; justify-content:center; gap:clamp(20px, 3.5vh, 32px); position:relative; z-index:2; width:100%; max-width:1200px; margin:0 auto; }
-  .xref-pair{
-    display:flex;
-    align-items:stretch;
-    width:100%;
-    gap:0;
+  /* CENTRAL TRUTH / SCRIPTURE CARD */
+  .dark-scripture-card{ 
+    background: rgba(255, 255, 255, 0.12); 
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,0.2);
+    color:#FFF; 
+    border-radius:24px; 
+    padding:24px 28px; 
+    box-shadow: var(--shadow-card); 
   }
-  .xref-node-card{
-    flex:1;
-    min-width:0;
-    background:#FBF7EC;
-    color:var(--ink);
-    border:1.5px solid rgba(13,13,13,0.22);
-    border-radius:12px;
-    padding: 16px 18px;
-  }
-  .xref-ref-label{
-    font-family:'Space Grotesk',sans-serif;
-    font-size:11px;
-    font-weight:800;
-    letter-spacing:0.6px;
-    text-transform:uppercase;
-    color:var(--purple);
-    margin-bottom:6px;
-  }
-  .xref-node-card.to .xref-ref-label{ color:var(--pink); }
-  .xref-node-note{ font-family:'Inter',sans-serif; font-size:clamp(13.5px, 1.8vh, 16px); font-weight:500; line-height:1.5; color:rgba(13,13,13,0.88); }
-  .xref-node-note em{ font-style:normal; color:var(--ink); font-weight:800; background:rgba(244,63,94,0.18); padding:0 3px; border-radius:3px; }
-  .xref-chain{
-    flex-shrink:0;
-    width:40px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:0;
-  }
-  .xref-chain-line{ flex:1; height:2px; background:rgba(13,13,13,0.28); }
-  .xref-chain-link{
-    position:relative;
-    width:26px; height:32px;
-    flex-shrink:0;
-  }
-  .xref-chain-link .bar-v{
-    position:absolute;
-    left:50%;
-    top:0; bottom:0;
-    width:6px;
-    margin-left:-3px;
-    background:var(--purple);
-    border-radius:3px;
-  }
-  .xref-chain-link .bar-h{
-    position:absolute;
-    left:50%;
-    top:9px;
-    width:22px; height:6px;
-    margin-left:-11px;
-    background:var(--purple);
-    border-radius:3px;
-  }
-  .xref-content{ display:none; }
-  .xref-topic{ display:none; }
-  .xref-body{ display:none; }
-  .xref-icon-node{ display:none; }
-  @media (max-width: 479px) {
-    .xref-pair{ flex-direction:column; align-items:stretch; }
-    .xref-chain{ width:100%; height:32px; flex-direction:row; }
-    .xref-chain-line{ height:2px; width:auto; }
-  }
-  @media (min-width: 1024px) {
-    .xref-compact-list{ max-width:1300px; }
-    .xref-node-card{ padding:22px 26px; }
-    .xref-ref-label{ font-size:13px; }
-    .xref-node-note{ font-size:18px; line-height:1.6; }
-    .xref-chain{ width:56px; }
-    .xref-chain-link{ width:34px; height:42px; }
-    .xref-chain-link .bar-v{ width:8px; margin-left:-4px; }
-    .xref-chain-link .bar-h{ top:12px; width:30px; height:8px; margin-left:-15px; }
-  }
+  .dark-scripture-card .ref{ font-family:'Space Grotesk', sans-serif; font-size:13px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--teal); margin-bottom:8px; }
+  .dark-scripture-card .vt{ font-family:'Inter',sans-serif; font-weight:500; font-size:clamp(16px, 2.2vh, 19px); line-height:1.6; opacity:.95; }
 
-  /* SLIDE 11: CHAR COACHING */
-  .dark-scripture-card{ background:var(--ink); color:#FFF; border:3.5px solid var(--ink); border-radius:20px; padding:18px 22px; box-shadow:4px 4px 0 rgba(0,0,0,0.25); position:relative; z-index:2; }
-  .dark-scripture-card .ref{ font-family:'Space Grotesk', sans-serif; font-size:12px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--lime); margin-bottom:6px; }
-  .dark-scripture-card .vt{ font-style:normal; font-family:'Inter',sans-serif; font-weight:700; font-size:clamp(14px, 1.9vh, 16px); line-height:1.5; opacity:.95; }
-  @media (min-width: 1024px) {
-    .dark-scripture-card{ padding:52px 56px; border-radius:28px; border-width:4.5px; }
-    .dark-scripture-card .ref{ font-size:23px; margin-bottom:18px; }
-    .dark-scripture-card .vt{ font-size:33px; line-height:1.65; }
-    .circle-hero.coaching-circle{ width:clamp(400px, 52vh, 520px); height:clamp(400px, 52vh, 520px); padding:44px; border-width:6px; box-shadow:9px 9px 0 var(--ink); }
-    .circle-hero.coaching-circle .arc-stem-text{ font-size:17px; letter-spacing:1.6px; margin-bottom:14px; }
-    .circle-hero.coaching-circle .label-god-is{ font-size:clamp(40px, 5vh, 50px); margin-bottom:16px; }
-    .circle-hero.coaching-circle .blank-input{ font-size:clamp(28px, 3.6vh, 36px); border-bottom-width:4.5px; }
-  }
-  @media (min-width: 1400px) {
-    .dark-scripture-card{ padding:60px 64px; }
-    .dark-scripture-card .ref{ font-size:26px; }
-    .dark-scripture-card .vt{ font-size:38px; }
-    .circle-hero.coaching-circle{ width:clamp(460px, 56vh, 580px); height:clamp(460px, 56vh, 580px); }
-    .circle-hero.coaching-circle .label-god-is{ font-size:clamp(46px, 5.6vh, 56px); }
-    .circle-hero.coaching-circle .blank-input{ font-size:clamp(32px, 4vh, 40px); }
-  }
-
-  /* SLIDE 12: FINAL RESPONSE */
-  .final-reflection-grid {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    min-height: 0;
-    gap: 28px;
-    align-items: center;
-    justify-content: center;
-    max-width: 1300px;
-    margin: 0 auto;
-    width: 100%;
-  }
-  @media (min-width: 768px) {
-    .final-reflection-grid {
-      display: grid;
-      grid-template-columns: 1.25fr 0.75fr;
-      gap: 50px;
-      align-items: center;
-    }
-  }
-
-  .circle-hero.expanded-god-is {
-    width: clamp(270px, 38vh, 360px);
-    height: clamp(270px, 38vh, 360px);
-    padding: 24px;
-  }
-  .circle-hero.expanded-god-is .static-trait.no-underline {
-    border-bottom: none !important;
-    padding: 0;
-    margin-bottom: 8px;
-  }
-  .circle-hero.expanded-god-is .therefore-label {
-    font-family:'Space Grotesk', sans-serif;
-    font-weight:800;
-    font-size:clamp(22px, 3vh, 28px);
-    letter-spacing:-.5px;
-    text-transform:uppercase;
-    line-height:1;
-    margin-top:14px;
-    margin-bottom:8px;
-    color:var(--ink);
-  }
-  .circle-hero.expanded-god-is .therefore-blank {
-    width: 80%;
-    border-bottom: 3.5px solid var(--ink);
-    height: 20px;
-  }
-  @media (min-width: 1024px) {
-    .circle-hero.expanded-god-is {
-      width: clamp(400px, 54vh, 520px);
-      height: clamp(400px, 54vh, 520px);
-      padding: 48px;
-      border-width: 6px;
-    }
-    .circle-hero.expanded-god-is .label-god-is {
-      font-size: clamp(38px, 5vh, 48px);
-    }
-    .circle-hero.expanded-god-is .static-trait.no-underline {
-      font-size: clamp(34px, 4.4vh, 42px);
-    }
-    .circle-hero.expanded-god-is .therefore-label {
-      font-size: clamp(38px, 5vh, 48px);
-      margin-top: 24px;
-      margin-bottom: 12px;
-    }
-    .circle-hero.expanded-god-is .therefore-blank {
-      border-bottom-width: 5px;
-      height: 32px;
-    }
-  }
-
+  /* TIMER CARD */
   .timer-card {
-    background: #FFF;
-    border: 4px solid var(--ink);
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(16px);
     border-radius: 28px;
-    padding: clamp(22px, 3vh, 36px);
-    box-shadow: 6px 6px 0 var(--ink);
+    padding: clamp(20px, 3vh, 32px);
+    box-shadow: var(--shadow-card);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    text-align: center;
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     width: 100%;
     max-width: 360px;
   }
-  .timer-card:hover { transform: translate(-2px, -2px); box-shadow: 8px 8px 0 var(--ink); }
-  .timer-card:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--ink); }
-  .timer-card.running { background: var(--lime); }
-  .timer-label { font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase; margin-bottom: 6px; }
-  .timer-digits { font-family: 'Space Grotesk', sans-serif; font-size: clamp(48px, 7vh, 72px); font-weight: 900; line-height: 1; margin-bottom: 12px; }
-  .timer-status-btn { font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 800; text-transform: uppercase; background: var(--ink); color: #FFF; padding: 8px 18px; border-radius: 100px; display: inline-flex; align-items: center; gap: 6px; }
-  @media (min-width: 1024px) {
-    .timer-card { max-width: 440px; padding: 48px 40px; border-radius: 36px; border-width: 5px; box-shadow: 8px 8px 0 var(--ink); }
-    .timer-label { font-size: 16px; }
-    .timer-digits { font-size: 88px; margin-bottom: 16px; }
-    .timer-status-btn { font-size: 16px; padding: 12px 24px; }
+  .timer-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-floating); }
+  .timer-card.running { background: linear-gradient(145deg, #32B39B, #248D7F); color: #FFF; }
+  .timer-card.running .timer-status-btn { background: #FFFFFF; color: var(--ink); }
+  .timer-label { font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
+  .timer-digits { font-family: 'Space Grotesk', sans-serif; font-size: clamp(48px, 7vh, 64px); font-weight: 700; line-height: 1; margin-bottom: 12px; }
+  .timer-status-btn { 
+    font-family: 'Space Grotesk', sans-serif; 
+    font-size: 13px; 
+    font-weight: 700; 
+    background: var(--ink); 
+    color: #FFF; 
+    padding: 8px 20px; 
+    border-radius: 100px; 
+    display: inline-flex; 
+    align-items: center; 
+    gap: 6px; 
   }
 
+  /* DEV MODE & UTILITIES */
+  .dev-bubbles-bar{ display:flex; gap:8px; overflow-x:auto; padding:2px 40px 6px 2px; }
+  .dev-bubble{ flex-shrink:0; width:30px; height:30px; border-radius:50%; border:1px solid rgba(0,0,0,0.15); display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:12px; cursor:pointer; }
+  .dev-notes-overlay{ position:absolute; inset:0; z-index:200; background:rgba(0,0,0,0.5); backdrop-filter:blur(6px); display:flex; align-items:center; justify-content:center; padding:24px; }
+  .dev-notes-panel{ background:#fff; border-radius:24px; padding:24px; width:100%; max-width:500px; box-shadow:var(--shadow-floating); display:flex; flex-direction:column; gap:14px; }
+  .dev-notes-panel textarea{ width:100%; min-height:90px; border:1px solid rgba(0,0,0,0.15); border-radius:12px; padding:12px; font-family:'Inter',sans-serif; }
   .full-page{ flex:1; display:flex; flex-direction:column; min-height:0; width:100%; }
-
-  /* DEV MODE */
-  .dev-bubbles-bar{ display:flex; gap:8px; overflow-x:auto; overflow-y:hidden; padding:2px 40px 6px 2px; scrollbar-width:none; }
-  .dev-bubbles-bar::-webkit-scrollbar{ display:none; }
-  .dev-bubble{ flex-shrink:0; width:30px; height:30px; border-radius:50%; border:2px solid rgba(0,0,0,0.25); display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk',sans-serif; font-weight:800; font-size:12px; cursor:pointer; position:relative; transition:transform .12s ease; }
-  .dev-bubble:hover{ transform:scale(1.12); }
-  .dev-bubble.active{ border:3px solid var(--ink); box-shadow:0 0 0 3px rgba(255,255,255,0.6); }
-  .dev-bubble .note-dot{ position:absolute; top:-3px; right:-3px; width:9px; height:9px; border-radius:50%; background:var(--yellow); border:1.5px solid var(--ink); }
-
-  .dev-notes-overlay{ position:absolute; inset:0; z-index:200; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; padding:24px; }
-  .dev-notes-panel{ background:#fff; color:var(--ink); border:4px solid var(--ink); border-radius:20px; padding:20px; width:100%; max-width:520px; max-height:85vh; overflow-y:auto; box-shadow:6px 6px 0 var(--ink); display:flex; flex-direction:column; gap:12px; font-family:'Inter',sans-serif; }
-  .dev-notes-panel h3{ font-family:'Space Grotesk',sans-serif; margin:0; font-size:16px; text-transform:uppercase; }
-  .dev-notes-panel textarea{ width:100%; min-height:90px; border:2.5px solid var(--ink); border-radius:10px; padding:10px; font-family:'Inter',sans-serif; font-size:14px; resize:vertical; }
-  .dev-notes-panel .dnp-row{ display:flex; gap:10px; }
-  .dev-notes-panel button.dnp-btn{ font-family:'Space Grotesk',sans-serif; font-weight:800; font-size:13px; text-transform:uppercase; background:var(--lime); border:2.5px solid var(--ink); border-radius:100px; padding:10px 16px; cursor:pointer; }
-  .dev-notes-panel button.dnp-close{ background:#eee; }
-  .dnp-status{ font-size:12px; font-weight:700; font-family:'Inter',sans-serif; }
-  .dnp-status.ok{ color:#1a7a3c; }
-  .dnp-status.warn{ color:#8a5a00; }
 </style>
 </head>
 <body>
 
 <div class="app-viewport" id="phone">
-  <button class="fs-toggle-btn" id="fsToggleBtn" onclick="toggleFullScreen()" title="Toggle Fullscreen (F)">
-    <i class="fa-solid fa-expand" id="fsIcon"></i>
-  </button>
+  <button class="fs-toggle-btn" id="fsToggleBtn" onclick="toggleFullScreen()" title="Toggle Fullscreen (F)"></button>
 
   <div class="clue-badge" id="clueBadge" style="display:none;"><i class="fa-solid fa-circle-exclamation"></i><span id="clueBadgeText"></span></div>
 
@@ -1019,7 +910,7 @@
 
   <div class="stage" id="stage"></div>
 
-  <!-- PERSISTENT MINIMAL CHEVRON NAVIGATION SHELL -->
+  <!-- MINIMAL SKEUOMORPHIC NAVIGATION SHELL -->
   <div class="persistent-nav-shell">
     <button class="minimal-arrow-btn" id="shellPrevBtn" onclick="goPrev()" aria-label="Previous">
       <i class="fa-solid fa-chevron-left"></i>
@@ -1029,30 +920,19 @@
     </button>
   </div>
 
-  <!-- FLOATING CONTEXT ISLAND FOR INTERACTION SLIDES -->
+  <!-- FLOATING CONTEXT ISLAND FOR INTERACTIVE SLIDES -->
   <div class="floating-context-island" id="floatingContextIsland" style="display:none;"></div>
 
   <div class="dev-notes-overlay" id="devNotesOverlay" style="display:none;">
     <div class="dev-notes-panel">
       <h3 id="dnpTitle">Slide Note</h3>
-      <textarea id="devNoteInput" placeholder="Notes for this slide..." oninput="saveCurrentDevNote(this.value)"></textarea>
-      <div class="dnp-row">
-        <button class="dnp-btn" onclick="copyAllDevNotes()">Copy All Notes</button>
-        <button class="dnp-btn dnp-close" onclick="closeDevNotesPanel()">Close</button>
-      </div>
-      <div id="devAllNotesSection" style="display:none; flex-direction:column; gap:8px;">
-        <h3>All Notes (compiled)</h3>
-        <textarea id="devAllNotesPanel" readonly></textarea>
-        <div class="dnp-row" style="align-items:center;">
-          <span class="dnp-status" id="dnpStatus"></span>
-          <button class="dnp-btn dnp-close" id="dnpRetryBtn" style="display:none;" onclick="tryCopyAllNotes()">Try Copy Again</button>
-        </div>
+      <textarea id="devNoteInput" placeholder="Notes for this slide..."></textarea>
+      <div style="display:flex; gap:10px;">
+        <button class="action-gate-pill ready" onclick="closeDevNotesPanel()">Close</button>
       </div>
     </div>
   </div>
 </div>
-
-<div id="exportTarget" style="position:fixed; left:-9999px; top:0; width:420px;"></div>
 
 <script>
 const passage = [
@@ -1087,13 +967,13 @@ const defs = {
   "jesus":"Jesus of Nazareth: the Son of God and promised Messiah, whose ministry of teaching, healing, and casting out evil spirits is the subject of Mark's Gospel.",
   "sabbath":"The traditional Jewish day of rest and worship (Saturday).",
   "synagogue":"A Jewish house of prayer and community center for studying Scripture.",
-  "impurespirit":"Another name for a demon: a created, fallen angel operating in spiritual rebellion under Satan's hierarchy. Real and deceptive, but finite: not all-powerful, all-knowing, or a match for Christ's authority.",
+  "impurespirit":"Another name for a demon: a created, fallen angel operating in spiritual rebellion under Satan's hierarchy.",
   "leprosy":"A severe skin disease causing social exclusion; sufferers were treated as outcasts (Leviticus 13).",
   "indignant":"Feeling deep anger or emotion at unfair treatment, sin, or disease.",
   "galilee":"The northern region of Israel where Jesus conducted much of His early ministry.",
   "capernaum":"A bustling fishing village on the Sea of Galilee that served as Jesus's ministry hub.",
-  "jesusofnazareth":"Nazareth was a small, obscure village in Galilee, easy to overlook and looked down on by outsiders (John 1:46). Calling Jesus \"of Nazareth\" marked Him, by human standards, as an unlikely candidate for Messiah.",
-  "holyoneofgod":"A title acknowledging Jesus's divine identity and authority. It's notable that a demon says it first: even the spiritual realm recognized who Jesus was on sight."
+  "jesusofnazareth":"Nazareth was a small, obscure village in Galilee. Calling Jesus \"of Nazareth\" marked Him as an unlikely candidate for Messiah.",
+  "holyoneofgod":"A title acknowledging Jesus's divine identity and authority."
 };
 
 const phrases = [
@@ -1104,17 +984,9 @@ const phrases = [
 ];
 
 const state = { index:0, wordTaps:[], charVerse:null, trait:'', scrolledToEnd:false, activeTool:{ vocab:null, char:null } };
-let renderGen = 0;
 
-function quoteVerse(text){
-  const t = (text||'').trim();
-  const startsWithQuote = /^["“]/.test(t);
-  const endsWithQuote = /["”]$/.test(t);
-  return (startsWithQuote ? '' : '"') + text + (endsWithQuote ? '' : '"');
-}
 function normWord(w){ return w.replace(/[^a-zA-Z']/g,'').toLowerCase(); }
-
-const stopWords = new Set(['a','an','the','and','but','or','nor','for','so','yet','of','to','in','on','at','by','with','from','into','onto','up','out','off','over','under','again','then','than','as','is','am','are','was','were','be','been','being','he','she','it','they','him','her','them','his','its','their','this','that','these','those','who','whom','whose','which','what','i','you','we','me','us','my','your','our','not','no','all','any','some','there','here','when','where','why','how','went','come','came','said','say','says','saw','see','seen','got','get','gets','made','make','makes','took','take','taken','knew','know','known','told','tell','asked','ask','gave','give','given','put','let','called','call','began','begin','left','leave','found','find','ran','run','stood','stand','sat','sit','looked','look','walked','walk','brought','bring','heard','hear','felt','feel','thought','think','wanted','want','one','two','three','man','men','people','day','days','time','way','down','after','before','while','because','if','also','just','only','very','too','back','away','still','around','about','once','more','other','many','much']);
+const stopWords = new Set(['a','an','the','and','but','or','for','so','yet','of','to','in','on','at','by','with','from','into','he','she','it','they','him','her','them','his','its','their','this','that','who','what','i','you','we','not','no','all','when','where','how']);
 
 function kw(lines, extraClass){
   let i = 0;
@@ -1167,33 +1039,32 @@ function versePickHTML(){
 
 const beats = [
   /* 0. INTRO */
-  { id:'intro', type:'tapAuto', isInteractive:false, bgGrad:'var(--bg-cream)', text:'dark', align:'start',
+  { id:'intro', bgGrad:'var(--d-discover)', text:'light',
     html:`<div class="emoji" onclick="event.stopPropagation(); handleEmojiTap();">👋</div>
           <div class="hero-wrap">
             <div class="intro-top-title">MS Hang Prep</div>
             ${kw([["MARK"],["1:21–45"]],'xl')}
-            <div class="intro-duration"><i class="fa-regular fa-clock"></i> Prep Duration: 5 min</div>
           </div>` },
 
-  /* 1. LOCATE MARK: TESTAMENT */
-  { id:'quest-testament', type:'input', blockTap:true, isInteractive:true, clue:'Pick an answer to continue', bgGrad:'var(--bg-teal)', text:'light',
-    html:`<div class="sketch-lead-title">Bible Book Locator: Testament</div>
+  /* 1. TESTAMENT */
+  { id:'quest-testament', blockTap:true, isInteractive:true, bgGrad:'var(--bg-discover)', text:'dark',
+    html:`<div class="sketch-lead-title">Which testament is the book of <span class="pop-mark">Mark</span> in?</div>
           <div class="testament-deck" id="questTestamentGrid">
             <div class="deck-card" data-correct="false" onclick="questAnswer(event,this,'questTestamentGrid')">
               <span class="dc-title">Old Testament</span>
-              <span class="dc-badge">39 books · 1000+ yrs in the making</span>
-              <span class="dc-desc">The Hebrew scriptures pointing toward the coming promise of the Messiah.</span>
+              <span class="dc-badge">39 books · 1000+ yrs</span>
+              <span class="dc-desc">Hebrew scriptures pointing toward the coming Messiah.</span>
             </div>
             <div class="deck-card" data-correct="true" onclick="questAnswer(event,this,'questTestamentGrid')">
               <span class="dc-title">New Testament</span>
-              <span class="dc-badge">27 books · ~40 yrs in the making</span>
-              <span class="dc-desc">Jesus's earthly life, teaching, resurrection, and the birth of the church.</span>
+              <span class="dc-badge">27 books · ~40 yrs</span>
+              <span class="dc-desc">Jesus's earthly life, teaching, resurrection, and the early church.</span>
             </div>
           </div>` },
 
-  /* 2. LOCATE MARK: SECTION */
-  { id:'quest-section', type:'input', blockTap:true, isInteractive:true, clue:'Pick an answer to continue', bgGrad:'var(--bg-teal)', text:'light',
-    html:`<div class="sketch-lead-title">Bible Book Locator: Section</div>
+  /* 2. SECTION */
+  { id:'quest-section', blockTap:true, isInteractive:true, bgGrad:'var(--bg-discover)', text:'dark',
+    html:`<div class="sketch-lead-title">Which section is the book of <span class="pop-mark">Mark</span> in?</div>
           <div class="sections-5-deck" id="questSectionGrid">
             <div class="deck-card" data-correct="true" onclick="questAnswer(event,this,'questSectionGrid')">
               <i class="fa-solid fa-cross dc-icon"></i>
@@ -1211,7 +1082,7 @@ const beats = [
               <i class="fa-solid fa-envelope dc-icon"></i>
               <span class="dc-title">Paul's Letters</span>
               <span class="dc-badge">13 books</span>
-              <span class="dc-desc">Helping churches live out the gospel</span>
+              <span class="dc-desc">Guidance for churches</span>
             </div>
             <div class="deck-card" data-correct="false" onclick="questAnswer(event,this,'questSectionGrid')">
               <i class="fa-solid fa-envelopes-bulk dc-icon"></i>
@@ -1223,209 +1094,142 @@ const beats = [
               <i class="fa-solid fa-eye dc-icon"></i>
               <span class="dc-title">Prophecy</span>
               <span class="dc-badge">1 book</span>
-              <span class="dc-desc">A visionary look at how it all ends</span>
+              <span class="dc-desc">A visionary look at eternity</span>
             </div>
           </div>` },
 
   /* 3. RECAP */
-  { id:'reveal-context', type:'tapAuto', isInteractive:false, bgGrad:'var(--bg-teal)', text:'light', align:'start',
-    html:`<div class="sketch-lead-title" style="margin-bottom:12px;">Recap</div>
+  { id:'reveal-context', bgGrad:'var(--bg-discover)', text:'dark',
+    html:`<div class="sketch-lead-title">Recap</div>
           <div class="set-scene-grid">
-            <div class="circle-hero-container">
-              <div class="circle-hero">
-                <div class="arc-stem-text">Last Week's God Shot</div>
-                <div class="label-god-is">GOD IS...</div>
-                <div class="static-trait">King</div>
-              </div>
+            <div class="circle-hero">
+              <div class="arc-stem-text">Last Week's God Shot</div>
+              <div class="label-god-is">GOD IS...</div>
+              <div class="static-trait">King</div>
             </div>
             <div class="folder-wrap">
               <div class="folder-tab">Set the Scene</div>
               <div class="folder-body">
                 <div class="folder-bullet">
                   <span class="recap-tag">Last Week</span>
-                  <div>Jesus announces that the Kingdom of God is near and begins recruiting ordinary fishermen to follow Him.</div>
+                  <div>Jesus announces the Kingdom of God is near and recruits ordinary fishermen.</div>
                 </div>
                 <div class="folder-bullet">
                   <span class="recap-tag">This Week</span>
-                  <div>Jesus begins to openly display His divine authority—teaching with power and commanding unclean spirits.</div>
+                  <div>Jesus openly displays His divine authority—teaching with power and commanding spirits.</div>
                 </div>
               </div>
             </div>
           </div>` },
 
-  /* 4. PRAYER (KICKER IN CIRCLE: PRAYER) */
-  { id:'breath-prayer', type:'tapAuto', isInteractive:false, bgGrad:'var(--bg-cream)', text:'dark', align:'center',
+  /* 4. PRAYER */
+  { id:'breath-prayer', bgGrad:'var(--bg-cream)', text:'dark',
     html:`<div style="flex:1; display:flex; align-items:center; justify-content:center; width:100%;">
             <div class="breath-visual">
               <div class="breath-circle"></div>
-              <div class="breath-label-wrap">
+              <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center;">
                 <div class="pray-center-text">PRAY</div>
               </div>
             </div>
           </div>` },
 
-  /* 5. WORD WORK COVER */
-  { id:'reading-intro', type:'tapAuto', isInteractive:false, bgGrad:'var(--bg-leather)', text:'light', align:'start',
+  /* 5. COVER 1 */
+  { id:'reading-intro', bgGrad:'var(--bg-cream)', text:'dark',
     html:`<div class="leather-cover">
             <div class="leather-spine"></div>
             <div class="leather-cover-inner">
-              <div class="book-title" style="margin-bottom:2px;">Holy Bible</div>
-              <div class="focus-pill yellow">
+              <div class="book-title">Holy Bible</div>
+              <div class="focus-pill">
                 <div class="focus-pill-value">Highlight Key Words</div>
               </div>
-              <div class="cover-note">Grab a highlighter and mark words that are confusing or that you see repeated in the text.</div>
+              <div class="cover-note">Mark repeated words or terms you want to explore further.</div>
             </div>
           </div>` },
 
-  /* 6. PASSAGE SCAN (WITH MASK GRADIENT FADE-OUT) */
-  { id:'vocab-scan', type:'input', blockTap:true, isInteractive:true, clue:'Highlight key words & scroll to bottom', bgGrad:'var(--bg-cream)', text:'dark',
+  /* 6. PASSAGE SCAN */
+  { id:'vocab-scan', blockTap:true, isInteractive:true, bgGrad:'var(--bg-cream)', text:'dark',
     html:`<div class="full-page">
             <div class="passage-scroll-wrap">
               <div class="passage-scroll" id="passageScrollEl">${passageWordsHTML()}</div>
             </div>
           </div>` },
 
-  /* 7. GLOSSARY REVIEW (EDITORIAL DEFINITIONS) */
-  { id:'vocab-review', type:'input', blockTap:false, isInteractive:false, bgGrad:'var(--bg-terracotta)', text:'dark',
+  /* 7. GLOSSARY REVIEW */
+  { id:'vocab-review', bgGrad:'var(--bg-wordwork)', text:'light',
     html:`<div class="sketch-lead-title">Glossary Review</div>
           <div class="review-scroll" id="vocabReviewBox"></div>` },
 
-  /* 8. CROSS REFERENCES (EDITORIAL ANNOTATIONS) */
-  { id:'expand-cross-refs', type:'tapAuto', isInteractive:false, bgGrad:'var(--bg-sage)', text:'dark', align:'start',
-    html:`<div class="sketch-lead-title">Make Connections</div>
-          <div class="xref-compact-list">
-            <div class="xref-pair">
-              <div class="xref-node-card from">
-                <div class="xref-ref-label">Mark 1:27</div>
-                <div class="xref-node-note">The crowd is stunned: Jesus teaches with real, unmistakable authority.</div>
-              </div>
-              <div class="xref-chain">
-                <span class="xref-chain-line"></span>
-                <span class="xref-chain-link"><span class="bar-v"></span><span class="bar-h"></span></span>
-                <span class="xref-chain-line"></span>
-              </div>
-              <div class="xref-node-card to">
-                <div class="xref-ref-label">Matthew 28:18</div>
-                <div class="xref-node-note">Matthew writes that Jesus said, "<em>All authority</em> in heaven and earth has been given to me."</div>
-              </div>
-            </div>
-            <div class="xref-pair">
-              <div class="xref-node-card from">
-                <div class="xref-ref-label">Mark 1:24</div>
-                <div class="xref-node-note">An impure spirit obeys Jesus instantly, the moment he speaks.</div>
-              </div>
-              <div class="xref-chain">
-                <span class="xref-chain-line"></span>
-                <span class="xref-chain-link"><span class="bar-v"></span><span class="bar-h"></span></span>
-                <span class="xref-chain-line"></span>
-              </div>
-              <div class="xref-node-card to">
-                <div class="xref-ref-label">James 2:19</div>
-                <div class="xref-node-note">James writes that even demons <em>believe</em>, and <em>shudder</em>.</div>
-              </div>
-            </div>
-          </div>` },
-
-  /* 9. GOD SHOT COVER */
-  { id:'character-prompt', type:'tapAuto', isInteractive:false, bgGrad:'var(--bg-leather)', text:'light', align:'start',
+  /* 8. COVER 2 */
+  { id:'character-prompt', bgGrad:'var(--bg-cream)', text:'dark',
     html:`<div class="leather-cover">
             <div class="leather-spine"></div>
             <div class="leather-cover-inner">
-              <div class="book-title" style="margin-bottom:2px;">Holy Bible</div>
-              <div class="focus-pill lime">
+              <div class="book-title">Holy Bible</div>
+              <div class="focus-pill">
                 <div class="focus-pill-value">Spot a God Shot</div>
               </div>
-              <div class="cover-note">Find a verse that shows who God is.</div>
+              <div class="cover-note">Select a verse that reveals God's character and nature.</div>
             </div>
           </div>` },
 
-  /* 10. VERSE PICK (WITH MASK GRADIENT FADE-OUT) */
-  { id:'char-verse-pick', type:'input', blockTap:true, isInteractive:true, clue:'Select a verse to continue', bgGrad:'var(--bg-cream)', text:'dark',
+  /* 9. VERSE PICK */
+  { id:'char-verse-pick', blockTap:true, isInteractive:true, bgGrad:'var(--bg-cream)', text:'dark',
     html:`<div class="full-page">
             <div class="passage-scroll-wrap">
               <div class="verse-pick-list">${versePickHTML()}</div>
             </div>
           </div>` },
 
-  /* 11. GOD SHOT COACHING (HEADER: CENTRAL TRUTH) */
-  { id:'char-coaching', type:'input', blockTap:true, isInteractive:true, clue:'Fill in the blank to continue', bgGrad:'var(--bg-orange)', text:'dark',
-    html:`<div class="sketch-lead-title" style="margin-bottom:14px;">Central Truth</div>
-          <div class="set-scene-grid coaching-scene">
-            <div style="display:flex; flex-direction:column; gap:14px; width:100%;">
-              <div class="dark-scripture-card coaching-card">
-                <div class="ref" id="charRef"></div>
-                <div class="vt" id="charText"></div>
-              </div>
+  /* 10. GOD SHOT COACHING */
+  { id:'char-coaching', blockTap:true, isInteractive:true, bgGrad:'var(--bg-live)', text:'light',
+    html:`<div class="beat-kicker">Learn</div>
+          <div class="sketch-lead-title">Central Truth</div>
+          <div class="set-scene-grid">
+            <div class="dark-scripture-card">
+              <div class="ref" id="charRef"></div>
+              <div class="vt" id="charText"></div>
             </div>
-            <div class="circle-hero-container">
-              <div class="circle-hero coaching-circle">
-                <div class="arc-stem-text" id="arcStemText">GOD IS...</div>
-                <div class="label-god-is">GOD IS...</div>
-                <input class="blank-input" id="customTraitInput" placeholder="" oninput="handleCustomTrait(this.value)" onclick="event.stopPropagation();" />
-              </div>
+            <div class="circle-hero">
+              <div class="arc-stem-text" id="arcStemText">GOD IS...</div>
+              <div class="label-god-is">GOD IS...</div>
+              <input class="blank-input" id="customTraitInput" placeholder="Enter trait" oninput="handleCustomTrait(this.value)" onclick="event.stopPropagation();" />
             </div>
           </div>` },
 
-  /* 12. FINAL (HEADER: CENTRAL TRUTH) */
-  { id:'final', type:'input', blockTap:true, isInteractive:false, bgGrad:'var(--bg-cream)', text:'dark', align:'start',
-    html:`<div class="sketch-lead-title" style="margin-bottom:14px;">Central Truth</div>
-          <div class="final-reflection-grid">
-            <div class="circle-hero-container">
-              <div class="circle-hero expanded-god-is">
-                <div class="label-god-is">GOD IS...</div>
-                <div class="static-trait no-underline" id="finalGodIsTrait">Holy</div>
-                <div class="therefore-label">Therefore, I...</div>
-                <div class="therefore-blank"></div>
-              </div>
+  /* 11. FINAL REFLECTION */
+  { id:'final', blockTap:true, isInteractive:false, bgGrad:'var(--bg-cream)', text:'dark',
+    html:`<div class="beat-kicker">Live</div>
+          <div class="sketch-lead-title">Central Truth</div>
+          <div class="set-scene-grid">
+            <div class="circle-hero">
+              <div class="label-god-is">GOD IS...</div>
+              <div class="static-trait" id="finalGodIsTrait">Holy</div>
             </div>
-            <div style="display:flex; justify-content:center; width:100%;">
-              <div class="timer-card" id="timerCard" onclick="event.stopPropagation(); toggleTimer();">
-                <div class="timer-label"><i class="fa-regular fa-clock"></i> Reflection Timer</div>
-                <div class="timer-digits" id="timerDigits">02:00</div>
-                <div class="timer-status-btn" id="timerBtn"><i class="fa-solid fa-play"></i> Start 2 Min</div>
-              </div>
+            <div class="timer-card" id="timerCard" onclick="event.stopPropagation(); toggleTimer();">
+              <div class="timer-label"><i class="fa-regular fa-clock"></i> Reflection Timer</div>
+              <div class="timer-digits" id="timerDigits">02:00</div>
+              <div class="timer-status-btn" id="timerBtn"><i class="fa-solid fa-play"></i> Start 2 Min</div>
             </div>
           </div>` }
 ];
 
 const sectionLabels = [
   'Dwell Guide', 'Discover', 'Discover', 'Recap',
-  'Prayer', 'Word Work', 'Word Work', 'Word Work', 'Expand',
+  'Prayer', 'Word Work', 'Word Work', 'Word Work',
   'Learn', 'Learn', 'Central Truth', 'Central Truth'
 ];
 
-function initNotches(){
-  const layer = document.getElementById('notchesLayer');
-  layer.innerHTML = '';
-  const total = beats.length;
-  beats.forEach((b, i) => {
-    if (b.isInteractive) {
-      const notch = document.createElement('div');
-      notch.className = 'prog-notch';
-      notch.id = `notch-${i}`;
-      const pct = (i / (total - 1)) * 100;
-      notch.style.left = `${pct}%`;
-      layer.appendChild(notch);
-    }
-  });
-}
-
-function updateProgressBar(){
-  const fill = document.getElementById('progressBarFill');
-  const total = beats.length;
-  const pct = (state.index / (total - 1)) * 100;
-  fill.style.width = `${pct}%`;
-
-  beats.forEach((b, i) => {
-    if (b.isInteractive) {
-      const notch = document.getElementById(`notch-${i}`);
-      if (!notch) return;
-      notch.classList.remove('passed', 'active');
-      if (state.index > i) notch.classList.add('passed');
-      else if (state.index === i) notch.classList.add('active');
-    }
-  });
-}
+const GLOW_THEMES = {
+  'reveal-context':   { base:'var(--d-discover)', base2:'var(--d-wordwork)', p1:'85% 80%', a1:'rgba(233,160,36,0.3)',   p2:'12% 15%', a2:'rgba(255,255,255,0.22)' },
+  'breath-prayer':    { base:'var(--bg-cream)',   base2:'var(--bg-cream)',   p1:'18% 82%', a1:'rgba(158,100,136,0.25)', p2:'85% 15%', a2:'rgba(215,107,101,0.18)' },
+  'reading-intro':    { base:'var(--bg-cream)',   base2:'var(--bg-cream)',   p1:'15% 15%', a1:'rgba(226,138,92,0.25)',  p2:'85% 85%', a2:'rgba(158,100,136,0.18)' },
+  'vocab-scan':       { base:'var(--bg-cream)',   base2:'var(--bg-cream)',   p1:'8% 8%',   a1:'rgba(58,134,200,0.14)',   p2:'92% 92%', a2:'rgba(46,147,82,0.12)' },
+  'vocab-review':     { base:'var(--d-wordwork)', base2:'#b54842',           p1:'85% 20%', a1:'rgba(255,255,255,0.2)',  p2:'15% 85%', a2:'rgba(233,160,36,0.28)' },
+  'character-prompt': { base:'var(--bg-cream)',   base2:'var(--bg-cream)',   p1:'85% 20%', a1:'rgba(158,100,136,0.22)', p2:'15% 85%', a2:'rgba(93,88,126,0.18)' },
+  'char-verse-pick':  { base:'var(--bg-cream)',   base2:'var(--bg-cream)',   p1:'15% 80%', a1:'rgba(93,88,126,0.2)',    p2:'85% 15%', a2:'rgba(58,134,200,0.15)' },
+  'char-coaching':    { base:'var(--d-live)',     base2:'#181b30',           p1:'85% 80%', a1:'rgba(233,160,36,0.25)',  p2:'15% 15%', a2:'rgba(94,148,186,0.2)' },
+  'final':            { base:'var(--bg-cream)',   base2:'var(--bg-cream)',   p1:'80% 85%', a1:'rgba(46,147,82,0.2)',    p2:'15% 15%', a2:'rgba(226,138,92,0.18)' },
+};
 
 const stage = document.getElementById('stage');
 const phoneEl = document.getElementById('phone');
@@ -1438,24 +1242,37 @@ beats.forEach((b,i)=>{
   stage.appendChild(div);
 });
 
-function updateHeaderMeta(){
-  const labelEl = document.getElementById('sectionLabel');
-  const scriptureEl = document.getElementById('scriptureMeta');
-  if (!labelEl || !scriptureEl) return;
-
-  if (devMode) {
-    labelEl.innerHTML = `<button class="meta-link-btn" onclick="event.stopPropagation(); openDevNotesPanel();">Notes</button>`;
-    scriptureEl.innerHTML = `<button class="meta-link-btn" onclick="event.stopPropagation(); exitDevMode();">Close</button>`;
-  } else {
-    labelEl.textContent = sectionLabels[state.index] || '';
-    scriptureEl.textContent = 'Mark 1:21–45';
-  }
+function initNotches(){
+  const layer = document.getElementById('notchesLayer');
+  layer.innerHTML = '';
+  const total = beats.length;
+  beats.forEach((b, i) => {
+    if (b.isInteractive) {
+      const notch = document.createElement('div');
+      notch.className = 'prog-notch';
+      notch.id = `notch-${i}`;
+      notch.style.left = `${(i / (total - 1)) * 100}%`;
+      layer.appendChild(notch);
+    }
+  });
 }
 
-/* ================= UPDATE CONTEXT ISLAND & MINIMAL CHEVRONS ================= */
-function isVocabComplete(){
-  return state.wordTaps.length > 0 && state.scrolledToEnd;
+function updateProgressBar(){
+  const fill = document.getElementById('progressBarFill');
+  const total = beats.length;
+  fill.style.width = `${(state.index / (total - 1)) * 100}%`;
+  beats.forEach((b, i) => {
+    if (b.isInteractive) {
+      const notch = document.getElementById(`notch-${i}`);
+      if (!notch) return;
+      notch.classList.remove('passed', 'active');
+      if (state.index > i) notch.classList.add('passed');
+      else if (state.index === i) notch.classList.add('active');
+    }
+  });
 }
+
+function isVocabComplete(){ return state.wordTaps.length > 0 && state.scrolledToEnd; }
 
 function updateNavShell(){
   const prevBtn = document.getElementById('shellPrevBtn');
@@ -1463,60 +1280,47 @@ function updateNavShell(){
   const island = document.getElementById('floatingContextIsland');
   const b = beats[state.index];
 
-  // Configure Previous Button
   prevBtn.classList.toggle('disabled', state.index === 0);
 
-  // Configure Next Intent
   let ready = false;
-  if (b.id === 'vocab-scan') ready = isVocabComplete();
+  if (b.id === 'quest-testament' || b.id === 'quest-section') ready = answeredBeats.has(state.index);
+  else if (b.id === 'vocab-scan') ready = isVocabComplete();
   else if (b.id === 'char-verse-pick') ready = state.charVerse !== null;
   else if (b.id === 'char-coaching') ready = Boolean(state.trait && state.trait.trim());
   else ready = !b.blockTap;
   nextBtn.classList.toggle('ready', ready);
 
-  // Quest screens: replace the arrow nav entirely with a themed locator pill
-  const hideArrows = (b.id === 'quest-testament' || b.id === 'quest-section');
-  prevBtn.style.display = hideArrows ? 'none' : '';
-  nextBtn.style.display = hideArrows ? 'none' : '';
+  const hideNextArrow = (b.id === 'vocab-scan' || b.id === 'char-verse-pick');
+  nextBtn.style.display = hideNextArrow ? 'none' : '';
 
-  // Contextual Floating Tool Island for interaction slides
-  if (b.id === 'quest-testament' || b.id === 'quest-section') {
-    island.style.display = 'flex';
-    island.innerHTML = `
-      <button class="action-gate-pill" id="findBookPill" onclick="event.stopPropagation(); handleForwardAttempt();">
-        <i class="fa-solid fa-magnifying-glass"></i> Find Book: Mark
-      </button>
-    `;
-  } else if (b.id === 'vocab-scan') {
+  if (b.id === 'vocab-scan') {
     island.style.display = 'flex';
     const isDone = isVocabComplete();
     island.innerHTML = `
       <div class="hl-flank-row">
-        <button class="hl-flank-btn ${state.activeTool.vocab === 'blue' ? 'active' : ''}" data-color="blue" onclick="event.stopPropagation(); setPassageHighlighter('blue', this);">
+        <button class="hl-flank-btn ${state.activeTool.vocab === 'blue' ? 'active' : ''}" onclick="event.stopPropagation(); setPassageHighlighter('blue');">
           <span class="hl-swatch hl-swatch-blue"></span><span class="hl-flank-label">Characters</span>
         </button>
-        <button class="hl-flank-btn ${state.activeTool.vocab === 'green' ? 'active' : ''}" data-color="green" onclick="event.stopPropagation(); setPassageHighlighter('green', this);">
+        <button class="hl-flank-btn ${state.activeTool.vocab === 'green' ? 'active' : ''}" onclick="event.stopPropagation(); setPassageHighlighter('green');">
           <span class="hl-swatch hl-swatch-green"></span><span class="hl-flank-label">Setting</span>
         </button>
-        <button class="action-gate-pill ${isDone ? 'ready' : ''}" id="vocabActionPill" onclick="event.stopPropagation(); handleForwardAttempt();">
+        <button class="action-gate-pill ${isDone ? 'ready' : ''}" onclick="event.stopPropagation(); handleForwardAttempt();">
           ${isDone ? '<i class="fa-solid fa-check"></i> Continue' : 'Highlight Words'}
         </button>
-        <button class="hl-flank-btn ${state.activeTool.vocab === 'yellow' ? 'active' : ''}" data-color="yellow" onclick="event.stopPropagation(); setPassageHighlighter('yellow', this);">
+        <button class="hl-flank-btn ${state.activeTool.vocab === 'yellow' ? 'active' : ''}" onclick="event.stopPropagation(); setPassageHighlighter('yellow');">
           <span class="hl-swatch hl-swatch-yellow"></span><span class="hl-flank-label">Confusing</span>
         </button>
-        <button class="hl-flank-btn ${state.activeTool.vocab === 'pink' ? 'active' : ''}" data-color="pink" onclick="event.stopPropagation(); setPassageHighlighter('pink', this);">
+        <button class="hl-flank-btn ${state.activeTool.vocab === 'pink' ? 'active' : ''}" onclick="event.stopPropagation(); setPassageHighlighter('pink');">
           <span class="hl-swatch hl-swatch-pink"></span><span class="hl-flank-label">Repeated</span>
         </button>
-      </div>
-    `;
+      </div>`;
   } else if (b.id === 'char-verse-pick') {
     island.style.display = 'flex';
     const isPicked = state.charVerse !== null;
     island.innerHTML = `
-      <button class="action-gate-pill ${isPicked ? 'ready' : ''}" id="verseActionPill" onclick="event.stopPropagation(); handleForwardAttempt();">
+      <button class="action-gate-pill ${isPicked ? 'ready' : ''}" onclick="event.stopPropagation(); handleForwardAttempt();">
         ${isPicked ? '<i class="fa-solid fa-check"></i> Continue' : 'Spot a God Shot'}
-      </button>
-    `;
+      </button>`;
   } else {
     island.style.display = 'none';
   }
@@ -1525,10 +1329,24 @@ function updateNavShell(){
 function renderBeat(i){
   document.querySelectorAll('.beat').forEach(el=>el.classList.remove('active'));
   document.getElementById(`beat-${i}`).classList.add('active');
-  renderGen++;
   const b = beats[i];
 
   phoneEl.style.background = b.bgGrad;
+  phoneEl.classList.toggle('intro-glow', b.id === 'intro');
+  phoneEl.classList.toggle('quest-glow', b.id === 'quest-testament' || b.id === 'quest-section');
+  phoneEl.classList.toggle('variant-b', b.id === 'quest-section');
+  
+  const glowTheme = GLOW_THEMES[b.id];
+  phoneEl.classList.toggle('beat-glow', !!glowTheme);
+  if (glowTheme) {
+    phoneEl.style.setProperty('--glow-base', glowTheme.base);
+    phoneEl.style.setProperty('--glow-base2', glowTheme.base2);
+    phoneEl.style.setProperty('--glow-p1', glowTheme.p1);
+    phoneEl.style.setProperty('--glow-a1', glowTheme.a1);
+    phoneEl.style.setProperty('--glow-p2', glowTheme.p2);
+    phoneEl.style.setProperty('--glow-a2', glowTheme.a2);
+  }
+
   if (b.text === 'light') {
     phoneEl.classList.add('tx-light');
     phoneEl.classList.remove('tx-dark');
@@ -1539,28 +1357,29 @@ function renderBeat(i){
     document.getElementById('hudHeader').className = 'hud-header tx-dark';
   }
 
-  updateHeaderMeta();
+  document.getElementById('sectionLabel').textContent = sectionLabels[i] || '';
   updateNavShell();
 
   if (b.id === 'char-coaching') {
     const activeVerse = state.charVerse || 21;
     document.getElementById('charRef').textContent = 'Mark 1:' + activeVerse;
-    document.getElementById('charText').textContent = quoteVerse(passage[activeVerse-21]);
+    document.getElementById('charText').textContent = '"' + passage[activeVerse-21] + '"';
     const arcStem = document.getElementById('arcStemText');
     if (arcStem) arcStem.textContent = `BASED ON VERSE ${activeVerse}:`;
     const inp = document.getElementById('customTraitInput');
     if (inp) inp.value = state.trait || '';
-    requestAnimationFrame(() => requestAnimationFrame(fitCharVerseText));
   } else if (b.id === 'char-verse-pick') {
     document.querySelectorAll('#beat-'+i+' .verse-tile').forEach(t=>t.classList.toggle('selected', state.charVerse !== null && Number(t.dataset.v)===state.charVerse));
   } else if (b.id === 'vocab-scan') {
     checkPassageScroll();
   }
 
-  if (b.id === 'final') renderFinalReflection();
+  if (b.id === 'final') {
+    const traitEl = document.getElementById('finalGodIsTrait');
+    if (traitEl) traitEl.textContent = state.trait && state.trait.trim() ? state.trait.trim() : 'Holy';
+  }
   if (b.id === 'vocab-review') renderVocabReview();
   updateProgressBar();
-  if (devMode) renderDevBubbles();
 }
 
 const answeredBeats = new Set();
@@ -1569,24 +1388,18 @@ function questAnswer(e, el, gridId){
   if (el.classList.contains('locked')) return;
   const isCorrect = el.dataset.correct === 'true';
   if (isCorrect) {
-    const grid = document.getElementById(gridId);
-    grid.querySelectorAll('.deck-card').forEach(t=>t.classList.add('locked'));
+    document.getElementById(gridId).querySelectorAll('.deck-card').forEach(t=>t.classList.add('locked'));
     el.classList.add('correct');
     answeredBeats.add(state.index);
-    const myGen = renderGen;
-    setTimeout(()=>{ if (renderGen === myGen) goNext(); }, 600);
+    updateNavShell();
   } else {
-    el.classList.add('incorrect','shake');
-    setTimeout(()=>{ el.classList.remove('shake','incorrect'); }, 500);
+    el.classList.add('incorrect');
+    setTimeout(()=> el.classList.remove('incorrect'), 600);
   }
 }
 
-function setPassageHighlighter(color, btnEl){
-  if (state.activeTool.vocab === color) {
-    state.activeTool.vocab = null;
-  } else {
-    state.activeTool.vocab = color;
-  }
+function setPassageHighlighter(color){
+  state.activeTool.vocab = state.activeTool.vocab === color ? null : color;
   updateNavShell();
 }
 
@@ -1594,16 +1407,15 @@ function tapWord(e, el){
   e.stopPropagation();
   const key = el.dataset.word;
   if (!key) return;
-  const word = el.textContent.trim().replace(/^[^A-Za-z']+/, '').replace(/[^A-Za-z']+$/, '');
+  const word = el.textContent.trim();
   const def = defs[key] || null;
   const isStop = stopWords.has(key);
 
   if (state.activeTool.vocab) {
     const cls = 'hl-' + state.activeTool.vocab;
-    const alreadyThisColor = el.classList.contains(cls);
-    ['hl-blue','hl-green','hl-yellow','hl-pink','flagged','flagged-light'].forEach(c => el.classList.remove(c));
-    
-    if (!alreadyThisColor) {
+    const alreadyThis = el.classList.contains(cls);
+    ['hl-blue','hl-green','hl-yellow','hl-pink','flagged'].forEach(c => el.classList.remove(c));
+    if (!alreadyThis) {
       el.classList.add(cls);
       state.wordTaps = state.wordTaps.filter(w => w.el !== el);
       state.wordTaps.push({ el, word, def, isStop, key });
@@ -1611,20 +1423,13 @@ function tapWord(e, el){
       state.wordTaps = state.wordTaps.filter(w => w.el !== el);
     }
   } else {
-    const isColored = ['hl-blue','hl-green','hl-yellow','hl-pink'].some(c=>el.classList.contains(c));
-    if (isColored) {
-      ['hl-blue','hl-green','hl-yellow','hl-pink'].forEach(c => el.classList.remove(c));
-      state.wordTaps = state.wordTaps.filter(w => w.el !== el);
-    } else if (el.classList.contains('flagged')) {
-      // second tap: lighten instead of removing the flag entirely
+    if (el.classList.contains('flagged')) {
       el.classList.remove('flagged');
-      el.classList.add('flagged-light');
-    } else if (el.classList.contains('flagged-light')) {
-      // third tap: back to full flag
-      el.classList.remove('flagged-light');
-      el.classList.add('flagged');
+      state.wordTaps = state.wordTaps.filter(w => w.el !== el);
     } else {
+      ['hl-blue','hl-green','hl-yellow','hl-pink'].forEach(c => el.classList.remove(c));
       el.classList.add('flagged');
+      state.wordTaps = state.wordTaps.filter(w => w.el !== el);
       state.wordTaps.push({ el, word, def, isStop, key });
     }
   }
@@ -1654,31 +1459,23 @@ function renderVocabReview(){
     box.innerHTML = `<div class="glossary-panel"><div class="review-def-entry" style="border:none; opacity:0.7;">No words highlighted yet!</div></div>`;
     return;
   }
-  
-  const defined = [];
-  const undefinedWords = [];
-  const seen = new Set();
-
+  const defined = [], undefinedWords = [], seen = new Set();
   state.wordTaps.forEach(w => {
     const norm = normWord(w.word);
     if (seen.has(norm)) return;
     seen.add(norm);
-
     const fullDef = defs[w.key] || defs[norm];
-    if (fullDef) {
-      defined.push({ word: w.word, def: fullDef });
-    } else {
-      undefinedWords.push(w.word);
-    }
+    if (fullDef) defined.push({ word: w.word, def: fullDef });
+    else undefinedWords.push(w.word);
   });
 
   let html = '<div class="glossary-panel">';
   if (defined.length > 0) {
     html += `<div class="review-section-header"><i class="fa-solid fa-book-bookmark"></i> Defined Terms</div>`;
-    html += defined.map((w,i) => `<div class="review-def-entry"><span class="term-word"><span class="gloss-num">${i+1}</span>${w.word}</span>${w.def}</div>`).join('');
+    html += defined.map(w => `<div class="review-def-entry"><span class="term-word">${w.word}</span>${w.def}</div>`).join('');
   }
   if (undefinedWords.length > 0) {
-    html += `<div class="review-section-header"><i class="fa-solid fa-magnifying-glass"></i> Terms to Define</div>
+    html += `<div class="review-section-header" style="margin-top:16px;"><i class="fa-solid fa-magnifying-glass"></i> Terms to Explore</div>
              <div class="pill-cloud">${undefinedWords.map(word => `<div class="research-pill">${word}</div>`).join('')}</div>`;
   }
   html += '</div>';
@@ -1690,17 +1487,8 @@ function handleCustomTrait(val){
   updateNavShell();
 }
 
-function renderFinalReflection(){
-  const trait = state.trait && state.trait.trim() ? state.trait.trim() : 'Holy';
-  const traitEl = document.getElementById('finalGodIsTrait');
-  if (traitEl) traitEl.textContent = trait;
-}
-
-/* 2 MINUTE TIMER LOGIC */
-let timerSeconds = 120;
-let timerInterval = null;
-let timerRunning = false;
-
+/* TIMER */
+let timerSeconds = 120, timerInterval = null, timerRunning = false;
 function toggleTimer(){
   const card = document.getElementById('timerCard');
   const btn = document.getElementById('timerBtn');
@@ -1716,13 +1504,9 @@ function toggleTimer(){
     timerRunning = true;
     card.classList.add('running');
     btn.innerHTML = '<i class="fa-solid fa-pause"></i> Pause';
-    
     timerInterval = setInterval(() => {
       timerSeconds--;
-      const mins = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
-      const secs = String(timerSeconds % 60).padStart(2, '0');
-      digits.textContent = `${mins}:${secs}`;
-      
+      digits.textContent = `${String(Math.floor(timerSeconds / 60)).padStart(2, '0')}:${String(timerSeconds % 60).padStart(2, '0')}`;
       if (timerSeconds <= 0) {
         clearInterval(timerInterval);
         timerRunning = false;
@@ -1733,310 +1517,50 @@ function toggleTimer(){
   }
 }
 
-let clueTimeout = null;
-function showBadgeClue(text, iconClass){
+function showBadgeClue(text){
   const badge = document.getElementById('clueBadge');
   const badgeText = document.getElementById('clueBadgeText');
-  const badgeIcon = badge ? badge.querySelector('i') : null;
   if (!badge || !badgeText) return;
   badgeText.textContent = text;
-  if (badgeIcon) badgeIcon.className = iconClass || 'fa-solid fa-circle-exclamation';
   badge.style.display = 'flex';
-
-  clearTimeout(clueTimeout);
-  clueTimeout = setTimeout(() => {
-    badge.style.display = 'none';
-  }, 2200);
-}
-
-function triggerGateShake(msg, elementId, iconClass){
-  const el = document.getElementById(elementId) || document.getElementById('shellNextBtn');
-  if (el) {
-    el.classList.remove('shake-warn');
-    void el.offsetWidth;
-    el.classList.add('shake-warn');
-    setTimeout(() => el.classList.remove('shake-warn'), 600);
-  }
-  showBadgeClue(msg, iconClass);
+  setTimeout(() => { badge.style.display = 'none'; }, 2200);
 }
 
 function handleForwardAttempt(){
   const b = beats[state.index];
   if (b.blockTap) {
     if ((b.id === 'quest-testament' || b.id === 'quest-section') && !answeredBeats.has(state.index)) { 
-      triggerGateShake('Pick an answer to continue', 'findBookPill', 'fa-solid fa-hand-point-up'); 
-      return; 
+      showBadgeClue('Select an answer to continue'); return; 
     }
     if (b.id === 'vocab-scan') {
-      if (!state.wordTaps.length && !state.scrolledToEnd) {
-        triggerGateShake('Highlight at least 1 word & scroll down!', 'vocabActionPill');
-        return;
-      } else if (!state.wordTaps.length) {
-        triggerGateShake('Highlight at least 1 word!', 'vocabActionPill');
-        return;
-      } else if (!state.scrolledToEnd) {
-        triggerGateShake('Scroll to the bottom first!', 'vocabActionPill');
-        return;
-      }
+      if (!state.wordTaps.length) { showBadgeClue('Highlight at least 1 word'); return; }
+      if (!state.scrolledToEnd) { showBadgeClue('Scroll to the bottom'); return; }
     }
     if (b.id === 'char-verse-pick' && state.charVerse === null) { 
-      triggerGateShake('Tap a verse to select!', 'verseActionPill'); 
-      return; 
+      showBadgeClue('Tap a verse to select'); return; 
     }
     if (b.id === 'char-coaching' && !(state.trait && state.trait.trim())) { 
-      triggerGateShake('Fill in the blank to continue!'); 
-      return; 
+      showBadgeClue('Fill in the blank to continue'); return; 
     }
   }
   goNext();
 }
 
-function fitCharVerseText(){
-  const vt = document.getElementById('charText');
-  const card = vt ? vt.closest('.dark-scripture-card') : null;
-  const beatEl = card ? card.closest('.beat') : null;
-  if (!vt || !card || !beatEl) return;
-  vt.style.fontSize = '';
-  const maxFont = parseFloat(getComputedStyle(vt).fontSize);
-  let fontSize = maxFont;
-  const minFont = Math.max(11, maxFont * 0.5);
-  let guard = 0;
-  while (beatEl.scrollHeight > beatEl.clientHeight + 2 && fontSize > minFont && guard < 50) {
-    fontSize -= 0.5;
-    vt.style.fontSize = fontSize + 'px';
-    guard++;
-  }
-}
-
-const PAGE_FLIP_BEAT_IDS = ['reading-intro', 'character-prompt'];
-function goNext(){
-  if (state.index < beats.length - 1) {
-    const leavingBeat = beats[state.index];
-    if (PAGE_FLIP_BEAT_IDS.includes(leavingBeat.id)) {
-      const el = document.getElementById('beat-' + state.index);
-      if (el) {
-        el.classList.add('page-flip-exit');
-        setTimeout(() => {
-          el.classList.remove('page-flip-exit');
-          state.index++; renderBeat(state.index);
-        }, 380);
-        return;
-      }
-    }
-    state.index++; renderBeat(state.index);
-  }
-}
-
-function goPrev(){ 
-  if (state.index > 0) { 
-    state.index--; renderBeat(state.index); 
-  } 
-}
-
+function goNext(){ if (state.index < beats.length - 1) { state.index++; renderBeat(state.index); } }
+function goPrev(){ if (state.index > 0) { state.index--; renderBeat(state.index); } }
 function toggleFullScreen() {
-  if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(err => console.log(err));
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
   else if (document.exitFullscreen) document.exitFullscreen();
 }
 
 document.addEventListener('keydown', (e) => {
-  const inField = e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable;
-  if (!inField && (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'PageDown' || e.key === 'PageUp')) {
-    const scrollable = document.querySelector(
-      '.beat.active .passage-scroll, .beat.active .verse-pick-list, .beat.active .review-scroll'
-    );
-    if (scrollable) {
-      const amount = (e.key === 'PageDown' || e.key === 'PageUp')
-        ? scrollable.clientHeight * 0.9
-        : 220;
-      const dir = (e.key === 'ArrowDown' || e.key === 'PageDown') ? 1 : -1;
-      scrollable.scrollBy({ top: amount * dir, behavior: 'smooth' });
-      return;
-    }
-  }
   if (e.key === 'ArrowRight') handleForwardAttempt();
   if (e.key === 'ArrowLeft') goPrev();
   if (e.key.toLowerCase() === 'f' && e.target.tagName !== 'INPUT') toggleFullScreen();
 });
 
-/* TAP-ZONE + SWIPE NAVIGATION */
-(function initGestureNav(){
-  const stageEl = document.getElementById('stage');
-  if (!stageEl) return;
-  const LEFT_ZONE = 0.28;
-  const SWIPE_THRESHOLD = 60;
-  let lastSwipeTime = 0;
-
-  stageEl.addEventListener('click', (e) => {
-    if (Date.now() - lastSwipeTime < 500) return;
-    const b = beats[state.index];
-    const rect = stageEl.getBoundingClientRect();
-    const relX = (e.clientX - rect.left) / rect.width;
-    if (relX < LEFT_ZONE) {
-      goPrev();
-    } else if (!b.blockTap) {
-      goNext();
-    }
-  });
-
-  let touchStartX = 0, touchStartY = 0, touchTracking = false;
-  stageEl.addEventListener('touchstart', (e) => {
-    if (e.touches.length !== 1) return;
-    touchStartX = e.touches[0].clientX;
-    touchStartY = e.touches[0].clientY;
-    touchTracking = true;
-  }, { passive: true });
-
-  stageEl.addEventListener('touchend', (e) => {
-    if (!touchTracking) return;
-    touchTracking = false;
-    const touch = e.changedTouches[0];
-    const dx = touch.clientX - touchStartX;
-    const dy = touch.clientY - touchStartY;
-    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > SWIPE_THRESHOLD) {
-      lastSwipeTime = Date.now();
-      const b = beats[state.index];
-      if (dx < 0) {
-        if (!b.blockTap) goNext();
-      } else {
-        goPrev();
-      }
-    }
-  }, { passive: true });
-
-  stageEl.addEventListener('touchcancel', () => { touchTracking = false; }, { passive: true });
-})();
-
 const passageScrollElInit = document.getElementById('passageScrollEl');
 if (passageScrollElInit) passageScrollElInit.addEventListener('scroll', checkPassageScroll, { passive: true });
-
-/* ===================== DEV MODE ===================== */
-let devMode = false;
-let devTapCount = 0;
-let devLastTapTime = 0;
-const DEV_NOTES_KEY = 'msHangDevNotes_1_21_45';
-
-function loadDevNotes(){
-  try { return JSON.parse(localStorage.getItem(DEV_NOTES_KEY) || '{}'); }
-  catch(e){ return {}; }
-}
-function saveDevNotes(obj){
-  try { localStorage.setItem(DEV_NOTES_KEY, JSON.stringify(obj)); } catch(e){}
-}
-
-function handleEmojiTap(){
-  const now = Date.now();
-  if (now - devLastTapTime > 1500) devTapCount = 0;
-  devTapCount++;
-  devLastTapTime = now;
-  if (devTapCount >= 10) {
-    devTapCount = 0;
-    enterDevMode();
-  }
-}
-
-function enterDevMode(){
-  devMode = true;
-  document.getElementById('normalProgressWrap').style.display = 'none';
-  document.getElementById('devBubblesBar').style.display = 'flex';
-  updateHeaderMeta();
-  renderDevBubbles();
-}
-
-function exitDevMode(){
-  devMode = false;
-  document.getElementById('normalProgressWrap').style.display = 'block';
-  document.getElementById('devBubblesBar').style.display = 'none';
-  updateHeaderMeta();
-  closeDevNotesPanel();
-}
-
-function renderDevBubbles(){
-  const bar = document.getElementById('devBubblesBar');
-  const notes = loadDevNotes();
-  bar.innerHTML = '';
-  beats.forEach((b, i) => {
-    const bub = document.createElement('div');
-    bub.className = 'dev-bubble' + (i === state.index ? ' active' : '');
-    bub.style.background = b.bgGrad;
-    bub.style.color = b.text === 'light' ? '#FFF' : 'var(--ink)';
-    bub.textContent = i + 1;
-    bub.title = b.id;
-    if (notes[i + '_' + b.id] && notes[i + '_' + b.id].trim()) {
-      const dot = document.createElement('div');
-      dot.className = 'note-dot';
-      bub.appendChild(dot);
-    }
-    bub.onclick = (e) => { e.stopPropagation(); state.index = i; renderBeat(i); renderDevBubbles(); };
-    bar.appendChild(bub);
-  });
-  const activeBub = bar.querySelector('.dev-bubble.active');
-  if (activeBub) activeBub.scrollIntoView({ inline: 'center', block: 'nearest' });
-}
-
-function openDevNotesPanel(){
-  const b = beats[state.index];
-  document.getElementById('dnpTitle').textContent = `Slide ${state.index + 1}: ${b.id}`;
-  const notes = loadDevNotes();
-  document.getElementById('devNoteInput').value = notes[state.index + '_' + b.id] || '';
-  document.getElementById('devAllNotesSection').style.display = 'none';
-  document.getElementById('dnpStatus').textContent = '';
-  document.getElementById('dnpRetryBtn').style.display = 'none';
-  document.getElementById('devNotesOverlay').style.display = 'flex';
-}
-function closeDevNotesPanel(){
-  document.getElementById('devNotesOverlay').style.display = 'none';
-}
-function saveCurrentDevNote(val){
-  const b = beats[state.index];
-  const notes = loadDevNotes();
-  notes[state.index + '_' + b.id] = val;
-  saveDevNotes(notes);
-  if (devMode) renderDevBubbles();
-}
-
-function compileAllNotes(){
-  const notes = loadDevNotes();
-  const lines = [];
-  beats.forEach((b, i) => {
-    const key = i + '_' + b.id;
-    const txt = notes[key];
-    if (txt && txt.trim()) lines.push(`[${i}] ${b.id}:\n${txt.trim()}`);
-  });
-  return lines.length ? lines.join('\n\n') : 'No notes yet.';
-}
-
-function copyAllDevNotes(){
-  const section = document.getElementById('devAllNotesSection');
-  const panel = document.getElementById('devAllNotesPanel');
-  section.style.display = 'flex';
-  panel.value = compileAllNotes();
-  panel.focus();
-  panel.select();
-  tryCopyAllNotes();
-}
-
-function tryCopyAllNotes(){
-  const panel = document.getElementById('devAllNotesPanel');
-  const status = document.getElementById('dnpStatus');
-  const retryBtn = document.getElementById('dnpRetryBtn');
-  panel.focus();
-  panel.select();
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(panel.value).then(() => {
-      status.textContent = '✓ Copied to clipboard';
-      status.className = 'dnp-status ok';
-      retryBtn.style.display = 'none';
-    }).catch(() => {
-      status.textContent = 'Copy failed — select the text above and copy manually.';
-      status.className = 'dnp-status warn';
-      retryBtn.style.display = 'inline-block';
-    });
-  } else {
-    status.textContent = 'Clipboard unavailable — select the text above and copy manually.';
-    status.className = 'dnp-status warn';
-    retryBtn.style.display = 'inline-block';
-  }
-}
 
 initNotches();
 renderBeat(0);
