@@ -1,2522 +1,2089 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>MS Hang Prep — Mark 1:21–45</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&family=Raleway:wght@800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Dwell | Building blocks for Biblical literacy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..900;1,9..144,400..900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Raleway:ital,wght@0,400..900;1,400..900&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet" />
+
 <style>
-  :root{
-    --ink:#0D0D0D;
-    --paper:#FFFFFF;
-    --cream:#EAE6DF;
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* Baseline: Golden Hour Horizon — the adult site's actual D-W-E-L-L
-       flat colors, used directly as flat backgrounds and as the source
-       family every accent below is mixed from. */
-    --d-discover:     #e28a5c;
-    --d-wordwork:     #d76b65;
-    --d-expand:       #9e6488;
-    --d-learn:        #5d587e;
-    --d-live:         #2d324f;
-
-    /* Accent palette — ONE confident teal as the single "positive/
-       interactive" accent (success, correct, ready, highlighter), a
-       matching gold for attention/pulse, and coral-red for errors —
-       instead of six different muted/dusty hues that read as a random
-       grab-bag next to each other. Punchier and more saturated than a
-       "matched by mood" attempt, closer to the energy of the original
-       lime, but genuinely complementary (teal vs. the warm orange-to-
-       navy DWELL spread) instead of literally identical hue to the
-       background it sits on. Names kept for low-risk reuse. */
-    --lime:   #50af9b;  /* softer teal — success / correct / positive */
-    --yellow: #efac39;  /* vivid gold  — attention / ready / pulse */
-    --pink:   #dd554b;  /* vivid coral-red — error / incorrect */
-    --purple: #8459cf;  /* vivid violet    — reference / kicker accents */
-    --purple-light: #bfabe3;  /* soft lavender — the "God is..." trait word specifically */
-    --blue:   #4299d7;  /* vivid sky blue  — highlighter: Characters */
-    --green:  #30a68e;  /* same teal as --lime — highlighter: Setting */
-
-    --bg-lime: var(--lime);
-    --bg-purple: var(--purple);
-    --bg-pink: var(--pink);
-    --bg-dark: #181818;
-    --bg-cream: #e8e3da;
-    --bg-yellow: var(--yellow);
-
-    --bg-discover:  var(--d-discover);
-    --bg-wordwork:  var(--d-wordwork);
-    --bg-expand:    var(--d-expand);
-    --bg-learn:     var(--d-learn);
-    --bg-live:      var(--d-live);
-
-    --bg-terracotta: #c87760;
-    --bg-orange: #d99762;
-    --bg-leather: #643c23;
-  }
-
-  /* ── DEV MODE: Northern Depths theme ──
-     Same family as the adult site's cool palette (discover #38b2a3,
-     wordwork #1d788a, expand #295b87, learn #2d3766, live #141933),
-     pushed brighter/higher-chroma to match this app's energy. Toggle
-     with the dev pill button, top-left. */
-  :root[data-theme="northern"] {
-    --bg-discover:  #2dd7b2;
-    --bg-wordwork:  #23bcdf;
-    --bg-expand:    #4576ee;
-    --bg-learn:     #5666e1;
-    --bg-live:      #212a73;
-    --bg-cream:     #e4eff3;
-  }
-  *{box-sizing:border-box;}
+:root {
+  --ink:            #1a141e;
+  --paper:          #f2ece6;
+  --paper-dim:      #e8e0d7;
   
-  html, body { 
-    margin:0; 
-    padding:0; 
-    width:100%; 
-    height:100%; 
-    background:var(--ink); 
-    font-family:'Plus Jakarta Sans', sans-serif; 
-    -webkit-tap-highlight-color: transparent; 
-    overscroll-behavior:none; 
-    overflow:hidden;
-  }
+  /* Baseline: Golden Hour Horizon */
+  --d-discover:     #e28a5c;
+  --d-wordwork:     #d76b65;
+  --d-expand:       #9e6488;
+  --d-learn:        #5d587e;
+  --d-live:         #2d324f;
 
-  .app-viewport {
-    position: relative;
-    z-index: 0;
-    width: 100vw;
-    height: 100vh;
-    height: 100dvh;
-    background: var(--bg-cream);
-    display: flex;
-    flex-direction: column;
+  /* Text colors */
+  --d-intro-text:    var(--ink);
+  --d-discover-text: #ffffff;
+  --d-wordwork-text: #ffffff;
+  --d-expand-text:   #ffffff;
+  --d-learn-text:    #ffffff;
+  --d-live-text:     #ffffff;
+
+  --font-display: 'Raleway', sans-serif;
+  --font-sans:    'Plus Jakarta Sans', sans-serif;
+  --font-mono:    'Space Grotesk', monospace;
+  --font-serif:   'Fraunces', serif;
+}
+
+html, body {
+  height: 100%;
+  height: 100dvh;
+  width: 100%;
+  width: 100dvw;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  overflow: hidden;
+  position: fixed;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ── Columns Wrapper ── */
+.columns-wrapper {
+  display: flex;
+  width: 100vw;
+  width: 100dvw;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.dwell-column {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: clamp(16px, 2.5vw, 32px);
+  cursor: pointer;
+  overflow: hidden;
+  transition: flex 0.5s cubic-bezier(0.25, 1, 0.3, 1), filter 0.2s ease, background-color 0.4s ease, color 0.4s ease;
+  user-select: none;
+}
+
+.dwell-column:hover:not(.is-expanded) {
+  flex: 1.25;
+  filter: brightness(1.03);
+}
+
+.dwell-column.is-expanded {
+  flex: 7.5;
+  cursor: default;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 12px;
+}
+
+/* Background & Body Text Colors */
+.col-intro    { background: var(--paper-dim); color: var(--d-intro-text); }
+.col-discover { background: var(--d-discover); color: var(--d-discover-text); }
+.col-wordwork { background: var(--d-wordwork); color: var(--d-wordwork-text); }
+.col-expand   { background: var(--d-expand); color: var(--d-expand-text); }
+.col-learn    { background: var(--d-learn); color: var(--d-learn-text); }
+.col-live     { background: var(--d-live); color: var(--d-live-text); }
+
+.col-headline, .col-nav-cue { color: inherit; }
+.col-subtext, .col-prompt-list li { color: inherit; opacity: 0.95; }
+.col-step-tag, .col-nav-cue { opacity: 0.85; }
+
+/* Header */
+.col-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  z-index: 2;
+  flex-shrink: 0;
+}
+
+.col-header-left {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Spine Letter Container */
+.col-letter-target {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  font-weight: 600;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(34px, 3.8vw, 48px);
+  letter-spacing: -0.02em;
+  opacity: 0.95;
+  transition: transform 0.3s ease, opacity 0.3s ease, color 0.3s ease;
+  color: #ffffff;
+}
+
+/* Introduction closed state brand spine */
+.col-intro:not(.is-expanded) .col-brand-lockup {
+  position: absolute;
+  left: 50%;
+  bottom: 40px;
+  transform: translateX(-50%) rotate(180deg);
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+}
+
+.col-intro.is-expanded .col-letter-target { display: none; }
+
+/* Brand Lockup */
+.col-brand-lockup {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.col-brand-text {
+  font-family: var(--font-display);
+  font-size: clamp(38px, 4.2vw, 56px);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--ink);
+}
+
+/* ── 5-Tile Logo Mark ── */
+.dwell-mark {
+  display: inline-grid;
+  grid-template-columns: repeat(3, 6px);
+  grid-template-rows: repeat(3, 6px);
+  gap: 2.5px;
+  flex-shrink: 0;
+  transform: translateY(-3px);
+  transition: transform 0.1s ease;
+}
+.dwell-mark:active {
+  transform: translateY(-3px) scale(0.9);
+}
+.dwell-mark span { 
+  width: 6px; 
+  height: 6px; 
+  border-radius: 1.5px; 
+  transition: background-color 0.4s ease; 
+}
+.dm-top    { grid-column: 2; grid-row: 1; background: var(--d-discover); }
+.dm-left   { grid-column: 1; grid-row: 2; background: var(--d-wordwork); }
+.dm-center { grid-column: 2; grid-row: 2; background: var(--d-learn); }
+.dm-right  { grid-column: 3; grid-row: 2; background: var(--d-expand); }
+.dm-bottom { grid-column: 2; grid-row: 3; background: var(--d-live); }
+
+/* Rotated Vertical Title */
+.col-vertical-title {
+  position: absolute;
+  left: 50%;
+  bottom: 40px;
+  transform: translateX(-50%) rotate(180deg);
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  white-space: nowrap;
+  font-family: var(--font-display);
+  font-size: clamp(20px, 2.2vw, 28px);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  opacity: 0.85;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+  color: #ffffff;
+}
+
+.dwell-column.is-expanded .col-vertical-title {
+  opacity: 0;
+}
+
+.col-discover:not(.is-expanded) .col-vertical-title,
+.col-wordwork:not(.is-expanded) .col-vertical-title {
+  color: #ffffff;
+}
+
+/* Expanded Body Content */
+.col-expanded-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  opacity: 0;
+  max-height: 0;
+  transform: translateY(14px);
+  pointer-events: none;
+  transition: opacity 0.35s ease, transform 0.35s ease, max-height 0.35s ease;
+  width: 100%;
+  max-width: 920px;
+  z-index: 2;
+  overflow: hidden;
+  flex: 1;
+}
+
+.dwell-column.is-expanded .col-expanded-body {
+  opacity: 1;
+  max-height: 100%;
+  transform: translateY(0);
+  pointer-events: auto;
+  overflow-y: auto;
+}
+
+.col-step-tag {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+}
+
+.col-headline {
+  font-family: var(--font-display);
+  font-size: clamp(20px, 2.4vw, 30px);
+  font-weight: 900;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+}
+
+.col-subtext {
+  font-size: clamp(14px, 1.1vw, 16px);
+  line-height: 1.55;
+}
+
+/* Original Prompt List */
+.col-prompt-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0;
+  margin: 0;
+  font-size: clamp(14px, 1.1vw, 15.5px);
+  line-height: 1.5;
+}
+
+.col-prompt-list li {
+  position: relative;
+  padding-left: 20px;
+}
+
+.col-prompt-list li::before {
+  content: "—";
+  position: absolute;
+  left: 0;
+  opacity: 0.55;
+  font-weight: 700;
+}
+
+.col-meta-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.92em;
+  font-weight: 700;
+  opacity: 0.9;
+  margin-top: 4px;
+}
+
+/* Navigation hint gesture */
+.col-nav-cue {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  cursor: pointer;
+  width: fit-content;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  user-select: none;
+  margin-top: auto;
+  flex-shrink: 0;
+}
+
+.col-nav-cue:hover {
+  opacity: 1;
+  transform: translateX(4px);
+}
+
+.cue-label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.cue-arrow {
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Interactive Bible Workspace ── */
+.interactive-container {
+  display: none;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+  min-height: 0;
+  color: #ffffff;
+  user-select: auto;
+}
+
+body.interactive-mode .interactive-container {
+  display: flex;
+}
+
+.interactive-meta-inline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  background: rgba(0, 0, 0, 0.14);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 500;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  margin-top: 4px;
+}
+
+.interactive-meta-inline .meta-item strong {
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 10.5px;
+  opacity: 0.85;
+  margin-right: 4px;
+}
+
+/* Full-Screen Scripture Reader Card */
+.scripture-card-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  color: #1a141e;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  flex: 1;
+  min-height: 180px;
+  max-height: calc(100vh - 380px);
+  overflow: hidden;
+  user-select: text;
+}
+
+.scripture-header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f7f4f0;
+  padding: 7px 14px;
+  border-bottom: 1px solid #e8e2da;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #555;
+  user-select: none;
+}
+
+.scripture-card {
+  padding: 14px 18px;
+  overflow-y: auto;
+  font-size: 15px;
+  line-height: 1.7;
+  font-family: var(--font-sans);
+  user-select: text;
+  -webkit-user-select: text;
+  flex: 1;
+}
+
+.scripture-card p {
+  margin-bottom: 8px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: background-color 0.15s ease;
+}
+
+.scripture-card[data-step="learn"] p {
+  cursor: pointer;
+}
+
+.scripture-card[data-step="learn"] p:hover {
+  background-color: rgba(93, 88, 126, 0.08);
+}
+
+.scripture-card[data-step="expand"] p {
+  cursor: pointer;
+}
+
+.scripture-card[data-step="expand"] p:hover {
+  background-color: rgba(158, 100, 136, 0.08);
+}
+
+.scripture-card[data-step="expand"] p.active-verse-inspect {
+  background-color: #fdf5f9;
+}
+
+.scripture-card sup {
+  font-weight: 800;
+  color: #8c857b;
+  margin-right: 5px;
+  font-size: 0.75em;
+  user-select: none;
+  cursor: pointer;
+}
+
+/* ── Precise Highlight Tokens ── */
+.dw-word {
+  display: inline;
+  padding: 0;
+  margin: 0;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background-color 0.12s ease;
+}
+
+.dw-word:hover {
+  filter: brightness(0.96);
+}
+
+.character-underline {
+  text-decoration: underline;
+  text-decoration-color: #5d587e;
+  text-decoration-thickness: 3px;
+  text-underline-offset: 3.5px;
+  font-weight: 600;
+  background-color: rgba(93, 88, 126, 0.12) !important;
+}
+
+/* Expand Actions */
+.expand-verse-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 6px 0 2px 0;
+  padding: 4px 0;
+  border-top: 1px dashed rgba(158, 100, 136, 0.25);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.expand-act-btn {
+  background: #ffffff;
+  border: 1px solid #d8cad4;
+  color: #724260;
+  padding: 3px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 700;
+  transition: all 0.15s ease;
+}
+
+.expand-act-btn:hover, .expand-act-btn.active {
+  background: #9e6488;
+  color: #ffffff;
+  border-color: #9e6488;
+}
+
+.expand-detail-drawer {
+  background: #fbf8fa;
+  border-radius: 8px;
+  border: 1px solid #ebdce6;
+  padding: 8px 10px;
+  margin-top: 6px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #2b1f28;
+}
+
+.expand-detail-drawer strong {
+  color: #9e6488;
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  display: block;
+  margin-bottom: 2px;
+}
+
+/* Highlighter Toolbar */
+.highlighter-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(0, 0, 0, 0.14);
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  user-select: none;
+}
+
+.color-dot-group {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.color-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.color-dot:hover {
+  transform: scale(1.15);
+}
+
+.color-dot.active {
+  border-color: #ffffff;
+  transform: scale(1.25);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+}
+
+.dot-red    { background: #ff7875; }
+.dot-yellow { background: #ffe58f; }
+.dot-green  { background: #95de64; }
+.dot-blue   { background: #69c0ff; }
+
+/* Interactive Note / Summary Textareas */
+.dwell-textarea {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: #ffffff;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.4;
+  resize: vertical;
+  min-height: 48px;
+  outline: none;
+  flex-shrink: 0;
+  user-select: text;
+}
+
+.dwell-textarea::placeholder {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.dwell-textarea:focus {
+  border-color: #ffffff;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+/* ── Synthesis & Dwell Summary Sheet ── */
+.synthesis-formula-box {
+  background: rgba(255, 255, 255, 0.96);
+  color: var(--ink);
+  border-radius: 12px;
+  padding: 14px 16px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.formula-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.formula-lead {
+  font-weight: 800;
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #5d587e;
+}
+
+.formula-learn-preview {
+  padding: 7px 10px;
+  background: #f4eff7;
+  border-left: 3px solid #5d587e;
+  border-radius: 4px;
+  font-size: 13px;
+  font-style: italic;
+  color: #2d1c3a;
+  min-height: 32px;
+}
+
+.formula-live-input {
+  width: 100%;
+  border: 1.5px solid #d5cdd9;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--ink);
+  outline: none;
+  resize: vertical;
+  min-height: 48px;
+  user-select: text;
+}
+
+.formula-live-input:focus {
+  border-color: #2d324f;
+  background: #faf8fc;
+}
+
+/* Completed Dwell Card Modal */
+.dwell-summary-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(16, 12, 19, 0.85);
+  backdrop-filter: blur(14px);
+  z-index: 2000000;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.dwell-summary-modal.active {
+  display: flex;
+}
+
+.dwell-summary-card {
+  background: #ffffff;
+  color: var(--ink);
+  width: 100%;
+  max-width: 540px;
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 20px;
+  padding: 26px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.dwell-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1.5px solid #eee;
+  padding-bottom: 12px;
+}
+
+.dwell-card-header h3 {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.dwell-card-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dwell-card-section label {
+  font-size: 10.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #777;
+}
+
+.dwell-card-section .val-box {
+  background: var(--paper);
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: #1a141e;
+}
+
+.dwell-card-btn-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.dwell-card-btn {
+  flex: 1;
+  padding: 11px 14px;
+  border-radius: 10px;
+  font-weight: 800;
+  font-size: 13px;
+  cursor: pointer;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+
+.dwell-copy-btn {
+  background: var(--ink);
+  color: #ffffff;
+}
+
+.dwell-close-btn {
+  background: var(--paper-dim);
+  color: var(--ink);
+}
+
+/* ── Hidden Mode Selector Modal ── */
+.passage-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(16, 12, 19, 0.8);
+  backdrop-filter: blur(12px);
+  z-index: 1000000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.passage-modal-overlay.active {
+  display: flex;
+}
+
+.passage-modal {
+  background: #ffffff;
+  color: var(--ink);
+  width: 100%;
+  max-width: 480px;
+  border-radius: 20px;
+  padding: 28px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.passage-modal h3 {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+.passage-modal p {
+  font-size: 13.5px;
+  color: #555;
+  line-height: 1.5;
+}
+
+.passage-form-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 10px;
+}
+
+.passage-select-input {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1.5px solid #dcd5cc;
+  background: #fdfbf9;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  outline: none;
+}
+
+.passage-select-input:focus {
+  border-color: var(--ink);
+}
+
+.passage-load-btn {
+  padding: 12px;
+  border-radius: 10px;
+  background: var(--ink);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.1s ease;
+}
+
+.passage-load-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.passage-quick-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-top: 1px solid #eae5de;
+  padding-top: 12px;
+}
+
+.passage-quick-btn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: var(--paper);
+  border-radius: 8px;
+  border: 1px solid rgba(0,0,0,0.06);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.passage-quick-btn:hover {
+  background: #e8e0d7;
+}
+
+.interactive-badge {
+  display: none;
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  background: rgba(26, 20, 30, 0.88);
+  color: #ffffff;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  z-index: 9999;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+}
+
+body.interactive-mode .interactive-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ── Mobile Layout (< 768px in Portrait Only) ── */
+@media (max-width: 768px) and (orientation: portrait) {
+  html, body {
     overflow: hidden;
-    transition: background .4s ease;
-    -webkit-user-select: none;
-    user-select: none;
-    -webkit-touch-callout: none;
+    height: 100dvh;
   }
-  /* INTRO SCREEN — soft blurred color blobs + a grain overlay instead of
-     a flat fill, so the title screen has some depth/texture (reference:
-     poster-style hero with blurred gradient blobs + film grain). Both
-     pseudo-elements sit at negative z-index so they stay behind the
-     .beat content (z-index 1/2) without needing to touch that stack. */
-  .app-viewport.intro-glow::before{
-    content:'';
-    position:absolute;
-    inset:-15%;
-    background:
-      radial-gradient(circle at 18% 22%, rgba(255,255,255,0.30) 0%, transparent 45%),
-      radial-gradient(circle at 78% 15%, var(--d-wordwork) 0%, transparent 55%),
-      radial-gradient(circle at 82% 78%, var(--d-expand) 0%, transparent 55%),
-      radial-gradient(circle at 22% 82%, var(--d-live) 0%, transparent 50%),
-      linear-gradient(155deg, var(--d-discover) 0%, var(--d-wordwork) 100%);
-    filter: blur(60px) saturate(1.15);
-    z-index: -2;
-  }
-  .app-viewport.intro-glow::after{
-    content:'';
-    position:absolute;
-    inset:0;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
-    opacity: 0.22;
-    mix-blend-mode: overlay;
-    z-index: -1;
-    pointer-events: none;
-  }
-  /* QUEST SCREENS (testament/section) — same grain-over-blurred-blob
-     treatment as the intro. Every color here is one of the 5 baseline
-     D-W-E-L-L hues (never an invented one-off hex) so it reads as the
-     same system as the intro/every other screen, just recombined.
-     Each screen previews a different "next" baseline color so
-     back-to-back Discover screens don't look identical. */
-  .app-viewport.quest-glow::before{
-    content:'';
-    position:absolute;
-    inset:-15%;
-    background:
-      radial-gradient(circle at 15% 85%, var(--d-expand) 0%, transparent 42%),
-      radial-gradient(circle at 88% 30%, rgba(255,255,255,0.24) 0%, transparent 40%),
-      linear-gradient(155deg, var(--d-discover) 0%, var(--d-wordwork) 100%);
-    filter: blur(60px) saturate(1.15);
-    z-index: -2;
-  }
-  .app-viewport.quest-glow.variant-b::before{
-    background:
-      radial-gradient(circle at 85% 82%, var(--d-learn) 0%, transparent 44%),
-      radial-gradient(circle at 12% 20%, rgba(255,255,255,0.24) 0%, transparent 40%),
-      linear-gradient(200deg, var(--d-discover) 0%, var(--d-expand) 100%);
-  }
-  .app-viewport.quest-glow::after{
-    content:'';
-    position:absolute;
-    inset:0;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
-    opacity: 0.20;
-    mix-blend-mode: overlay;
-    z-index: -1;
-    pointer-events: none;
-  }
-  /* FINAL SCREEN — mirrors char-coaching's recipe in reverse (learn to
-     live vs. live to learn) so the two "Learn"/"Live" screens visually
-     bookend each other, instead of final having its own invented purple
-     that shares no vocabulary with anything else in the app. --d-learn
-     IS the app's purple (used nowhere near as saturated as an accent
-     violet would be, but it's the real baseline purple), so "purple
-     gradient" and "only baseline colors" aren't actually in tension. */
-  .app-viewport.final-glow::before{
-    content:'';
-    position:absolute;
-    inset:-15%;
-    background:
-      radial-gradient(circle at 20% 15%, rgba(255,255,255,0.22) 0%, transparent 45%),
-      radial-gradient(circle at 82% 82%, var(--d-expand) 0%, transparent 46%),
-      linear-gradient(155deg, var(--d-learn) 0%, var(--d-live) 100%);
-    filter: blur(60px) saturate(1.15);
-    z-index: -2;
-  }
-  .app-viewport.final-glow::after{
-    content:'';
-    position:absolute;
-    inset:0;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
-    opacity: 0.20;
-    mix-blend-mode: overlay;
-    z-index: -1;
-    pointer-events: none;
-  }
-  /* EVERY OTHER SCREEN — same grain-over-blurred-blob mechanism, but
-     generic: each beat's own background color is the base of the
-     gradient (set as --glow-base/--glow-base2 inline per beat in JS),
-     with two soft accent blooms layered on top. This is what makes a
-     cream "Word Work" screen glow warm-cream, a navy "Learn" screen
-     glow navy, etc. — the screen's existing identity color leads,
-     instead of importing an unrelated accent hue. */
-  .app-viewport.beat-glow::before{
-    content:'';
-    position:absolute;
-    inset:-15%;
-    background:
-      radial-gradient(circle at var(--glow-p3, 50% 50%), var(--glow-a3, rgba(255,255,255,0)) 0%, transparent 40%),
-      radial-gradient(circle at var(--glow-p1, 15% 85%), var(--glow-a1, rgba(255,255,255,0)) 0%, transparent 42%),
-      radial-gradient(circle at var(--glow-p2, 88% 20%), var(--glow-a2, rgba(255,255,255,0.18)) 0%, transparent 40%),
-      linear-gradient(155deg, var(--glow-base, var(--bg-cream)) 0%, var(--glow-base2, var(--bg-cream)) 100%);
-    filter: blur(60px) saturate(1.12);
-    z-index: -2;
-  }
-  .app-viewport.beat-glow::after{
-    content:'';
-    position:absolute;
-    inset:0;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
-    opacity: 0.18;
-    mix-blend-mode: overlay;
-    z-index: -1;
-    pointer-events: none;
-  }
-
-  /* DEV-ONLY: palette tester — docked inline inside the dev notes panel,
-     toggled via the "Color" text button next to "Close" */
-  .palette-tester-wrap {
-    position: absolute;
-    bottom: clamp(78px, 13vh, 108px);
-    right: clamp(14px, 3vw, 22px);
-    z-index: 100;
+  
+  .columns-wrapper {
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
-  }
-  .palette-tester-panel {
-    display: none;
-    background: #FFF;
-    color: var(--ink);
-    border: 3px solid var(--ink);
-    border-radius: 18px;
-    padding: 12px;
-    margin-bottom: 10px;
-    box-shadow: 5px 5px 0 var(--ink);
-    width: 240px;
-  }
-  .palette-tester-wrap.open .palette-tester-panel { display: block; }
-  /* Docked variant: lives inline inside the dev notes panel instead of
-     floating bottom-right */
-  .palette-tester-wrap.docked-panel {
-    position: static;
-    align-items: stretch;
-    margin: 2px 0 0 0;
-  }
-  .palette-tester-wrap.docked-panel .palette-tester-panel {
-    width: 100%;
-    margin-bottom: 0;
+    height: 100dvh;
+    width: 100vw;
+    overflow: hidden;
   }
 
-  .ptp-head {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 11px;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin-bottom: 10px;
-    padding-bottom: 8px;
-    border-bottom: 1.5px solid rgba(0,0,0,0.1);
-  }
-  .ptp-list { display: flex; flex-direction: column; gap: 7px; }
-  .ptp-card {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    padding: 9px 11px;
-    background: #FBFBFB;
-    border: 2px solid var(--ink);
-    border-radius: 12px;
-    cursor: pointer;
-    text-align: left;
-    font-family: inherit;
-    transition: transform 0.12s ease;
-  }
-  .ptp-card:hover { transform: translate(-1px, -1px); }
-  .ptp-card.active { background: var(--bg-yellow); box-shadow: 2px 2px 0 var(--ink); }
-  .ptp-name {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 12.5px;
-    font-weight: 800;
-  }
-  .ptp-swatches { display: flex; gap: 4px; height: 14px; border-radius: 4px; overflow: hidden; }
-  .ptp-swatches span { flex: 1; }
-
-
-  /* FULLSCREEN CLICK ZONE (DESKTOP ONLY) — invisible hotspot, top-right corner.
-     No visible mark; clicking/tapping this corner still toggles fullscreen. */
-  .fs-toggle-btn {
-    position: absolute;
-    top: 0;
-    right: 0;
-    z-index: 100;
-    width: 72px;
-    height: 64px;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-  }
-  @media (max-width: 767px) {
-    .fs-toggle-btn { display: none !important; }
-  }
-
-  /* ================= MINIMAL BORDERLESS CHEVRON NAVIGATION ================= */
-  .persistent-nav-shell {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: clamp(14px, 2.5vh, 22px);
-    z-index: 90;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 clamp(16px, 4vw, 40px);
-    pointer-events: none;
-  }
-  .minimal-arrow-btn {
-    pointer-events: auto;
-    background: none;
-    border: none;
-    padding: 10px 14px;
-    color: var(--ink);
-    font-size: clamp(22px, 3vh, 28px);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
+  .dwell-column {
+    flex: 1 1 0px !important;
+    min-height: 0;
+    padding: 0 20px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
     justify-content: center;
-    opacity: 0.55;
-    transition: opacity 0.2s ease, transform 0.2s ease, color 0.2s ease;
-  }
-  .app-viewport.tx-light .minimal-arrow-btn {
-    color: #FFFFFF;
-  }
-  .minimal-arrow-btn:hover {
-    opacity: 1;
-    transform: scale(1.15);
-  }
-  .minimal-arrow-btn.disabled {
-    opacity: 0.15;
-    pointer-events: none;
-  }
-  .minimal-arrow-btn.ready {
-    opacity: 1;
-    animation: chevronPulse 1.3s infinite cubic-bezier(.45,0,.55,1);
-  }
-  @keyframes chevronPulse {
-    0%, 100% {
-      transform: translateX(0) scale(1);
-      opacity: 0.75;
-      filter: drop-shadow(0 0 0 rgba(239,172,57,0));
-    }
-    50% {
-      transform: translateX(14px) scale(1.5);
-      opacity: 1;
-      filter: drop-shadow(0 0 10px rgba(239,172,57,0.85));
-    }
-  }
-  .minimal-arrow-btn.shake-warn {
-    animation: shakeX 0.45s !important;
-    opacity: 1;
+    transition: flex 0.4s cubic-bezier(0.25, 1, 0.3, 1);
   }
 
-  /* CONTEXTUAL FLOATING ISLAND */
-  .floating-context-island {
-    position: absolute;
-    left: 50%;
-    bottom: clamp(14px, 2.5vh, 22px);
-    transform: translateX(-50%);
-    z-index: 95;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    pointer-events: auto;
-  }
-  .tools-capsule {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: rgba(255, 255, 255, 0.95);
-    border: 3px solid var(--ink);
-    border-radius: 100px;
-    padding: 5px 8px;
-    box-shadow: 3.5px 3.5px 0 var(--ink);
-    backdrop-filter: blur(8px);
-  }
-  .hl-mini-btn {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: #FFF;
-    color: var(--ink);
-    border: 2px solid var(--ink);
-    border-radius: 100px;
-    padding: 7px 11px;
-    font-family: 'Space Grotesk', sans-serif;
-    font-weight: 700;
-    font-size: 11.5px;
-    cursor: pointer;
-    transition: all 0.12s ease;
-    white-space: nowrap;
-  }
-  .hl-mini-btn:hover { background: #F4F0E8; }
-  .hl-mini-btn.active {
-    border-width: 2.5px;
-    transform: scale(0.96);
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.18);
-  }
-  .hl-mini-btn[data-color="blue"].active { background: rgba(66,153,215,0.3); }
-  .hl-mini-btn[data-color="green"].active { background: rgba(48,166,142,0.3); }
-  .hl-mini-btn[data-color="yellow"].active { background: rgba(239,172,57,0.4); }
-  .hl-mini-btn[data-color="pink"].active { background: rgba(221,85,75,0.3); }
-
-  .hl-swatch {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    border: 1.5px solid var(--ink);
-    flex-shrink: 0;
-  }
-  .hl-swatch-blue{ background:var(--blue); }
-  .hl-swatch-green{ background:var(--green); }
-  .hl-swatch-yellow{ background:var(--yellow); }
-  .hl-swatch-pink{ background:var(--pink); }
-
-  /* FLANKING HIGHLIGHTER CONTROLS — unified into one toolbar capsule so it
-     reads as a single tool, not floating icons; swatches are dot-only by
-     default (label only shows on the active color) to keep the footprint
-     small — sizes stay tight for mobile */
-  .hl-flank-row{
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    background: rgba(255,255,255,0.97);
-    border: 2.5px solid var(--ink);
-    border-radius: 100px;
-    padding: 4px 6px;
-    box-shadow: 3px 3px 0 var(--ink);
-  }
-  .hl-flank-btn{
-    background: none;
-    border: none;
-    padding: 2px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2px;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .hl-flank-btn .hl-swatch{
-    width: 11px;
-    height: 11px;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-  }
-  .hl-flank-btn .hl-flank-label{
-    display: none;
-    font-family: 'Space Grotesk', sans-serif;
-    font-weight: 800;
-    font-size: 7px;
-    letter-spacing: 0.1px;
-    text-transform: uppercase;
-    color: var(--ink);
-    opacity: 0.65;
-    white-space: nowrap;
-  }
-  .hl-flank-btn.active .hl-swatch{
-    transform: scale(1.25);
-    box-shadow: 0 0 0 3px rgba(13,13,13,0.15);
-  }
-  .hl-flank-btn.active .hl-flank-label{ display: block; opacity: 1; }
-  .hl-flank-row .action-gate-pill{ padding: 9px 14px; font-size: 11.5px; border: none; box-shadow: none; }
-  @media (min-width: 480px) {
-    .hl-flank-row{ gap: 7px; padding: 5px 8px; }
-    .hl-flank-btn .hl-swatch{ width: 13px; height: 13px; }
-    .hl-flank-btn .hl-flank-label{ font-size: 8.5px; letter-spacing: 0.3px; }
-    .hl-flank-row .action-gate-pill{ padding: 10px 20px; font-size: 13px; }
-  }
-  @media (min-width: 1024px) {
-    .hl-flank-row{ gap: 10px; padding: 7px 12px; border-width: 3px; box-shadow: 4px 4px 0 var(--ink); }
-    .hl-flank-btn .hl-swatch{ width: 16px; height: 16px; }
-    .hl-flank-btn .hl-flank-label{ font-size: 11px; }
+  .col-intro:not(.is-expanded) .col-brand-lockup {
+    position: static;
+    transform: none;
+    writing-mode: horizontal-tb;
   }
 
-  .action-gate-pill {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 13px;
-    font-weight: 800;
-    letter-spacing: 0.4px;
-    text-transform: uppercase;
-    background: #FFF;
-    color: var(--ink);
-    border: 3px solid var(--ink);
-    border-radius: 100px;
-    padding: 10px 20px;
-    cursor: pointer;
-    box-shadow: 3.5px 3.5px 0 var(--ink);
+  .dwell-column:not(.is-expanded) .col-header {
+    height: 100%;
+    display: flex;
+    align-items: center;
+  }
+
+  .dwell-column:not(.is-expanded) .col-header-left {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    white-space: nowrap;
-    transition: all 0.15s ease;
-  }
-  .action-gate-pill:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
-  .action-gate-pill.ready {
-    animation: gentlePulse 2s infinite ease-in-out;
-  }
-  .action-gate-pill.shake-warn {
-    animation: shakeX 0.45s !important;
-  }
-
-  @keyframes gentlePulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.02); }
-  }
-  @keyframes shakeX{ 10%,90%{transform:translateX(-3px);} 20%,80%{transform:translateX(5px);} 30%,50%{transform:translateX(-8px);} 40%,60%{transform:translateX(8px);} }
-
-  /* FLOATING NOTICE BADGE */
-  .clue-badge{
-    position: absolute;
-    left: 50%;
-    bottom: clamp(76px, 12vh, 96px);
-    transform: translateX(-50%);
-    display: flex; align-items: center; gap: 8px;
-    background: var(--ink); color: #FFF;
-    font-family:'Space Grotesk', sans-serif; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: .4px;
-    padding: 10px 18px; border-radius: 100px;
-    box-shadow: 3px 3px 0 rgba(0,0,0,0.3);
-    z-index: 100;
-    white-space: nowrap;
-  }
-  .clue-badge i{ color: var(--yellow); }
-
-  /* HEADER & HUD */
-  .hud-header{ 
-    position:relative; 
-    z-index:50; 
-    padding: clamp(14px, 2.5vh, 22px) clamp(20px, 4vw, 60px) 6px; 
-    width: 100%;
-    margin: 0 auto;
-    display:flex; 
-    flex-direction:column; 
-    gap:8px; 
-  }
-
-  .progress-container{ position:relative; width:100%; height:7px; background:rgba(13,13,29,0.18); border-radius:100px; }
-  .tx-light .progress-container{ background:rgba(255,255,255,0.25); }
-  .progress-bar-fill{ position:absolute; left:0; top:0; bottom:0; width:0%; background:var(--ink); border-radius:100px; transition:width .3s cubic-bezier(.2,.8,.25,1); }
-  .tx-light .progress-bar-fill{ background:#FFF; }
-  
-  .notches-layer{ position:absolute; inset:0; pointer-events:none; }
-  .prog-notch{ position:absolute; top:50%; transform:translate(-50%, -50%); width:9px; height:9px; border-radius:50%; background:rgba(13,13,29,0.3); border:1.5px solid rgba(255,255,255,0.6); transition:all .25s ease; }
-  .tx-light .prog-notch{ background:rgba(255,255,255,0.4); border-color:rgba(0,0,0,0.3); }
-  .prog-notch.passed{ background:var(--lime); border-color:var(--ink); }
-  .prog-notch.active{ width:13px; height:13px; background:var(--yellow); border-color:var(--ink); box-shadow:0 0 8px rgba(0,0,0,0.3); animation:notchPulse 1.2s infinite ease-in-out; }
-  @keyframes notchPulse{ 0%,100%{ transform:translate(-50%, -50%) scale(1); } 50%{ transform:translate(-50%, -50%) scale(1.25); } }
-
-  .story-meta{ display:flex; align-items:center; justify-content:space-between; font-family:'Space Grotesk', sans-serif; font-size:12px; font-weight:800; letter-spacing:1.2px; text-transform:uppercase; opacity:.85; padding-right: 16px; }
-  @media (max-width: 767px) {
-    .story-meta { padding-right: 0; }
-  }
-  .story-meta .meta-link-btn{
-    background: none;
-    border: none;
-    padding: 0;
-    color: inherit;
-    font-family: inherit;
-    font-size: inherit;
-    font-weight: inherit;
-    letter-spacing: inherit;
-    text-transform: inherit;
-    cursor: pointer;
-    text-decoration: underline;
-    text-underline-offset: 3px;
-    opacity: 0.9;
-  }
-
-  /* STAGE & BEATS */
-  .stage{ 
-    position:relative; 
-    flex:1; 
-    overflow:hidden; 
-    z-index:1; 
-    perspective:1400px; 
-    width: 100%;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-  }
-  .beat{ 
-    position:absolute; 
-    inset:0; 
-    display:flex; 
-    flex-direction:column; 
-    padding: clamp(10px, 2vh, 24px) clamp(20px, 4vw, 60px) clamp(70px, 10vh, 85px); 
-    opacity:0; 
-    transform:translateY(10px) scale(0.98); 
-    transition:opacity .25s ease, transform .25s ease; 
-    pointer-events:none; 
-    z-index:1; 
-    background: transparent !important;
-    /* Once the fade-in transform settles, drop the layer promotion so
-       children paint through the normal (reliable) path rather than
-       staying composited indefinitely — see .deck-card for why this
-       matters on iOS Safari. */
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-  }
-  .beat.active{ opacity:1; transform:translateY(0) scale(1); pointer-events:auto; z-index:2; }
-  .tx-dark{ color:var(--ink); }
-  .tx-light{ color:#FFF; }
-
-  /* PAGE-FLIP TRANSITION — used when leaving a book-cover screen (reading-intro, character-prompt) */
-  .beat.page-flip-exit{
-    animation: pageFlipOut 0.42s cubic-bezier(.45,.05,.55,.95) forwards;
-    transform-origin: left center;
-    z-index: 6;
-    backface-visibility: hidden;
-  }
-  @keyframes pageFlipOut{
-    0%{ transform: rotateY(0deg); opacity:1; }
-    100%{ transform: rotateY(-100deg); opacity:0.1; }
-  }
-
-  .sketch-lead-title {
-    font-family:'Space Grotesk', sans-serif;
-    font-size: clamp(24px, 3.8vw, 42px);
-    font-weight: 800;
-    letter-spacing: -0.5px;
-    text-transform: uppercase;
-    margin-bottom: clamp(10px, 1.8vh, 24px);
-    text-align: left;
-    width: 100%;
-  }
-  .sketch-lead-title.tight{ margin-bottom: clamp(22px, 4vh, 40px); }
-  .locator-subtitle{
-    font-family:'Plus Jakarta Sans', sans-serif;
-    font-size: clamp(14px, 1.9vh, 17px);
-    font-weight: 600;
-    line-height: 1.4;
-    max-width: 560px;
-    margin-bottom: clamp(18px, 3vh, 32px);
-    opacity: 0.85;
-  }
-  .locator-subtitle strong{ font-weight: 800; }
-  .pop-mark{
-    display: inline-block;
-    background: var(--ink);
-    color: #FFF;
-    padding: 1px 10px 3px;
-    border: 2.5px solid #FFF;
-    border-radius: 8px;
-    transform: rotate(-2deg);
-    box-shadow: 3px 3px 0 var(--ink);
-    margin: 0 1px;
-  }
-
-  /* INTRO SLIDE */
-  .intro-top-title{ font-family:'Space Grotesk', sans-serif; font-size:16px; font-weight:700; letter-spacing:2px; text-transform:uppercase; opacity:.85; margin-bottom:12px; }
-  .intro-duration{ font-family:'Space Grotesk', sans-serif; font-size:13.5px; font-weight:700; letter-spacing:.5px; text-transform:uppercase; opacity:.6; margin-top:16px; display:flex; align-items:center; gap:8px; }
-  @media (min-width: 768px) {
-    .intro-duration { display: none; }
-  }
-  .hero-wrap{ flex:1; display:flex; flex-direction:column; justify-content:center; position:relative; z-index:2; width:100%; max-width:800px; margin:0 auto; }
-
-  .kline{ overflow:hidden; margin-bottom:2px; }
-  .kline:last-child{ margin-bottom:0; }
-  .kword{ display:inline-block; opacity:0; transform:translateY(16px) scale(0.92); font-family:'Space Grotesk', sans-serif; font-weight:700; letter-spacing:-0.3px; text-transform:uppercase; }
-  .beat.active .kword{ animation:kwIn .5s cubic-bezier(.2,.85,.25,1) forwards; }
-  @keyframes kwIn{ to{ opacity:1; transform:translateY(0) scale(1); } }
-  .hero-title.xl .kword{ font-size:clamp(42px, 8vw, 76px); line-height:1.05; }
-  /* Brand mark — ported directly from dwellstudy.com's actual "5-tile"
-     logo mark: a plus-shaped grid of 5 dots, one per D-W-E-L-L step
-     color. Doubles as the secret dev-mode tap target — same 10-tap
-     trigger as before, just the real brand instead of a placeholder.
-     Sized 2x the site's original (6px dots) per request. */
-  .brand-mark{
-    display:inline-flex;
-    align-items:center;
-    line-height:1;
-    margin-bottom:14px;
-    position:relative;
-    z-index:2;
-    -webkit-tap-highlight-color: transparent;
-    cursor: default;
-  }
-  .dwell-mark{
-    display:inline-grid;
-    grid-template-columns: repeat(3, 12px);
-    grid-template-rows: repeat(3, 12px);
-    gap: 5px;
-    flex-shrink: 0;
-  }
-  .dwell-mark span{ width:12px; height:12px; border-radius:3px; }
-  .dwell-mark .dm-top{    grid-column:2; grid-row:1; background:var(--d-discover); }
-  .dwell-mark .dm-left{   grid-column:1; grid-row:2; background:var(--d-wordwork); }
-  .dwell-mark .dm-center{ grid-column:2; grid-row:2; background:var(--d-learn); }
-  .dwell-mark .dm-right{  grid-column:3; grid-row:2; background:var(--d-expand); }
-  .dwell-mark .dm-bottom{ grid-column:2; grid-row:3; background:var(--d-live); }
-  @media (min-width: 768px) {
-    .hero-wrap{ max-width:960px; }
-    .hero-title.xl .kword{ font-size:clamp(56px, 8vw, 140px); }
-    .intro-top-title{ font-size:19px; letter-spacing:3px; }
-    .brand-mark{ margin-bottom:18px; }
-    .dwell-mark{ grid-template-columns: repeat(3, 14px); grid-template-rows: repeat(3, 14px); gap:6px; }
-    .dwell-mark span{ width:14px; height:14px; }
-  }
-
-  /* SLIDE 1: TESTAMENT CARDS */
-  .testament-deck {
-    display: flex;
-    flex-direction: column;
     gap: 16px;
-    flex: 1;
-    min-height: 0;
-    max-width: 1200px;
-    margin: 0 auto;
-    width: 100%;
-    justify-content: center;
+  }
+
+  .dwell-column:not(.is-expanded) .col-vertical-title {
+    position: static;
+    transform: none;
+    writing-mode: horizontal-tb;
+    font-size: 18px;
+    font-weight: 800;
+    opacity: 0.95;
+    pointer-events: none;
+    letter-spacing: -0.01em;
+    color: #ffffff;
+  }
+
+  .dwell-column:not(.is-expanded) .col-letter-target {
+    font-size: 22px;
+    width: 26px;
+    justify-content: flex-start;
+    color: #ffffff;
+  }
+
+  .dwell-column.is-expanded {
+    flex: 9 1 0px !important;
+    padding: 20px 20px 24px;
+    justify-content: flex-start;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
   }
-  @media (max-width: 767px) {
-    .testament-deck { gap: 10px; }
-    .testament-deck .deck-card {
-      padding: 12px 16px;
-      border-width: 3px;
-      box-shadow: 4px 4px 0 var(--ink);
-    }
-    .testament-deck .dc-title { font-size: clamp(17px, 2.4vh, 21px); margin-bottom: 4px; }
-    .testament-deck .dc-badge { font-size: 10px; padding: 3px 10px; margin-bottom: 6px; }
-    .testament-deck .dc-desc { font-size: 12px; line-height: 1.35; }
-  }
-  @media (max-width: 767px) and (max-height: 700px) {
-    .locator-subtitle{ font-size:12.5px; margin-bottom:10px; }
-    .sketch-lead-title.tight{ margin-bottom:14px; }
-    .testament-deck { gap: 6px; }
-    .testament-deck .deck-card{ padding:8px 14px; }
-    .testament-deck .dc-title{ font-size:16px; margin-bottom:2px; }
-    .testament-deck .dc-badge{ margin-bottom:3px; }
-  }
-  @media (min-width: 768px) {
-    .testament-deck {
-      display: grid;
-      grid-template-columns: 1.85fr 1.15fr;
-      gap: 28px;
-      align-items: stretch;
-      max-height: 480px;
-      overflow-y: visible;
-    }
+
+  .dwell-column.is-expanded .col-vertical-title {
+    display: none;
   }
 
-  /* SLIDE 2: 5-COLUMN DECK */
-  .sections-5-deck {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    flex: 1;
-    overflow-y: auto;
-    max-width: 1300px;
-    margin: 0 auto;
-    width: 100%;
-    justify-content: space-evenly;
+  .scripture-card-wrapper {
+    max-height: 220px;
   }
-  @media (max-width: 767px) {
-    .sections-5-deck {
-      gap: 6px;
-      padding: 0 4px 10px 4px;
-      overflow-y: hidden;
-    }
-    .sections-5-deck .deck-card {
-      padding: 8px 12px;
-      border-width: 2.5px;
-      border-radius: 14px;
-      box-shadow: 3px 3px 0 var(--ink);
-    }
-    .sections-5-deck .dc-icon { display: none; }
-    .sections-5-deck .dc-title { font-size: 15px; margin-bottom: 2px; }
-    .sections-5-deck .dc-badge { font-size: 9.5px; padding: 2px 8px; margin-bottom: 4px; }
-    .sections-5-deck .dc-desc { font-size: 11px; line-height: 1.3; }
-  }
-  @media (max-width: 767px) and (max-height: 700px) {
-    .sections-5-deck { gap: 4px; }
-    .sections-5-deck .deck-card { padding: 6px 12px; }
-    .sections-5-deck .dc-title { font-size: 13px; }
-    .sections-5-deck .dc-desc { display: none; }
-  }
-  @media (min-width: 768px) {
-    .sections-5-deck {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px;
-      align-items: center;
-      overflow-y: visible;
-      align-content: center;
-    }
-  }
-  @media (min-width: 1100px) {
-    .sections-5-deck {
-      grid-template-columns: repeat(5, 1fr);
-    }
-    .sections-5-deck .deck-card{ min-height: clamp(280px, 40vh, 420px); }
-  }
+}
 
-  .deck-card {
-    background: #FFF;
-    color: var(--ink);
-    border: 3.5px solid var(--ink);
-    border-radius: 20px;
-    padding: clamp(16px, 2.5vh, 28px);
-    cursor: pointer;
-    transition: all .14s ease;
-    box-shadow: 5px 5px 0 var(--ink);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    justify-content: center;
-    /* Forces each card onto its own compositing layer. Without this,
-       iOS Safari can fail to repaint a rounded-corner+box-shadow card's
-       white fill after the parent .beat's transform-based fade-in
-       transition finishes — the border paints but the background
-       underneath it doesn't, so the card looks like it's blended into
-       the page behind it. */
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-  }
-  .deck-card:active { transform: translate(2px, 2px) translateZ(0); box-shadow: 0 0 0 var(--ink); }
-  .deck-card .dc-title { font-family: 'Space Grotesk', sans-serif; font-size: clamp(18px, 2.6vh, 24px); font-weight: 800; margin-bottom: 8px; }
-  .deck-card .dc-icon { font-size: clamp(22px, 3.4vh, 30px); color: var(--ink); margin-bottom: 8px; }
-  .deck-card.correct .dc-icon,
-  .deck-card.incorrect .dc-icon { color: inherit; }
-  .deck-card .dc-badge { font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 700; background: var(--ink); color: #FFF; padding: 4px 12px; border-radius: 100px; margin-bottom: 10px; }
-  .deck-card .dc-desc { font-family: 'Plus Jakarta Sans', sans-serif; font-size: clamp(12.5px, 1.7vh, 14.5px); font-weight: 700; opacity: 0.85; line-height: 1.45; }
-  /* Book-abbreviation pills — revealed inside the correct category card so
-     picking it doubles as a quick "where Mark sits" reference */
-  .dc-books{ display:none; flex-wrap:wrap; gap:6px; justify-content:center; margin-top:10px; }
-  .deck-card.correct .dc-books{ display:flex; animation: bookPillsIn .4s cubic-bezier(.2,.8,.25,1) .15s both; }
-  @keyframes bookPillsIn{ from{ opacity:0; transform:translateY(8px); } to{ opacity:1; transform:translateY(0); } }
-  .book-pill{
-    font-family:'Space Grotesk', sans-serif;
-    font-size: 11px;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: .3px;
-    background: rgba(255,255,255,0.55);
-    color: var(--ink);
-    border: 2px solid var(--ink);
-    border-radius: 100px;
-    padding: 4px 12px;
-  }
-  .book-pill.is-mark{
-    background: var(--ink);
-    color: #FFF;
-    box-shadow: 2px 2px 0 rgba(0,0,0,0.25);
-    transform: scale(1.1);
-  }
-  @media (min-width: 768px) {
-    .dc-books{ gap:8px; margin-top:16px; }
-    .book-pill{ font-size:13px; padding:6px 16px; }
-  }
-  .deck-card.correct { background: var(--lime) !important; color: var(--ink) !important; box-shadow: 4px 4px 0 var(--ink) !important; }
-  .deck-card.incorrect { background: var(--pink) !important; color: #FFF !important; }
-  .deck-card.locked { pointer-events: none; }
-  .deck-card.shake { animation: shakeX .45s; }
-  @media (min-width: 768px) {
-    .deck-card .dc-title{ font-size:clamp(22px, 3vh, 30px); }
-    .deck-card .dc-desc{ font-size:clamp(15px, 2vh, 17.5px); }
-    .testament-deck .deck-card { min-height: 380px; padding: 32px 28px; }
-  }
-  @media (min-width: 1024px) {
-    .testament-deck { max-width: 1500px; max-height: min(64vh, 620px); gap: 40px; }
-    .testament-deck .deck-card { min-height: clamp(400px, 60vh, 600px); padding: 48px 40px; border-width: 4.5px; box-shadow: 7px 7px 0 var(--ink); }
-    .testament-deck .dc-title { font-size: clamp(34px, 4.4vh, 46px); margin-bottom: 16px; }
-    .testament-deck .dc-badge { font-size: 15px; padding: 8px 18px; margin-bottom: 18px; }
-    .testament-deck .dc-desc { font-size: clamp(19px, 2.4vh, 24px); line-height: 1.55; max-width: 480px; }
-  }
-  @media (min-width: 1500px) {
-    .testament-deck { max-width: 1700px; }
-    .testament-deck .dc-desc { max-width: 540px; }
-  }
-  @media (max-width: 767px) {
-    .sections-5-deck .dc-icon{ font-size: 18px; margin-bottom: 2px; color: var(--ink); }
-  }
-  @media (min-width: 1100px) {
-    .sections-5-deck .dc-icon{ font-size: clamp(42px, 6vh, 64px); margin-bottom: 16px; }
-  }
+/* ── UI Style Tester Widget (Icon Only) ── */
+.tester-wrap {
+  position: fixed;
+  bottom: 18px;
+  right: 18px;
+  z-index: 999999;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-family: var(--font-sans);
+}
 
-  /* SLIDE 3: RECAP */
-  .set-scene-grid {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    min-height: 0;
-    gap: 20px;
-    align-items: center;
-    justify-content: center;
-    max-width: 1300px;
-    margin: 0 auto;
-    width: 100%;
-  }
-  @media (min-width: 768px) {
-    .set-scene-grid {
-      display: grid;
-      grid-template-columns: 0.9fr 1.1fr;
-      gap: 50px;
-      align-items: center;
-    }
-  }
+.tester-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ink);
+  color: var(--paper);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+  opacity: 0.95;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+.tester-toggle-btn:hover { transform: translateY(-2px); opacity: 1; }
+.tester-toggle-btn svg { width: 20px; height: 20px; }
 
-  .folder-wrap{ display:flex; flex-direction:column; justify-content:flex-start; width:100%; position:relative; z-index:2; }
-  .folder-tab{ align-self:flex-start; margin-left:8px; background:#E4B563; border:3.5px solid var(--ink); border-bottom:none; border-radius:10px 10px 0 0; padding:6px 18px 8px 18px; font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:13px; letter-spacing:1px; text-transform:uppercase; color:var(--ink); position:relative; z-index:3; margin-bottom:-4px; flex-shrink:0; }
-  .folder-body{ display:flex; flex-direction:column; justify-content:space-evenly; background:#F3D48B; border:3.5px solid var(--ink); border-radius:3px 18px 18px 18px; box-shadow:5px 5px 0 var(--ink); padding:18px 22px; position:relative; z-index:2; flex-shrink:0; gap:14px; }
-  .folder-bullet{ display:flex; flex-direction:column; gap:4px; font-family:'Plus Jakarta Sans', sans-serif; font-size:clamp(14px, 1.8vh, 16px); font-weight:800; line-height:1.45; color:var(--ink); }
-  .recap-tag{ align-self:flex-start; display:inline-block; font-family:'Space Grotesk', sans-serif; font-size:11px; font-weight:800; letter-spacing:0.6px; text-transform:uppercase; background:var(--ink); color:#fff; border-radius:6px; padding:3px 9px; margin-bottom:2px; }
-  @media (min-width: 1024px) {
-    .folder-body{ padding:38px 42px; gap:26px; border-width:4px; border-radius:4px 22px 22px 22px; }
-    .folder-bullet{ font-size:21px; line-height:1.5; }
-    .folder-tab{ font-size:16px; padding:10px 26px 12px 26px; border-width:4px; }
-    .recap-tag{ font-size:13px; padding:5px 12px; }
-  }
+.tester-panel {
+  display: none;
+  background: #ffffff;
+  color: #16252d;
+  border-radius: 18px;
+  padding: 16px;
+  margin-bottom: 10px;
+  box-shadow: 0 24px 50px rgba(0,0,0,0.25);
+  border: 1px solid rgba(0,0,0,0.12);
+  width: 320px;
+  max-height: 480px;
+  overflow-y: auto;
+}
+.tester-panel.open { display: block; }
 
-  /* GOD SHOT CIRCLE DESIGN */
-  .circle-hero-container{ position:relative; z-index:2; flex-shrink:0; display:flex; justify-content:center; align-items:center; }
-  .circle-hero{ width: clamp(230px, 32vh, 300px); height: clamp(230px, 32vh, 300px); border-radius:50%; background:#FFF; color:var(--ink); border:4px solid var(--ink); box-shadow:6px 6px 0 var(--ink); display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px; flex-shrink:0; }
-  .circle-hero .arc-stem-text{ font-family:'Space Grotesk', sans-serif; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:1px; opacity:.65; margin-bottom:6px; }
-  .circle-hero .label-god-is{ font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:clamp(22px, 3vh, 28px); letter-spacing:-.5px; text-transform:uppercase; line-height:1; margin-bottom:8px; }
-  .circle-hero .static-trait{ font-family:'Plus Jakarta Sans', sans-serif; font-size:clamp(20px, 2.6vh, 26px); font-weight:900; color:var(--purple); text-transform:capitalize; border-bottom:3.5px solid var(--ink); padding:2px 14px; margin-bottom:6px; }
-  .blank-input{ width:88%; max-width:88%; border:none; border-bottom:3.5px solid var(--ink); background:transparent; font-family:'Plus Jakarta Sans', sans-serif; font-size:clamp(16px, 2.2vh, 20px); font-weight:800; text-align:center; outline:none; color:var(--purple); padding:2px 0; }
-  
-  @media (min-width: 1024px) {
-    .circle-hero{ width: clamp(340px, 46vh, 460px); height: clamp(340px, 46vh, 460px); padding:36px; border-width:5px; box-shadow:8px 8px 0 var(--ink); }
-    .circle-hero .arc-stem-text{ font-size:15px; letter-spacing:1.4px; margin-bottom:12px; }
-    .circle-hero .label-god-is{ font-size:clamp(34px, 4.4vh, 44px); margin-bottom:14px; }
-    .circle-hero .static-trait{ font-size:clamp(30px, 3.8vh, 38px); border-bottom-width:4px; padding:4px 18px; }
-    .blank-input{ font-size:clamp(24px, 3.2vh, 32px); border-bottom-width:4px; }
-  }
+.tester-panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+}
+.tester-title {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #16252d;
+}
 
-  /* SLIDE 4: PRAYER (KICKER IN CIRCLE: PRAYER) */
-  .breath-visual{ position:relative; width: clamp(200px, 30vh, 300px); height: clamp(200px, 30vh, 300px); margin: 0 auto; flex-shrink:0; }
-  .breath-circle{ position:absolute; inset:0; border-radius:50%; background:#b99aae; border:4px solid var(--ink); box-shadow:0 0 26px rgba(185,154,174,0.35); transform:scale(0.8); z-index:2; }
-  .beat.active .breath-circle{ animation:breathe 16s ease-in-out infinite; }
-  @keyframes breathe{ 0%,100%{ transform:scale(0.8); background:#b99aae; } 50%{ transform:scale(1.2); background:#e1a6a3; } }
-  .breath-label-wrap{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; z-index:3; pointer-events:none; }
-  .pray-center-text{ font-family:'Space Grotesk', sans-serif; font-weight:900; font-size:clamp(32px, 5vh, 48px); letter-spacing:3px; text-transform:uppercase; color:var(--ink); line-height:1; }
-  @media (min-width: 768px) {
-    .breath-visual{ width: clamp(260px, 34vh, 360px); height: clamp(260px, 34vh, 360px); }
-    .pray-center-text{ font-size:clamp(36px, 5vh, 54px); }
-  }
-  @media (min-width: 1100px) {
-    .breath-visual{ width: clamp(340px, 42vh, 480px); height: clamp(340px, 42vh, 480px); }
-    .pray-center-text{ font-size:clamp(46px, 6vh, 66px); }
-  }
+.tester-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
 
-  /* BIBLE COVER */
-  .leather-cover{ flex:1; display:flex; border-radius:22px; overflow:hidden; min-height:0; position:relative; border:4px solid var(--ink); box-shadow:6px 6px 0 var(--ink); background: radial-gradient(circle at 28% 18%, rgba(255,255,255,0.10), transparent 42%), repeating-linear-gradient(135deg, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 2px, transparent 2px, transparent 7px), linear-gradient(160deg, #7a4a2c, #452817); width:100%; }
-  .leather-spine{ width:22px; background:rgba(0,0,0,0.38); flex-shrink:0; border-right:2px solid rgba(0,0,0,0.3); }
-  .leather-cover-inner{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap: clamp(14px, 2.5vh, 26px); padding:26px; color:#F1E3D3; text-align:center; }
-  .leather-cover-inner .book-title{ color:#F1E3D3; font-family:'Space Grotesk',sans-serif; font-weight:800; font-size:clamp(28px, 5vh, 42px); text-transform:uppercase; }
-  .focus-pill{ border-radius:24px; padding: clamp(14px, 2.2vh, 20px) clamp(18px, 3.5vw, 30px); text-align:center; position:relative; z-index:2; }
-  .focus-pill-value{ font-family:'Space Grotesk',sans-serif; font-weight:800; font-size:clamp(19px, 3vh, 28px); text-transform:uppercase; letter-spacing:.3px; color:var(--ink); margin-top:3px; }
-  .focus-pill.yellow{ background:var(--yellow); }
-  .focus-pill.lime{ background:var(--purple-light); }
-  .cover-note{ font-family:'Plus Jakarta Sans', sans-serif; font-size:clamp(13.5px, 1.9vh, 16px); font-weight:700; line-height:1.45; color:rgba(255,255,255,0.92); max-width:400px; }
-  @media (min-width: 1024px) {
-    /* Screen is too wide for a book-shaped card to read as a book — let the
-       leather texture become the full-bleed page background instead. */
-    .leather-cover{
-      position:absolute;
-      inset:0;
-      border-radius:0;
-      border:none;
-      box-shadow:none;
-      width:auto;
-    }
-    .leather-spine{ display:none; }
-  }
-  @media (min-width: 1100px) {
-    .leather-cover-inner .book-title{ font-size:56px; letter-spacing:1px; }
-    .focus-pill-value{ font-size:32px; }
-    .focus-pill{ padding:26px 42px; }
-    .cover-note{ font-size:20px; max-width:540px; }
-  }
+.tester-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 10px;
+  background: #fbfbfb;
+  border: 1.5px solid rgba(0,0,0,0.06);
+  border-radius: 9px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.tester-card:hover {
+  background: #f4f7f8;
+  border-color: #16252d;
+}
+.tester-card.active {
+  border-color: #16252d;
+  background: #edf3f5;
+}
 
-  /* SLIDE 6 & 10: PASSAGE SCROLL WRAP WITH GRADIENT FADE-OUT */
-  .passage-scroll-wrap{ 
-    flex:1; 
-    position:relative; 
-    min-height:0; 
-    display:flex; 
-    width:100%; 
-    justify-content:center;
-    mask-image: linear-gradient(to bottom, black calc(100% - 40px), transparent 100%);
-    -webkit-mask-image: linear-gradient(to bottom, black calc(100% - 40px), transparent 100%);
-  }
-  .passage-scroll{ 
-    overflow-y:auto; 
-    -webkit-overflow-scrolling:touch; 
-    flex:1; 
-    padding:6px 20px 30px 0; 
-    color:var(--ink); 
-    width:100%; 
-    max-width:820px; 
-  }
-  .flow-para{ 
-    margin:0 0 20px 0; 
-    font-size:clamp(18px, 2.3vh, 22px); 
-    line-height:1.75; 
-    font-family:'Plus Jakarta Sans', sans-serif; 
-    font-weight:400; 
-    max-width:820px; 
-  }
-  @media (min-width: 768px) {
-    .passage-scroll{ max-width:960px; padding-bottom:36px; }
-    .flow-para{ font-size:clamp(22px, 2.4vw, 26px); line-height:1.8; max-width:960px; margin-bottom:26px; }
-  }
-  @media (min-width: 1200px) {
-    .passage-scroll{ max-width:1300px; }
-    .flow-para{ font-size:clamp(25px, 2vw, 32px); line-height:1.85; max-width:1300px; }
-  }
-  .verse-num-inline{ font-family:'Space Grotesk', sans-serif; font-weight:700; color:var(--purple); font-size:.65em; vertical-align:super; margin:0 2px 0 6px; }
-  
-  /* UNIFIED SOFT MARKER HIGHLIGHT STYLE */
-  .w{ 
-    cursor:pointer; 
-    padding:2px 4px; 
-    border-radius:6px; 
-    transition:background .15s ease, color .15s ease; 
-  }
-  @media (hover: hover) and (pointer: fine) {
-    .w:hover{ background: var(--hover-preview, rgba(13,13,13,0.08)); }
-  }
-  .w.flagged,
-  .w.hl-yellow{ background: rgba(239, 172, 57, 0.55); font-weight: 700; }
-  .w.hl-blue{ background: rgba(66, 153, 215, 0.45); font-weight: 700; }
-  .w.hl-green{ background: rgba(48, 166, 142, 0.40); font-weight: 700; }
-  .w.hl-pink{ background: rgba(221, 85, 75, 0.40); font-weight: 700; }
+.tester-card-name {
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.tester-card-name span.tag {
+  font-size: 9px;
+  text-transform: uppercase;
+  font-weight: 800;
+  padding: 2px 5px;
+  background: rgba(0,0,0,0.06);
+  border-radius: 4px;
+}
 
-  /* SLIDE 10: VERSE PICK SCROLL WITH MATCHED TYPOGRAPHY & FADE */
-  .verse-pick-list{ 
-    overflow-y:auto; 
-    -webkit-overflow-scrolling:touch; 
-    flex:1; 
-    min-height:0; 
-    position:relative; 
-    z-index:2; 
-    padding:4px 12px 30px 0; 
-    width:100%; 
-    max-width:860px; 
-    margin:0 auto; 
-  }
-  .verse-tile{ display:flex; gap:16px; align-items:flex-start; padding:14px 16px; cursor:pointer; transition:background .13s ease; color:var(--ink); border-radius:16px; width:100%; }
-  .verse-tile.selected{ background:var(--purple-light); }
-  .verse-tile .vnum{ font-family:'Space Grotesk', sans-serif; font-weight:800; color:var(--purple); flex-shrink:0; width:34px; font-size:clamp(18px, 2.2vh, 22px); }
-  .verse-tile .vtext{ font-size:clamp(18px, 2.3vh, 22px); line-height:1.75; font-family:'Plus Jakarta Sans', sans-serif; font-weight:400; }
-  @media (min-width: 768px) {
-    .verse-pick-list{ max-width:960px; }
-    .verse-tile{ padding:18px 22px; gap:20px; }
-    .verse-tile .vnum{ font-size:24px; width:40px; }
-    .verse-tile .vtext{ font-size:clamp(22px, 2.4vw, 26px); line-height:1.8; }
-  }
-  @media (min-width: 1200px) {
-    .verse-pick-list{ max-width:1300px; }
-    .verse-tile .vnum{ font-size:28px; width:48px; }
-    .verse-tile .vtext{ font-size:clamp(25px, 2vw, 32px); line-height:1.85; }
-  }
-
-  /* SLIDE 7: VOCAB REVIEW (EDITORIAL LIST STYLE - NO BUTTON LOOK) */
-  .review-scroll{ flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; position:relative; z-index:2; padding:4px 8px 12px 4px; width:100%; max-width:1100px; margin:0 auto; display:flex; flex-direction:column; justify-content:flex-start; }
-  .glossary-panel{
-    background:#FFFDF6;
-    border-radius:14px;
-    padding: clamp(12px, 1.6vh, 16px) clamp(12px, 1.8vw, 16px);
-    margin-top: auto;
-    margin-bottom: auto;
-  }
-  .review-section-header{ font-family:'Space Grotesk', sans-serif; font-size:11.5px; font-weight:800; letter-spacing:1.2px; text-transform:uppercase; color:var(--ink); opacity:.55; margin:0 0 3px 0; display:flex; align-items:center; gap:8px; }
-  .review-section-header + .review-section-header{ margin-top:10px; }
-  .review-def-entry{ 
-    padding: 5px 0; 
-    border-bottom: 1.5px solid rgba(13,13,13,0.14); 
-    font-family: 'Plus Jakarta Sans', sans-serif; 
-    font-size: clamp(13.5px, 1.8vh, 16px); 
-    line-height: 1.3; 
-    color: var(--ink); 
-  }
-  .review-def-entry:last-child { border-bottom: none; }
-  .review-def-entry .gloss-num{ font-family:'Space Grotesk', sans-serif; font-weight:700; color:var(--purple); font-size:.65em; vertical-align:super; margin-right:3px; }
-  .review-def-entry .term-word{ font-family: 'Space Grotesk', sans-serif; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: var(--ink); margin-right: 6px; }
-  .review-def-entry .term-word::after{ content:'—'; margin-left:6px; opacity:.4; font-weight:400; }
-  @media (min-width: 900px) {
-    .review-scroll{ max-width:1300px; }
-    .glossary-panel{ padding:14px 22px; }
-    .review-def-entry{ display:grid; grid-template-columns:210px 1fr; gap:16px; padding:6px 0; align-items:baseline; }
-    .review-def-entry .term-word{ margin-right:0; }
-    .review-def-entry .term-word::after{ content:''; }
-  }
-  @media (min-width: 1100px) {
-    .glossary-panel{ padding:16px 26px; }
-    .review-section-header{ font-size:13px; }
-    .review-def-entry{ font-size:16.5px; grid-template-columns:240px 1fr; padding:7px 0; }
-  }
-  @media (min-width: 1400px) {
-    .review-scroll{ max-width:1700px; }
-    .glossary-panel{ padding:20px 32px; }
-    .review-def-entry{ font-size:18px; grid-template-columns:290px 1fr; gap:22px; padding:8px 0; }
-  }
-  .pill-cloud{ display:flex; flex-wrap:wrap; gap:6px; margin-top:4px; }
-  .research-pill{ font-family:'Space Grotesk', sans-serif; font-size:12.5px; font-weight:700; background:var(--ink); color:#FFF; padding:7px 14px; border-radius:100px; text-transform:capitalize; }
-  @media (min-width: 1100px) {
-    .research-pill{ font-size:15px; padding:10px 18px; }
-  }
-
-  /* SLIDE 8: CROSS REFS — SIMPLE SIDE-BY-SIDE CARDS JOINED BY A CHAIN LINK */
-  /* Zoom-out trail: verse -> passage -> book -> whole Bible, branching into
-     the connected books at the outer ring */
-  .zoom-trail{
-    display:flex;
-    align-items:center;
-    flex-wrap:wrap;
-    gap: 8px;
-    margin-bottom: clamp(20px, 3vh, 30px);
-  }
-  .zoom-node{ display:flex; flex-direction:column; align-items:center; gap:6px; }
-  .zn-dot{ width:14px; height:14px; border-radius:50%; background:#FFF; border:2.5px solid var(--ink); flex-shrink:0; }
-  .zn-label{ font-family:'Space Grotesk', sans-serif; font-weight:800; font-size:11px; text-transform:uppercase; letter-spacing:0.5px; white-space:nowrap; }
-  .zoom-arrow{ font-size:16px; font-weight:800; opacity:0.65; }
-  .zoom-node-final .zn-dot{ width:24px; height:24px; background:var(--yellow); border-width:3px; }
-  .zoom-node-final .zn-label{ font-size:13px; }
-  .zoom-branches{ display:flex; gap:6px; margin-top:4px; flex-wrap:wrap; justify-content:center; }
-  .zoom-branch-pill{
-    font-family:'Space Grotesk', sans-serif;
-    font-weight:800;
-    font-size:10.5px;
-    text-transform:uppercase;
-    background:#FFF;
-    color:var(--ink);
-    border:2px solid var(--ink);
-    border-radius:100px;
-    padding:4px 11px;
-    box-shadow:2px 2px 0 var(--ink);
-    white-space:nowrap;
-  }
-  @media (min-width: 900px) {
-    .zoom-trail{ gap:14px; }
-    .zn-dot{ width:18px; height:18px; }
-    .zn-label{ font-size:13px; }
-    .zoom-arrow{ font-size:20px; }
-    .zoom-node-final .zn-dot{ width:30px; height:30px; }
-    .zoom-node-final .zn-label{ font-size:15px; }
-    .zoom-branch-pill{ font-size:13px; padding:6px 14px; }
-  }
-
-  .xref-compact-list{ flex:1; display:flex; flex-direction:column; justify-content:center; gap:clamp(20px, 3.5vh, 32px); position:relative; z-index:2; width:100%; max-width:1200px; margin:0 auto; }
-
-  .xref-pair{
-    display:flex;
-    align-items:stretch;
-    width:100%;
-    gap:0;
-  }
-  .xref-node-card{
-    flex:1;
-    min-width:0;
-    background:#FBF7EC;
-    color:var(--ink);
-    border:1.5px solid rgba(13,13,13,0.22);
-    border-radius:12px;
-    padding: 16px 18px;
-  }
-  .xref-ref-label{
-    font-family:'Space Grotesk',sans-serif;
-    font-size:11px;
-    font-weight:800;
-    letter-spacing:0.6px;
-    text-transform:uppercase;
-    color:var(--purple);
-    margin-bottom:6px;
-  }
-  .xref-node-card.to .xref-ref-label{ color:var(--pink); }
-  .xref-node-note{ font-family:'Plus Jakarta Sans', sans-serif; font-size:clamp(13.5px, 1.8vh, 16px); font-weight:500; line-height:1.5; color:rgba(13,13,13,0.88); }
-  .xref-node-note em{ font-style:normal; color:var(--ink); font-weight:800; background:rgba(221,85,75,0.18); padding:0 3px; border-radius:3px; }
-  .xref-chain{
-    flex-shrink:0;
-    width:40px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:0;
-  }
-  .xref-chain-line{ flex:1; height:2px; background:rgba(13,13,13,0.28); }
-  .xref-chain-link{
-    position:relative;
-    width:26px; height:32px;
-    flex-shrink:0;
-  }
-  .xref-chain-link .bar-v{
-    position:absolute;
-    left:50%;
-    top:0; bottom:0;
-    width:6px;
-    margin-left:-3px;
-    background:var(--purple);
-    border-radius:3px;
-  }
-  .xref-chain-link .bar-h{
-    position:absolute;
-    left:50%;
-    top:9px;
-    width:22px; height:6px;
-    margin-left:-11px;
-    background:var(--purple);
-    border-radius:3px;
-  }
-  .xref-content{ display:none; }
-  .xref-topic{ display:none; }
-  .xref-body{ display:none; }
-  .xref-icon-node{ display:none; }
-  @media (max-width: 479px) {
-    .xref-pair{ flex-direction:column; align-items:stretch; }
-    .xref-chain{ width:100%; height:32px; flex-direction:row; }
-    .xref-chain-line{ height:2px; width:auto; }
-  }
-  @media (min-width: 1024px) {
-    .xref-compact-list{ max-width:1300px; }
-    .xref-node-card{ padding:22px 26px; }
-    .xref-ref-label{ font-size:13px; }
-    .xref-node-note{ font-size:18px; line-height:1.6; }
-    .xref-chain{ width:56px; }
-    .xref-chain-link{ width:34px; height:42px; }
-    .xref-chain-link .bar-v{ width:8px; margin-left:-4px; }
-    .xref-chain-link .bar-h{ top:12px; width:30px; height:8px; margin-left:-15px; }
-  }
-
-  /* SLIDE 11: CHAR COACHING */
-  .dark-scripture-card{ background:var(--ink); color:#FFF; border:3.5px solid var(--ink); border-radius:20px; padding:18px 22px; box-shadow:4px 4px 0 rgba(0,0,0,0.25); position:relative; z-index:2; }
-  .dark-scripture-card .ref{ font-family:'Space Grotesk', sans-serif; font-size:12px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--lime); margin-bottom:6px; }
-  .dark-scripture-card .vt{ font-style:normal; font-family:'Plus Jakarta Sans', sans-serif; font-weight:700; font-size:clamp(14px, 1.9vh, 16px); line-height:1.5; opacity:.95; }
-  @media (min-width: 1024px) {
-    .dark-scripture-card{ padding:52px 56px; border-radius:28px; border-width:4.5px; }
-    .dark-scripture-card .ref{ font-size:23px; margin-bottom:18px; }
-    .dark-scripture-card .vt{ font-size:33px; line-height:1.65; }
-    .circle-hero.coaching-circle{ width:clamp(400px, 52vh, 520px); height:clamp(400px, 52vh, 520px); padding:44px; border-width:6px; box-shadow:9px 9px 0 var(--ink); }
-    .circle-hero.coaching-circle .arc-stem-text{ font-size:17px; letter-spacing:1.6px; margin-bottom:14px; }
-    .circle-hero.coaching-circle .label-god-is{ font-size:clamp(40px, 5vh, 50px); margin-bottom:16px; }
-    .circle-hero.coaching-circle .blank-input{ font-size:clamp(28px, 3.6vh, 36px); border-bottom-width:4.5px; }
-  }
-  @media (min-width: 1400px) {
-    .dark-scripture-card{ padding:60px 64px; }
-    .dark-scripture-card .ref{ font-size:26px; }
-    .dark-scripture-card .vt{ font-size:38px; }
-    .circle-hero.coaching-circle{ width:clamp(460px, 56vh, 580px); height:clamp(460px, 56vh, 580px); }
-    .circle-hero.coaching-circle .label-god-is{ font-size:clamp(46px, 5.6vh, 56px); }
-    .circle-hero.coaching-circle .blank-input{ font-size:clamp(32px, 4vh, 40px); }
-  }
-
-  /* SLIDE 12: FINAL RESPONSE */
-  .final-reflection-grid {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    min-height: 0;
-    gap: 28px;
-    align-items: center;
-    justify-content: center;
-    max-width: 1300px;
-    margin: 0 auto;
-    width: 100%;
-  }
-  @media (min-width: 768px) {
-    .final-reflection-grid {
-      display: grid;
-      grid-template-columns: 1.25fr 0.75fr;
-      gap: 50px;
-      align-items: center;
-    }
-  }
-
-  .circle-hero.expanded-god-is {
-    width: clamp(270px, 38vh, 360px);
-    height: clamp(270px, 38vh, 360px);
-    padding: 24px;
-  }
-  .circle-hero.expanded-god-is .static-trait.no-underline {
-    border-bottom: none !important;
-    padding: 0;
-    margin-bottom: 8px;
-  }
-  .circle-hero.expanded-god-is .therefore-label {
-    font-family:'Space Grotesk', sans-serif;
-    font-weight:800;
-    font-size:clamp(22px, 3vh, 28px);
-    letter-spacing:-.5px;
-    text-transform:uppercase;
-    line-height:1;
-    margin-top:14px;
-    margin-bottom:8px;
-    color:var(--ink);
-  }
-  .circle-hero.expanded-god-is .therefore-blank {
-    width: 80%;
-    border-bottom: 3.5px solid var(--ink);
-    height: 20px;
-  }
-  @media (min-width: 1024px) {
-    .circle-hero.expanded-god-is {
-      width: clamp(400px, 54vh, 520px);
-      height: clamp(400px, 54vh, 520px);
-      padding: 48px;
-      border-width: 6px;
-    }
-    .circle-hero.expanded-god-is .label-god-is {
-      font-size: clamp(38px, 5vh, 48px);
-    }
-    .circle-hero.expanded-god-is .static-trait.no-underline {
-      font-size: clamp(34px, 4.4vh, 42px);
-    }
-    .circle-hero.expanded-god-is .therefore-label {
-      font-size: clamp(38px, 5vh, 48px);
-      margin-top: 24px;
-      margin-bottom: 12px;
-    }
-    .circle-hero.expanded-god-is .therefore-blank {
-      border-bottom-width: 5px;
-      height: 32px;
-    }
-  }
-
-  .timer-card {
-    background: #FFF;
-    color: var(--ink);
-    border: 4px solid var(--ink);
-    border-radius: 28px;
-    padding: clamp(22px, 3vh, 36px);
-    box-shadow: 6px 6px 0 var(--ink);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.15s ease;
-    width: 100%;
-    max-width: 360px;
-  }
-  .timer-card:hover { transform: translate(-2px, -2px); box-shadow: 8px 8px 0 var(--ink); }
-  .timer-card:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--ink); }
-  .timer-card.running { background: var(--lime); }
-  .timer-label { font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase; margin-bottom: 6px; }
-  .timer-digits { font-family: 'Space Grotesk', sans-serif; font-size: clamp(48px, 7vh, 72px); font-weight: 900; line-height: 1; margin-bottom: 12px; }
-  .timer-status-btn { font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 800; text-transform: uppercase; background: var(--ink); color: #FFF; padding: 8px 18px; border-radius: 100px; display: inline-flex; align-items: center; gap: 6px; }
-  @media (min-width: 1024px) {
-    .timer-card { max-width: 440px; padding: 48px 40px; border-radius: 36px; border-width: 5px; box-shadow: 8px 8px 0 var(--ink); }
-    .timer-label { font-size: 16px; }
-    .timer-digits { font-size: 88px; margin-bottom: 16px; }
-    .timer-status-btn { font-size: 16px; padding: 12px 24px; }
-  }
-
-  .full-page{ flex:1; display:flex; flex-direction:column; min-height:0; width:100%; }
-
-  /* DEV MODE */
-  .dev-bubbles-bar{ display:flex; gap:8px; overflow-x:auto; overflow-y:hidden; padding:2px 40px 6px 2px; scrollbar-width:none; }
-  .dev-bubbles-bar::-webkit-scrollbar{ display:none; }
-  .dev-bubble{ flex-shrink:0; width:30px; height:30px; border-radius:50%; border:2px solid rgba(0,0,0,0.25); display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk',sans-serif; font-weight:800; font-size:12px; cursor:pointer; position:relative; transition:transform .12s ease; }
-  .dev-bubble:hover{ transform:scale(1.12); }
-  .dev-bubble.active{ border:3px solid var(--ink); box-shadow:0 0 0 3px rgba(255,255,255,0.6); }
-  .dev-bubble .note-dot{ position:absolute; top:-3px; right:-3px; width:9px; height:9px; border-radius:50%; background:var(--yellow); border:1.5px solid var(--ink); }
-
-  .dev-notes-overlay{ position:absolute; inset:0; z-index:200; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; padding:24px; }
-  .dev-notes-panel{ background:#fff; color:var(--ink); border:4px solid var(--ink); border-radius:20px; padding:20px; width:100%; max-width:520px; max-height:85vh; overflow-y:auto; box-shadow:6px 6px 0 var(--ink); display:flex; flex-direction:column; gap:12px; font-family:'Plus Jakarta Sans', sans-serif; }
-  .dev-notes-panel h3{ font-family:'Space Grotesk',sans-serif; margin:0; font-size:16px; text-transform:uppercase; }
-  .dev-notes-panel textarea{ width:100%; min-height:90px; border:2.5px solid var(--ink); border-radius:10px; padding:10px; font-family:'Plus Jakarta Sans', sans-serif; font-size:14px; resize:vertical; }
-  .dev-notes-panel .dnp-row{ display:flex; gap:10px; }
-  .dev-notes-panel button.dnp-btn{ font-family:'Space Grotesk',sans-serif; font-weight:800; font-size:13px; text-transform:uppercase; background:var(--lime); border:2.5px solid var(--ink); border-radius:100px; padding:10px 16px; cursor:pointer; }
-  .dev-notes-panel button.dnp-close{ background:#eee; }
-  .dnp-status{ font-size:12px; font-weight:700; font-family:'Plus Jakarta Sans', sans-serif; }
-  .dnp-status.ok{ color:#1a7a3c; }
-  .dnp-status.warn{ color:#8a5a00; }
+.tester-swatches {
+  display: flex;
+  gap: 3px;
+  height: 12px;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.tester-swatches span { flex: 1; }
 </style>
 </head>
 <body>
 
-<div class="app-viewport" id="phone">
-  <button class="fs-toggle-btn" id="fsToggleBtn" onclick="toggleFullScreen()" title="Toggle Fullscreen (F)" aria-label="Toggle fullscreen"></button>
-
-  <div class="clue-badge" id="clueBadge" style="display:none;"><i class="fa-solid fa-circle-exclamation"></i><span id="clueBadgeText"></span></div>
-
-  <div class="hud-header" id="hudHeader">
-    <div class="progress-container" id="normalProgressWrap">
-      <div class="progress-bar-fill" id="progressBarFill"></div>
-      <div class="notches-layer" id="notchesLayer"></div>
-    </div>
-    <div class="dev-bubbles-bar" id="devBubblesBar" style="display:none;"></div>
-    <div class="story-meta" id="storyMetaRow">
-      <span id="sectionLabel">Dwell</span>
-      <span id="scriptureMeta">Mark 1:21–45</span>
-    </div>
+  <!-- Hidden Interactive Badge -->
+  <div class="interactive-badge" id="activePassageBadge" onclick="openModal()">
+    <span>●</span> <span id="badgePassageText">Mark 2</span> (Change)
   </div>
 
-  <div class="stage" id="stage"></div>
-
-  <!-- PERSISTENT MINIMAL CHEVRON NAVIGATION SHELL -->
-  <div class="persistent-nav-shell">
-    <button class="minimal-arrow-btn" id="shellPrevBtn" onclick="goPrev()" aria-label="Previous">
-      <i class="fa-solid fa-chevron-left"></i>
-    </button>
-    <button class="minimal-arrow-btn" id="shellNextBtn" onclick="handleForwardAttempt()" aria-label="Next">
-      <i class="fa-solid fa-chevron-right"></i>
-    </button>
-  </div>
-
-  <!-- FLOATING CONTEXT ISLAND FOR INTERACTION SLIDES -->
-  <div class="floating-context-island" id="floatingContextIsland" style="display:none;"></div>
-
-  <div class="dev-notes-overlay" id="devNotesOverlay" style="display:none;">
-    <div class="dev-notes-panel">
-      <h3 id="dnpTitle">Slide Note</h3>
-      <textarea id="devNoteInput" placeholder="Notes for this slide..." oninput="saveCurrentDevNote(this.value)"></textarea>
-      <div class="dnp-row">
-        <button class="dnp-btn" onclick="copyAllDevNotes()">Copy All Notes</button>
-        <button class="dnp-btn dnp-close" onclick="togglePaletteTester(event)">Color</button>
-        <button class="dnp-btn dnp-close" onclick="closeDevNotesPanel()">Close</button>
+  <!-- Hidden Passage Selector Modal -->
+  <div class="passage-modal-overlay" id="passageModal" onclick="closeModal(event)">
+    <div class="passage-modal" onclick="event.stopPropagation()">
+      <h3>Select Bible Passage</h3>
+      <p>Choose any book and chapter to load directly via Bible API into your full-screen study flow.</p>
+      
+      <div class="passage-form-row">
+        <select class="passage-select-input" id="bookSelect">
+          <!-- 66 Bible Books -->
+        </select>
+        <input type="number" class="passage-select-input" id="chapterInput" value="2" min="1" max="150" placeholder="Ch." />
       </div>
-      <div class="palette-tester-wrap docked-panel" id="paletteTesterWrap">
-        <div class="palette-tester-panel" id="palettePanel">
-          <div class="ptp-head">Color Theme</div>
-          <div class="ptp-list" id="palettePanelList"></div>
+
+      <button class="passage-load-btn" onclick="handleCustomPassageSubmit()">
+        Load Chapter & Start Study
+      </button>
+
+      <div class="passage-quick-list">
+        <span style="font-size:11px; font-weight:800; text-transform:uppercase; color:#888;">Sample Chapters</span>
+        <div class="passage-quick-btn" onclick="quickSelectPassage('Mark', 2)"><span>Mark 2 (Jesus Heals Paralytic)</span><span>&rarr;</span></div>
+        <div class="passage-quick-btn" onclick="quickSelectPassage('Psalm', 1)"><span>Psalm 1 (Tree Planted by Streams)</span><span>&rarr;</span></div>
+        <div class="passage-quick-btn" onclick="quickSelectPassage('Romans', 8)"><span>Romans 8 (Life in the Spirit)</span><span>&rarr;</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Completed Dwell Card Modal -->
+  <div class="dwell-summary-modal" id="summaryModal" onclick="closeSummaryModal(event)">
+    <div class="dwell-summary-card" onclick="event.stopPropagation()">
+      <div class="dwell-card-header">
+        <div>
+          <span style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.1em; color:#777;">Completed Study Sheet</span>
+          <h3 id="cardPassageHeading">Mark 2 • Dwell Rhythm</h3>
+        </div>
+        <button type="button" class="expand-act-btn" onclick="closeSummaryModal(event)">✕</button>
+      </div>
+
+      <div class="dwell-card-section">
+        <label>1. Discover (Historical Scene)</label>
+        <div class="val-box" id="summarySceneText">Author: John Mark • Audience: Gentiles in Rome • Time: c. AD 55–65</div>
+      </div>
+
+      <div class="dwell-card-section">
+        <label>2. Word Work (One-Sentence Main Point)</label>
+        <div class="val-box" id="summaryMainPoint">[Not yet recorded]</div>
+      </div>
+
+      <div class="dwell-card-section">
+        <label>3. Learn (Theological Truth)</label>
+        <div class="val-box" id="summaryLearnText" style="border-left: 3px solid #5d587e;">Because God is...</div>
+      </div>
+
+      <div class="dwell-card-section">
+        <label>4. Live (Action & Prayer Transformation)</label>
+        <div class="val-box" id="summaryLiveText" style="border-left: 3px solid #2d324f;">Therefore I will...</div>
+      </div>
+
+      <div class="dwell-card-btn-row">
+        <button class="dwell-card-btn dwell-copy-btn" id="copyDwellBtn" onclick="copyDwellCard()">
+          <span>Copy Completed Study</span>
+        </button>
+        <button class="dwell-card-btn dwell-close-btn" onclick="closeSummaryModal(event)">
+          <span>Done</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Column Accordion -->
+  <main class="columns-wrapper" id="columnsWrapper">
+    
+    <!-- Intro Card -->
+    <section class="dwell-column col-intro is-expanded" onclick="handleColumnClick(this, event)">
+      <div class="col-header">
+        <div class="col-brand-lockup" onclick="registerLogoClick(event)">
+          <span class="col-brand-text">Dwell</span>
+          <div class="dwell-mark">
+            <span class="dm-top"></span>
+            <span class="dm-left"></span>
+            <span class="dm-center"></span>
+            <span class="dm-right"></span>
+            <span class="dm-bottom"></span>
+          </div>
         </div>
       </div>
-      <div id="devAllNotesSection" style="display:none; flex-direction:column; gap:8px;">
-        <h3>All Notes (compiled)</h3>
-        <textarea id="devAllNotesPanel" readonly></textarea>
-        <div class="dnp-row" style="align-items:center;">
-          <span class="dnp-status" id="dnpStatus"></span>
-          <button class="dnp-btn dnp-close" id="dnpRetryBtn" style="display:none;" onclick="tryCopyAllNotes()">Try Copy Again</button>
+      <div class="col-expanded-body">
+        <span class="col-step-tag">Building Blocks for Biblical Literacy</span>
+        <h2 class="col-headline">Slow down. Re-read.<br>Be transformed.</h2>
+        <p class="col-subtext">
+          True transformation comes from the Holy Spirit. Dwell is simply a rhythm to slow down across five readings so Scripture can dwell in you richly. Like the tree planted by streams in Psalm 1, it helps you delight, take root, and listen. Practice one step or stack all five.
+        </p>
+        <div class="col-nav-cue" onclick="goToNextStep(event, '.col-discover')">
+          <span class="cue-label">Begin with Discover</span>
+          <span class="cue-arrow">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </span>
         </div>
       </div>
-    </div>
-  </div>
-</div>
+    </section>
 
-<div id="exportTarget" style="position:fixed; left:-9999px; top:0; width:420px;"></div>
+    <!-- D | Discover -->
+    <section class="dwell-column col-discover" onclick="handleColumnClick(this, event)">
+      <div class="col-header">
+        <div class="col-header-left">
+          <span class="col-letter-target">D</span>
+          <span class="col-vertical-title">Discover</span>
+        </div>
+      </div>
+      <div class="col-expanded-body">
+        <span class="col-step-tag">Step One &bull; Discover</span>
+        <h2 class="col-headline">Find the historical background.</h2>
+        
+        <!-- Original Prompt List from Homepage -->
+        <ul class="col-prompt-list">
+          <li>
+            Use a study Bible or trusted resource to set the scene:
+            <div class="col-meta-strip">Author &bull; Audience &bull; Time &bull; Purpose</div>
+          </li>
+          <li>Set aside outside resources to let the passage speak for itself. Read slowly and record what stands out to you.</li>
+        </ul>
+
+        <!-- Interactive Discover Workspace -->
+        <div class="interactive-container">
+          <div class="interactive-meta-inline" id="discoverMetaStrip">
+            <div class="meta-item"><strong>Author:</strong> <span class="meta-author">John Mark</span></div>
+            <div class="meta-item"><strong>Audience:</strong> <span class="meta-audience">Gentile believers in Rome</span></div>
+            <div class="meta-item"><strong>Time:</strong> <span class="meta-time">c. AD 55–65</span></div>
+            <div class="meta-item"><strong>Purpose:</strong> <span class="meta-purpose">Authoritative Son of God & Servant</span></div>
+          </div>
+
+          <div class="scripture-card-wrapper">
+            <div class="scripture-header-bar">
+              <span class="scripture-ref-title">Mark 2 (WEB)</span>
+            </div>
+            <div class="scripture-card scripture-body" data-step="discover">
+              <!-- Scripture loaded dynamically -->
+            </div>
+          </div>
+          
+          <textarea class="dwell-textarea" id="discoverObservationInput" placeholder="Record what stands out to you..."></textarea>
+        </div>
+
+        <div class="col-nav-cue" onclick="goToNextStep(event, '.col-wordwork')">
+          <span class="cue-label">Advance to Word Work</span>
+          <span class="cue-arrow">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- W | Word Work -->
+    <section class="dwell-column col-wordwork" onclick="handleColumnClick(this, event)">
+      <div class="col-header">
+        <div class="col-header-left">
+          <span class="col-letter-target">W</span>
+          <span class="col-vertical-title">Word Work</span>
+        </div>
+      </div>
+      <div class="col-expanded-body">
+        <span class="col-step-tag">Step Two &bull; Word Work</span>
+        <h2 class="col-headline">Inspect the text up close.</h2>
+        
+        <!-- Original Prompt List from Homepage -->
+        <ul class="col-prompt-list">
+          <li>Underline repeated words, lists, comparisons, and key connecting words.</li>
+          <li>Look up simple definitions for any words that seem unfamiliar or confusing.</li>
+          <li>Write out the main point of the passage in one clear sentence.</li>
+        </ul>
+
+        <!-- Interactive Word Work Workspace -->
+        <div class="interactive-container">
+          <div class="highlighter-bar">
+            <span>Highlight Palette:</span>
+            <div class="color-dot-group">
+              <div class="color-dot dot-red active" title="Repeated Words / Key Terms (Red)" onclick="setHighlightColor('#ff7875', this)"></div>
+              <div class="color-dot dot-yellow" title="Confusing Words / Definitions (Yellow)" onclick="setHighlightColor('#ffe58f', this)"></div>
+              <div class="color-dot dot-green" title="Comparisons / Lists (Green)" onclick="setHighlightColor('#95de64', this)"></div>
+              <div class="color-dot dot-blue" title="Connecting Words (Blue)" onclick="setHighlightColor('#69c0ff', this)"></div>
+            </div>
+            <span style="font-size:10px; opacity:0.8; margin-left:auto;">Click word or drag text</span>
+          </div>
+
+          <div class="scripture-card-wrapper">
+            <div class="scripture-header-bar">
+              <span class="scripture-ref-title">Mark 2 (WEB)</span>
+            </div>
+            <div class="scripture-card scripture-body" data-step="wordwork">
+              <!-- Scripture loaded dynamically -->
+            </div>
+          </div>
+
+          <textarea class="dwell-textarea" id="wordworkMainPointInput" placeholder="Write out the main point of the passage in one clear sentence..."></textarea>
+        </div>
+
+        <div class="col-nav-cue" onclick="goToNextStep(event, '.col-expand')">
+          <span class="cue-label">Advance to Expand</span>
+          <span class="cue-arrow">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- E | Expand -->
+    <section class="dwell-column col-expand" onclick="handleColumnClick(this, event)">
+      <div class="col-header">
+        <div class="col-header-left">
+          <span class="col-letter-target">E</span>
+          <span class="col-vertical-title">Expand</span>
+        </div>
+      </div>
+      <div class="col-expanded-body">
+        <span class="col-step-tag">Step Three &bull; Expand</span>
+        <h2 class="col-headline">Connect to the bigger picture.</h2>
+        
+        <!-- Original Prompt List from Homepage -->
+        <ul class="col-prompt-list">
+          <li>Read the surrounding chapters to see how this passage fits into the whole book.</li>
+          <li>Compare two different translations to clear up tricky phrasing.</li>
+          <li>Follow cross-references in the margins to see where else this idea appears throughout Scripture.</li>
+        </ul>
+
+        <!-- Interactive Expand Workspace -->
+        <div class="interactive-container">
+          <div class="scripture-card-wrapper">
+            <div class="scripture-header-bar">
+              <span class="scripture-ref-title">Mark 2 (WEB)</span>
+            </div>
+            <div class="scripture-card scripture-body" data-step="expand">
+              <!-- Scripture loaded dynamically -->
+            </div>
+          </div>
+
+          <textarea class="dwell-textarea" id="expandConnectionInput" placeholder="Record insights from surrounding context, translations, or cross-references..."></textarea>
+        </div>
+
+        <div class="col-nav-cue" onclick="goToNextStep(event, '.col-learn')">
+          <span class="cue-label">Advance to Learn</span>
+          <span class="cue-arrow">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- L | Learn -->
+    <section class="dwell-column col-learn" onclick="handleColumnClick(this, event)">
+      <div class="col-header">
+        <div class="col-header-left">
+          <span class="col-letter-target">L</span>
+          <span class="col-vertical-title">Learn</span>
+        </div>
+      </div>
+      <div class="col-expanded-body">
+        <span class="col-step-tag">Step Four &bull; Learn</span>
+        <h2 class="col-headline">Uncover the timeless truth.</h2>
+        
+        <!-- Original Prompt List from Homepage -->
+        <ul class="col-prompt-list">
+          <li>What was the main takeaway for the very first people who read this?</li>
+          <li>What does this passage teach us about who God is and how He works?</li>
+          <li>Check your findings in community, study notes, or commentaries to verify what you learned.</li>
+        </ul>
+
+        <!-- Interactive Learn Workspace (Isolated Underlining Canvas) -->
+        <div class="interactive-container">
+          <div class="scripture-card-wrapper">
+            <div class="scripture-header-bar">
+              <span class="scripture-ref-title">Mark 2 (WEB)</span>
+            </div>
+            <div class="scripture-card scripture-body" data-step="learn">
+              <!-- Scripture loaded with Learn-specific underlines -->
+            </div>
+          </div>
+
+          <textarea class="dwell-textarea" id="learnStatementInput" oninput="syncLiveSynthesis()" placeholder="Because God is [e.g., authoritative to forgive sins, Lord of the Sabbath, compassionate healer]..."></textarea>
+        </div>
+
+        <div class="col-nav-cue" onclick="goToNextStep(event, '.col-live')">
+          <span class="cue-label">Advance to Live</span>
+          <span class="cue-arrow">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- L | Live -->
+    <section class="dwell-column col-live" onclick="handleColumnClick(this, event)">
+      <div class="col-header">
+        <div class="col-header-left">
+          <span class="col-letter-target">L</span>
+          <span class="col-vertical-title">Live</span>
+        </div>
+      </div>
+      <div class="col-expanded-body">
+        <span class="col-step-tag">Step Five &bull; Live</span>
+        <h2 class="col-headline">Put the truth into practice.</h2>
+        
+        <!-- Original Prompt List from Homepage -->
+        <ul class="col-prompt-list">
+          <li>What cultural or personal lies does this truth expose?</li>
+          <li>How will this truth shape your prayers, thoughts, words, or actions today?</li>
+        </ul>
+
+        <!-- Interactive Live Workspace (Full Culminating Canvas) -->
+        <div class="interactive-container">
+          <div class="scripture-card-wrapper" style="min-height: 180px; max-height: calc(100vh - 390px);">
+            <div class="scripture-header-bar">
+              <span class="scripture-ref-title">Mark 2 (WEB)</span>
+            </div>
+            <div class="scripture-card scripture-body" data-step="live">
+              <!-- Full culmination of Word Work, Expand, and Learn markings rendered here -->
+            </div>
+          </div>
+
+          <div class="synthesis-formula-box">
+            <div class="formula-row">
+              <span class="formula-lead">Because God is... (Step 4: Learn)</span>
+              <div class="formula-learn-preview" id="formulaLearnPreview">
+                [Complete the Learn step to populate God's character]
+              </div>
+            </div>
+
+            <div class="formula-row">
+              <span class="formula-lead" style="color: #2d324f;">Therefore I will... (Step 5: Live)</span>
+              <textarea class="formula-live-input" id="liveTransformationInput" placeholder="What lies are exposed? How will this shape your prayers, thoughts, or actions today?"></textarea>
+            </div>
+
+            <button type="button" class="dwell-load-btn" style="padding:10px; border-radius:8px; background:#2d324f; color:#fff; font-weight:800; font-size:12.5px; border:none; cursor:pointer; margin-top:2px;" onclick="openSummaryModal()">
+              View & Export Completed Dwell Sheet &rarr;
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Style Tester Floating Widget -->
+  <div class="tester-wrap" onclick="event.stopPropagation()">
+    <div class="tester-panel" id="testerPanel">
+      <div class="tester-panel-head">
+        <span class="tester-title">Favorite Palettes (3)</span>
+      </div>
+      <div class="tester-list" id="paletteList"></div>
+    </div>
+
+    <button type="button" class="tester-toggle-btn" onclick="toggleTester(event)" aria-label="Toggle Palettes">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+    </button>
+  </div>
 
 <script>
-const passage = [
- "They went to Capernaum, and when the Sabbath came, Jesus went into the synagogue and began to teach.",
- "The people were amazed at his teaching, because he taught them as one who had authority, not as the teachers of the law.",
- "Just then a man in their synagogue who was possessed by an impure spirit cried out,",
- "\"What do you want with us, Jesus of Nazareth? Have you come to destroy us? I know who you are—the Holy One of God!\"",
- "\"Be quiet!\" said Jesus sternly. \"Come out of him!\"",
- "The impure spirit shook the man violently and came out of him with a shriek.",
- "The people were all so amazed that they asked each other, \"What is this? A new teaching—and with authority! He even gives orders to impure spirits and they obey him.\"",
- "News about him spread quickly over the whole region of Galilee.",
- "As soon as they left the synagogue, they went with James and John to the home of Simon and Andrew.",
- "Simon's mother-in-law was in bed with a fever, and they immediately told Jesus about her.",
- "So he went to her, took her hand and helped her up. The fever left her and she began to wait on them.",
- "That evening after sunset the people brought to Jesus all the sick and demon-possessed.",
- "The whole town gathered at the door,",
- "and Jesus healed many who had various diseases. He also drove out many demons, but he would not let the demons speak because they knew who he was.",
- "Very early in the morning, while it was still dark, Jesus got up, left the house and went off to a solitary place, where he prayed.",
- "Simon and his companions went to look for him,",
- "and when they found him, they exclaimed: \"Everyone is looking for you!\"",
- "Jesus replied, \"Let us go somewhere else—to the nearby villages—so I can preach there also. That is why I have come.\"",
- "So he traveled throughout Galilee, preaching in their synagogues and driving out demons.",
- "A man with leprosy came to him and begged him on his knees, \"If you are willing, you can make me clean.\"",
- "Jesus was indignant. He reached out his hand and touched the man. \"I am willing,\" he said. \"Be clean!\"",
- "Immediately the leprosy left him and he was cleansed.",
- "Jesus sent him away at once with a strong warning:",
- "\"See that you don't tell this to anyone. But go, show yourself to the priest and offer the sacrifices that Moses commanded for your cleansing, as a testimony to them.\"",
- "Instead he went out and began to talk freely, spreading the news. As a result, Jesus could no longer enter a town openly but stayed outside in lonely places. Yet the people still came to him from everywhere."
-];
+/* ── Navigation Accordion ── */
+function handleColumnClick(selectedCol, event) {
+  if (event && (
+    event.target.closest('.tester-wrap') || 
+    event.target.closest('.interactive-container') || 
+    event.target.closest('.passage-modal-overlay') ||
+    event.target.closest('.dwell-summary-modal') ||
+    event.target.closest('.scripture-card-wrapper') ||
+    event.target.closest('.dwell-textarea') ||
+    event.target.closest('.formula-live-input')
+  )) return;
+  
+  const isPortraitMobile = window.innerWidth <= 768 && window.matchMedia("(orientation: portrait)").matches;
+  const isAlreadyExpanded = selectedCol.classList.contains('is-expanded');
+  const allCols = document.querySelectorAll('.dwell-column');
 
-const defs = {
-  "jesus":"Jesus of Nazareth: the Son of God and promised Messiah, whose ministry of teaching, healing, and casting out evil spirits is the subject of Mark's Gospel.",
-  "sabbath":"The traditional Jewish day of rest and worship (Saturday).",
-  "synagogue":"A Jewish house of prayer and community center for studying Scripture.",
-  "impurespirit":"Another name for a demon: a created, fallen angel operating in spiritual rebellion under Satan's hierarchy. Real and deceptive, but finite: not all-powerful, all-knowing, or a match for Christ's authority.",
-  "leprosy":"A severe skin disease causing social exclusion; sufferers were treated as outcasts (Leviticus 13).",
-  "indignant":"Feeling deep anger or emotion at unfair treatment, sin, or disease.",
-  "galilee":"The northern region of Israel where Jesus conducted much of His early ministry.",
-  "capernaum":"A bustling fishing village on the Sea of Galilee that served as Jesus's ministry hub.",
-  "jesusofnazareth":"Nazareth was a small, obscure village in Galilee, easy to overlook and looked down on by outsiders (John 1:46). Calling Jesus \"of Nazareth\" marked Him, by human standards, as an unlikely candidate for Messiah.",
-  "holyoneofgod":"A title acknowledging Jesus's divine identity and authority. It's notable that a demon says it first: even the spiritual realm recognized who Jesus was on sight."
+  allCols.forEach(col => col.classList.remove('is-expanded'));
+
+  if (!isPortraitMobile || !isAlreadyExpanded) {
+    selectedCol.classList.add('is-expanded');
+    syncCanvases();
+  }
+}
+
+function goToNextStep(event, selector) {
+  if (event) event.stopPropagation();
+  const nextCol = document.querySelector(selector);
+  if (nextCol) {
+    const allCols = document.querySelectorAll('.dwell-column');
+    allCols.forEach(col => col.classList.remove('is-expanded'));
+    nextCol.classList.add('is-expanded');
+    syncCanvases();
+  }
+}
+
+/* ── Treasury of Scripture Knowledge (TSK) Full Cross-Ref Map for Mark 2 ── */
+const mark2TSKCrossReferences = {
+  "1": "Matt 9:1; Mark 1:45; Luke 5:18 (Capernaum headquarters)",
+  "2": "Mark 1:33, 45; Luke 5:17; Acts 10:44 (Preaching the Word to crowded rooms)",
+  "3": "Matt 9:2; Luke 5:18; Acts 9:33; Deut 22:8 (Bringing paralytic carried by four)",
+  "4": "Luke 5:19; Deut 22:8; Acts 10:9 (Removing tiles/mud thatch on Palestinian roof)",
+  "5": "Ps 103:3; Isa 43:25; Matt 9:2; Luke 5:20; Acts 5:31 (Jesus seeing their corporate faith)",
+  "6": "Matt 9:3; Luke 5:21; Mark 7:1; 8:11 (Religious leaders inner questioning)",
+  "7": "Exod 34:6-7; Job 14:4; Ps 130:4; Isa 43:25; 44:22 (God alone forgives sins)",
+  "8": "1 Sam 16:7; 1 Chron 28:9; Ps 139:1-2; Jer 17:10; John 2:24-25 (Jesus knowing thoughts in his spirit)",
+  "9": "Matt 9:5; Luke 5:23; 1 Kings 18:21 (Comparing invisible pardon with visible healing)",
+  "10": "Dan 7:13-14; Matt 28:18; John 5:21-27; 17:2 (Authority of the Son of Man on earth)",
+  "11": "John 5:8-9; Acts 3:6; 9:34 (Commanding immediate rising and taking up mat)",
+  "12": "Matt 9:8; 15:31; Luke 5:26; 7:16; Acts 4:21 (Crowd astonished: 'Never saw anything like this')",
+  "13": "Mark 1:16, 45; 3:7; 4:1 (Jesus teaching beside the Sea of Galilee)",
+  "14": "Matt 9:9 (Matthew); Luke 5:27-28 (Levi son of Alphaeus leaving tax booth)",
+  "15": "Matt 9:10; Luke 5:29; 15:1; 1 Cor 5:9-11 (Reclining with tax collectors and sinners)",
+  "16": "Matt 9:11; 11:19; Luke 5:30; 15:2; 19:7 (Pharisees complaining about table fellowship)",
+  "17": "Isa 55:7; Matt 9:12-13; Luke 5:31-32; 19:10; 1 Tim 1:15 (Physician for the sick, calling sinners to repentance)",
+  "18": "Matt 9:14; Luke 5:33; 18:12 (Disciples of John and Pharisees fasting)",
+  "19": "Gen 29:22; Judg 14:10-11; Matt 25:1-10; John 3:29 (Wedding guests cannot fast while Bridegroom is present)",
+  "20": "Isa 53:8; Dan 9:26; Zech 13:7; John 16:20-22 (Bridegroom taken away—crucifixion prophecy)",
+  "21": "Josh 9:4; Ps 119:83; Matt 9:16; Luke 5:36 (Unshrunk patch tearing old garment)",
+  "22": "Matt 9:17; Luke 5:37-39; 2 Cor 5:17 (New wine bursting old wineskins; Gospel era newness)",
+  "23": "Deut 23:25; Matt 12:1; Luke 6:1 (Plucking heads of grain on the Sabbath)",
+  "24": "Exod 20:10; 31:14; Matt 12:2; Luke 6:2 (Pharisees accusing unlawful Sabbath labor)",
+  "25": "1 Sam 21:1-6; Matt 12:3; Luke 6:3 (David when hungry eating the consecrated bread)",
+  "26": "Exod 29:32-33; Lev 24:5-9; 1 Sam 22:20; 2 Sam 8:17 (Abiathar and the Bread of the Presence)",
+  "27": "Exod 23:12; Deut 5:14; Ezek 20:12; 1 Cor 3:21-22 (Sabbath made for man, not man for the Sabbath)",
+  "28": "Ps 8:4-8; Dan 7:13-14; Matt 12:8; Luke 6:5; Rev 1:10 (Son of Man is Lord even of the Sabbath)"
 };
 
-const phrases = [
-  { words:['holy','one','of','god'], key:'holyoneofgod' },
-  { words:['jesus','of','nazareth'], key:'jesusofnazareth' },
-  { words:['impure','spirit'], key:'impurespirit' },
-  { words:['impure','spirits'], key:'impurespirit' }
+/* ── Bible Book List & Metadata ── */
+const bibleBooks = [
+  "Genesis","Exodus","Leviticus","Numbers","Deuteronomy","Joshua","Judges","Ruth","1 Samuel","2 Samuel",
+  "1 Kings","2 Kings","1 Chronicles","2 Chronicles","Ezra","Nehemiah","Esther","Job","Psalms","Proverbs",
+  "Ecclesiastes","Song of Solomon","Isaiah","Jeremiah","Lamentations","Ezekiel","Daniel","Hosea","Joel","Amos",
+  "Obadiah","Jonah","Micah","Nahum","Habakkuk","Zephaniah","Haggai","Zechariah","Malachi","Matthew",
+  "Mark","Luke","John","Acts","Romans","1 Corinthians","2 Corinthians","Galatians","Ephesians","Philippians",
+  "Colossians","1 Thessalonians","2 Thessalonians","1 Timothy","2 Timothy","Titus","Philemon","Hebrews","James",
+  "1 Peter","2 Peter","1 John","2 John","3 John","Jude","Revelation"
 ];
 
-const state = { index:0, wordTaps:[], charVerse:null, trait:'', scrolledToEnd:false, activeTool:{ vocab:null, char:null } };
-let renderGen = 0;
+const fallbackMetadata = {
+  "Mark": { author: "John Mark", audience: "Gentiles in Rome", time: "c. AD 55–65", purpose: "Jesus as Suffering Servant and Divine Son", context: "Early Galilean ministry and authority" },
+  "Psalms": { author: "David & others", audience: "Israel / God's People", time: "c. 1000–400 BC", purpose: "Worship, lament, and delight in Torah", context: "Wisdom literature & covenant life" },
+  "Romans": { author: "Paul", audience: "Church in Rome", time: "c. AD 57", purpose: "The Gospel of God's righteousness by faith", context: "Justification, sanctification, and eternal hope" },
+  "default": { author: "Biblical Author", audience: "God's Covenant People", time: "Ancient Era", purpose: "God's progressive revelation and redemption", context: "Canonical and covenantal narrative" }
+};
 
-function quoteVerse(text){
-  const t = (text||'').trim();
-  const startsWithQuote = /^["“]/.test(t);
-  const endsWithQuote = /["”]$/.test(t);
-  return (startsWithQuote ? '' : '"') + text + (endsWithQuote ? '' : '"');
-}
-function normWord(w){ return w.replace(/[^a-zA-Z']/g,'').toLowerCase(); }
-
-const stopWords = new Set(['a','an','the','and','but','or','nor','for','so','yet','of','to','in','on','at','by','with','from','into','onto','up','out','off','over','under','again','then','than','as','is','am','are','was','were','be','been','being','he','she','it','they','him','her','them','his','its','their','this','that','these','those','who','whom','whose','which','what','i','you','we','me','us','my','your','our','not','no','all','any','some','there','here','when','where','why','how','went','come','came','said','say','says','saw','see','seen','got','get','gets','made','make','makes','took','take','taken','knew','know','known','told','tell','asked','ask','gave','give','given','put','let','called','call','began','begin','left','leave','found','find','ran','run','stood','stand','sat','sit','looked','look','walked','walk','brought','bring','heard','hear','felt','feel','thought','think','wanted','want','one','two','three','man','men','people','day','days','time','way','down','after','before','while','because','if','also','just','only','very','too','back','away','still','around','about','once','more','other','many','much']);
-
-function kw(lines, extraClass){
-  let i = 0;
-  const body = lines.map(line=>{
-    const words = line.map(w=>{
-      const delay = (i * 0.09).toFixed(2); i++;
-      return `<span class="kword" style="animation-delay:${delay}s">${w}</span>`;
-    }).join(' ');
-    return `<div class="kline">${words}</div>`;
-  }).join('');
-  return `<div class="hero-title${extraClass ? ' '+extraClass : ''}">${body}</div>`;
+function populateBookDropdown() {
+  const select = document.getElementById("bookSelect");
+  if (!select) return;
+  select.innerHTML = "";
+  bibleBooks.forEach(b => {
+    const opt = document.createElement("option");
+    opt.value = b;
+    opt.textContent = b;
+    if (b === "Mark") opt.selected = true;
+    select.appendChild(opt);
+  });
 }
 
-const paragraphEnds = [28, 31, 34, 39, 44, 45];
+/* ── Hidden Easter Egg Modal Trigger (10 Clicks) ── */
+let logoClickCount = 0;
+let logoClickTimer = null;
 
-function passageWordsHTML(){
-  let out = '<p class="flow-para">';
-  passage.forEach((v,i)=>{
-    const verseNum = i + 21;
-    const words = v.replace(/—(?=\S)/g, '— ').split(/\s+/);
-    const normed = words.map(normWord);
-    const pieces = [];
-    let wi = 0;
-    while (wi < words.length) {
-      const marker = wi === 0 ? `<span class="verse-num-inline">${verseNum}</span>` : '';
-      const match = phrases.find(p => p.words.every((pw,k) => normed[wi+k] === pw));
-      if (match) {
-        const span = words.slice(wi, wi + match.words.length).join(' ');
-        pieces.push(`${marker}<span class="w" data-word="${match.key}" onclick="tapWord(event,this)">${span}</span>`);
-        wi += match.words.length;
-        continue;
+function registerLogoClick(event) {
+  event.stopPropagation();
+  logoClickCount++;
+  
+  clearTimeout(logoClickTimer);
+  logoClickTimer = setTimeout(() => {
+    logoClickCount = 0;
+  }, 3500);
+
+  if (logoClickCount >= 10) {
+    logoClickCount = 0;
+    openModal();
+  }
+}
+
+function openModal() {
+  document.getElementById('passageModal').classList.add('active');
+}
+
+function closeModal(event) {
+  if (event) event.stopPropagation();
+  document.getElementById('passageModal').classList.remove('active');
+}
+
+/* ── Dynamic Bible Fetching & Tokenized Word Pre-Processing ── */
+let currentPassageRawData = [];
+let currentBook = "Mark";
+let currentChapter = 2;
+
+// Annotation State Stores
+const tokenHighlights = {}; // tokenKey -> color (Word Work only)
+const verseUnderlines = {}; // verseNum -> true (Learn only)
+const expandInspections = {}; // verseNum -> { type, text } (Expand only)
+
+function generateTokenizedHTML(verses) {
+  let html = "";
+  verses.forEach(v => {
+    const words = v.text.trim().split(/(\s+)/);
+    let verseWordsHTML = "";
+    let wordIndex = 0;
+
+    words.forEach(chunk => {
+      if (/\S/.test(chunk)) {
+        const tokenKey = `${v.verse}-${wordIndex}`;
+        verseWordsHTML += `<span class="dw-word" data-token="${tokenKey}" data-verse="${v.verse}">${chunk}</span>`;
+        wordIndex++;
+      } else {
+        verseWordsHTML += chunk;
       }
-      const norm = normed[wi];
-      pieces.push(`${marker}<span class="w" data-word="${norm}" onclick="tapWord(event,this)">${words[wi]}</span>`);
-      wi++;
-    }
-    out += pieces.join(' ') + ' ';
-    if (paragraphEnds.includes(verseNum) && verseNum !== 45) out += '</p><p class="flow-para">';
+    });
+
+    html += `<p data-verse="${v.verse}"><sup class="verse-num">${v.verse}</sup><span class="verse-content">${verseWordsHTML}</span></p>`;
   });
-  out += '</p>';
-  return out;
+  return html;
 }
 
-function versePickHTML(){
-  return passage.map((v,i)=>`
-    <div class="verse-tile" data-v="${i+21}" onclick="tapVerseTile(event, ${i+21})">
-      <div class="vnum">${i+21}</div><div class="vtext">${v}</div>
-    </div>`).join('');
-}
+async function fetchPassage(book, chapter) {
+  currentBook = book;
+  currentChapter = chapter;
+  const ref = `${book} ${chapter}`;
+  document.querySelectorAll('.scripture-ref-title').forEach(el => el.textContent = `${ref} (WEB)`);
+  document.getElementById('badgePassageText').textContent = ref;
 
-const beats = [
-  /* 0. INTRO */
-  { id:'intro', type:'tapAuto', isInteractive:false, bgGrad:'var(--d-discover)', text:'light', align:'start',
-    html:`<div class="brand-mark" onclick="event.stopPropagation(); handleEmojiTap();"><div class="dwell-mark"><span class="dm-top"></span><span class="dm-left"></span><span class="dm-center"></span><span class="dm-right"></span><span class="dm-bottom"></span></div></div>
-          <div class="hero-wrap">
-            <div class="intro-top-title">MS Hang Prep</div>
-            ${kw([["MARK"],["1:21–45"]],'xl')}
-            <div class="intro-duration"><i class="fa-regular fa-clock"></i> Prep Duration: 5 min</div>
-          </div>` },
+  const meta = fallbackMetadata[book] || fallbackMetadata["default"];
+  document.querySelectorAll('.meta-author').forEach(el => el.textContent = meta.author);
+  document.querySelectorAll('.meta-audience').forEach(el => el.textContent = meta.audience);
+  document.querySelectorAll('.meta-time').forEach(el => el.textContent = meta.time);
+  document.querySelectorAll('.meta-purpose').forEach(el => el.textContent = meta.purpose);
+  document.querySelectorAll('.meta-context').forEach(el => el.textContent = meta.context);
 
-  /* 1. LOCATE MARK: TESTAMENT */
-  { id:'quest-testament', type:'input', blockTap:true, isInteractive:true, clue:'Pick an answer to continue', bgGrad:'var(--bg-discover)', text:'dark',
-    html:`<div class="sketch-lead-title tight">Which testament is the book of <span class="pop-mark">Mark</span> in?</div>
-          <div class="testament-deck" id="questTestamentGrid">
-            <div class="deck-card" data-correct="false" onclick="questAnswer(event,this,'questTestamentGrid')">
-              <span class="dc-title">Old Testament</span>
-              <span class="dc-badge">39 books · 1000+ yrs in the making</span>
-              <span class="dc-desc">The Hebrew scriptures pointing toward the coming promise of the Messiah.</span>
-            </div>
-            <div class="deck-card" data-correct="true" onclick="questAnswer(event,this,'questTestamentGrid')">
-              <span class="dc-title">New Testament</span>
-              <span class="dc-badge">27 books · ~40 yrs in the making</span>
-              <span class="dc-desc">Jesus's earthly life, teaching, resurrection, and the birth of the church.</span>
-            </div>
-          </div>` },
-
-  /* 2. LOCATE MARK: SECTION */
-  { id:'quest-section', type:'input', blockTap:true, isInteractive:true, clue:'Pick an answer to continue', bgGrad:'var(--bg-discover)', text:'dark',
-    html:`<div class="sketch-lead-title tight">Which section is the book of <span class="pop-mark">Mark</span> in?</div>
-          <div class="sections-5-deck" id="questSectionGrid">
-            <div class="deck-card" data-correct="true" onclick="questAnswer(event,this,'questSectionGrid')">
-              <i class="fa-solid fa-cross dc-icon"></i>
-              <span class="dc-title">Gospels</span>
-              <span class="dc-badge">4 books</span>
-              <span class="dc-desc">Accounts of Jesus's life, death, and resurrection</span>
-              <div class="dc-books">
-                <span class="book-pill">Matt</span>
-                <span class="book-pill is-mark">Mark</span>
-                <span class="book-pill">Luke</span>
-                <span class="book-pill">John</span>
-              </div>
-            </div>
-            <div class="deck-card" data-correct="false" onclick="questAnswer(event,this,'questSectionGrid')">
-              <i class="fa-solid fa-fire dc-icon"></i>
-              <span class="dc-title">Church History</span>
-              <span class="dc-badge">1 book</span>
-              <span class="dc-desc">The Holy Spirit's arrival and church growth</span>
-            </div>
-            <div class="deck-card" data-correct="false" onclick="questAnswer(event,this,'questSectionGrid')">
-              <i class="fa-solid fa-envelope dc-icon"></i>
-              <span class="dc-title">Paul's Letters</span>
-              <span class="dc-badge">13 books</span>
-              <span class="dc-desc">Helping churches live out the gospel</span>
-            </div>
-            <div class="deck-card" data-correct="false" onclick="questAnswer(event,this,'questSectionGrid')">
-              <i class="fa-solid fa-envelopes-bulk dc-icon"></i>
-              <span class="dc-title">General Letters</span>
-              <span class="dc-badge">8 books</span>
-              <span class="dc-desc">Guidance for early believers</span>
-            </div>
-            <div class="deck-card" data-correct="false" onclick="questAnswer(event,this,'questSectionGrid')">
-              <i class="fa-solid fa-eye dc-icon"></i>
-              <span class="dc-title">Prophecy</span>
-              <span class="dc-badge">1 book</span>
-              <span class="dc-desc">A visionary look at how it all ends</span>
-            </div>
-          </div>` },
-
-  /* 3. RECAP */
-  { id:'reveal-context', type:'tapAuto', isInteractive:false, bgGrad:'var(--bg-discover)', text:'dark', align:'start',
-    html:`<div class="sketch-lead-title" style="margin-bottom:12px;">Recap</div>
-          <div class="set-scene-grid">
-            <div class="circle-hero-container">
-              <div class="circle-hero">
-                <div class="arc-stem-text">Last Week's God Shot</div>
-                <div class="label-god-is">GOD IS...</div>
-                <div class="static-trait">King</div>
-              </div>
-            </div>
-            <div class="folder-wrap">
-              <div class="folder-tab">Set the Scene</div>
-              <div class="folder-body">
-                <div class="folder-bullet">
-                  <span class="recap-tag">Last Week</span>
-                  <div>Jesus announces that the Kingdom of God is near and begins recruiting ordinary fishermen to follow Him.</div>
-                </div>
-                <div class="folder-bullet">
-                  <span class="recap-tag">This Week</span>
-                  <div>Jesus begins to openly display His divine authority—teaching with power and commanding unclean spirits.</div>
-                </div>
-              </div>
-            </div>
-          </div>` },
-
-  /* 4. PRAYER (KICKER IN CIRCLE: PRAYER) */
-  { id:'breath-prayer', type:'tapAuto', isInteractive:false, bgGrad:'var(--bg-cream)', text:'dark', align:'center',
-    html:`<div style="flex:1; display:flex; align-items:center; justify-content:center; width:100%;">
-            <div class="breath-visual">
-              <div class="breath-circle"></div>
-              <div class="breath-label-wrap">
-                <div class="pray-center-text">PRAY</div>
-              </div>
-            </div>
-          </div>` },
-
-  /* 5. WORD WORK COVER */
-  { id:'reading-intro', type:'tapAuto', isInteractive:false, bgGrad:'var(--bg-cream)', text:'dark', align:'start',
-    html:`<div class="leather-cover">
-            <div class="leather-spine"></div>
-            <div class="leather-cover-inner">
-              <div class="book-title" style="margin-bottom:2px;">Holy Bible</div>
-              <div class="focus-pill yellow">
-                <div class="focus-pill-value">Highlight Key Words</div>
-              </div>
-              <div class="cover-note">Grab a highlighter and mark words that are confusing or that you see repeated in the text.</div>
-            </div>
-          </div>` },
-
-  /* 6. PASSAGE SCAN (WITH MASK GRADIENT FADE-OUT) */
-  { id:'vocab-scan', type:'input', blockTap:true, isInteractive:true, clue:'Highlight key words & scroll to bottom', bgGrad:'var(--bg-cream)', text:'dark',
-    html:`<div class="full-page">
-            <div class="passage-scroll-wrap">
-              <div class="passage-scroll" id="passageScrollEl">${passageWordsHTML()}</div>
-            </div>
-          </div>` },
-
-  /* 7. GLOSSARY REVIEW (EDITORIAL DEFINITIONS) */
-  { id:'vocab-review', type:'input', blockTap:false, isInteractive:false, bgGrad:'var(--bg-wordwork)', text:'light',
-    html:`<div class="sketch-lead-title">Glossary Review</div>
-          <div class="review-scroll" id="vocabReviewBox"></div>` },
-
-  /* 9. GOD SHOT COVER */
-  { id:'character-prompt', type:'tapAuto', isInteractive:false, bgGrad:'var(--bg-cream)', text:'dark', align:'start',
-    html:`<div class="leather-cover">
-            <div class="leather-spine"></div>
-            <div class="leather-cover-inner">
-              <div class="book-title" style="margin-bottom:2px;">Holy Bible</div>
-              <div class="focus-pill lime">
-                <div class="focus-pill-value">Spot a God Shot</div>
-              </div>
-              <div class="cover-note">Find a verse that shows who God is.</div>
-            </div>
-          </div>` },
-
-  /* 10. VERSE PICK (WITH MASK GRADIENT FADE-OUT) */
-  { id:'char-verse-pick', type:'input', blockTap:true, isInteractive:true, clue:'Select a verse to continue', bgGrad:'var(--bg-cream)', text:'dark',
-    html:`<div class="full-page">
-            <div class="passage-scroll-wrap">
-              <div class="verse-pick-list">${versePickHTML()}</div>
-            </div>
-          </div>` },
-
-  /* 11. GOD SHOT COACHING (HEADER: CENTRAL TRUTH) */
-  { id:'char-coaching', type:'input', blockTap:true, isInteractive:true, clue:'Fill in the blank to continue', bgGrad:'var(--bg-live)', text:'light',
-    html:`<div class="sketch-lead-title" style="margin-bottom:14px;">Central Truth</div>
-          <div class="set-scene-grid coaching-scene">
-            <div style="display:flex; flex-direction:column; gap:14px; width:100%;">
-              <div class="dark-scripture-card coaching-card">
-                <div class="ref" id="charRef"></div>
-                <div class="vt" id="charText"></div>
-              </div>
-            </div>
-            <div class="circle-hero-container">
-              <div class="circle-hero coaching-circle">
-                <div class="arc-stem-text" id="arcStemText">GOD IS...</div>
-                <div class="label-god-is">GOD IS...</div>
-                <input class="blank-input" id="customTraitInput" placeholder="" oninput="handleCustomTrait(this.value)" onclick="event.stopPropagation();" />
-              </div>
-            </div>
-          </div>` },
-
-  /* 12. FINAL (HEADER: CENTRAL TRUTH) */
-  { id:'final', type:'input', blockTap:true, isInteractive:false, bgGrad:'#5a3f96', text:'light', align:'start',
-    html:`<div class="sketch-lead-title" style="margin-bottom:14px;">Central Truth</div>
-          <div class="final-reflection-grid">
-            <div class="circle-hero-container">
-              <div class="circle-hero expanded-god-is">
-                <div class="label-god-is">GOD IS...</div>
-                <div class="static-trait no-underline" id="finalGodIsTrait">Holy</div>
-                <div class="therefore-label">Therefore, I...</div>
-                <div class="therefore-blank"></div>
-              </div>
-            </div>
-            <div style="display:flex; justify-content:center; width:100%;">
-              <div class="timer-card" id="timerCard" onclick="event.stopPropagation(); toggleTimer();">
-                <div class="timer-label"><i class="fa-regular fa-clock"></i> Reflection Timer</div>
-                <div class="timer-digits" id="timerDigits">02:00</div>
-                <div class="timer-status-btn" id="timerBtn"><i class="fa-solid fa-play"></i> Start 2 Min</div>
-              </div>
-            </div>
-          </div>` }
-];
-
-const sectionLabels = [
-  'Dwell Guide', 'Discover', 'Discover', 'Recap',
-  'Prayer', 'Word Work', 'Word Work', 'Word Work',
-  'Learn', 'Learn', 'Learn', 'Live'
-];
-
-function initNotches(){
-  const layer = document.getElementById('notchesLayer');
-  layer.innerHTML = '';
-  const total = beats.length;
-  beats.forEach((b, i) => {
-    if (b.isInteractive) {
-      const notch = document.createElement('div');
-      notch.className = 'prog-notch';
-      notch.id = `notch-${i}`;
-      const pct = (i / (total - 1)) * 100;
-      notch.style.left = `${pct}%`;
-      layer.appendChild(notch);
-    }
+  document.querySelectorAll('.scripture-body').forEach(el => {
+    el.innerHTML = "<p><em>Loading scripture...</em></p>";
   });
-}
 
-function updateProgressBar(){
-  const fill = document.getElementById('progressBarFill');
-  const total = beats.length;
-  const pct = (state.index / (total - 1)) * 100;
-  fill.style.width = `${pct}%`;
-
-  beats.forEach((b, i) => {
-    if (b.isInteractive) {
-      const notch = document.getElementById(`notch-${i}`);
-      if (!notch) return;
-      notch.classList.remove('passed', 'active');
-      if (state.index > i) notch.classList.add('passed');
-      else if (state.index === i) notch.classList.add('active');
-    }
-  });
-}
-
-const stage = document.getElementById('stage');
-const phoneEl = document.getElementById('phone');
-
-beats.forEach((b,i)=>{
-  const div=document.createElement('div');
-  div.className = `beat ${b.text === 'light' ? 'tx-light' : 'tx-dark'}`;
-  div.id = `beat-${i}`;
-  div.innerHTML = b.html;
-  stage.appendChild(div);
-});
-
-function updateHeaderMeta(){
-  const labelEl = document.getElementById('sectionLabel');
-  const scriptureEl = document.getElementById('scriptureMeta');
-  if (!labelEl || !scriptureEl) return;
-
-  if (devMode) {
-    labelEl.innerHTML = `<span style="display:inline-flex; gap:12px;"><button class="meta-link-btn" onclick="event.stopPropagation(); openDevNotesPanel();">Notes</button><button class="meta-link-btn" onclick="event.stopPropagation(); clearAllDevNotes();">Clear</button></span>`;
-    scriptureEl.innerHTML = `<button class="meta-link-btn" onclick="event.stopPropagation(); exitDevMode();">Close</button>`;
-  } else {
-    labelEl.textContent = sectionLabels[state.index] || '';
-    scriptureEl.textContent = 'Mark 1:21–45';
-  }
-}
-
-/* ================= UPDATE CONTEXT ISLAND & MINIMAL CHEVRONS ================= */
-function isVocabComplete(){
-  return state.wordTaps.length > 0 && state.scrolledToEnd;
-}
-
-function updateNavShell(){
-  const prevBtn = document.getElementById('shellPrevBtn');
-  const nextBtn = document.getElementById('shellNextBtn');
-  const island = document.getElementById('floatingContextIsland');
-  const b = beats[state.index];
-
-  // Configure Previous Button
-  prevBtn.classList.toggle('disabled', state.index === 0);
-
-  // Configure Next Intent
-  let ready = false;
-  if (b.id === 'quest-testament' || b.id === 'quest-section') ready = answeredBeats.has(state.index);
-  else if (b.id === 'vocab-scan') ready = isVocabComplete();
-  else if (b.id === 'char-verse-pick') ready = state.charVerse !== null;
-  else if (b.id === 'char-coaching') ready = Boolean(state.trait && state.trait.trim());
-  else ready = !b.blockTap;
-  nextBtn.classList.toggle('ready', ready);
-
-  // Screens whose floating island already has its own "Continue" pill hide
-  // the redundant chevron so there's a single forward control, not two
-  const hideNextArrow = (b.id === 'vocab-scan' || b.id === 'char-verse-pick');
-  nextBtn.style.display = hideNextArrow ? 'none' : '';
-
-  // Contextual Floating Tool Island for interaction slides
-  if (b.id === 'vocab-scan') {
-    island.style.display = 'flex';
-    const isDone = isVocabComplete();
-    island.innerHTML = `
-      <div class="hl-flank-row">
-        <button class="hl-flank-btn ${state.activeTool.vocab === 'blue' ? 'active' : ''}" data-color="blue" title="Characters" aria-label="Highlight: Characters" onclick="event.stopPropagation(); setPassageHighlighter('blue', this);">
-          <span class="hl-swatch hl-swatch-blue"></span><span class="hl-flank-label">Characters</span>
-        </button>
-        <button class="hl-flank-btn ${state.activeTool.vocab === 'green' ? 'active' : ''}" data-color="green" title="Setting" aria-label="Highlight: Setting" onclick="event.stopPropagation(); setPassageHighlighter('green', this);">
-          <span class="hl-swatch hl-swatch-green"></span><span class="hl-flank-label">Setting</span>
-        </button>
-        <button class="action-gate-pill ${isDone ? 'ready' : ''}" id="vocabActionPill" onclick="event.stopPropagation(); handleForwardAttempt();">
-          ${isDone ? '<i class="fa-solid fa-check"></i> Continue' : 'Highlight Words'}
-        </button>
-        <button class="hl-flank-btn ${state.activeTool.vocab === 'yellow' ? 'active' : ''}" data-color="yellow" title="Confusing" aria-label="Highlight: Confusing" onclick="event.stopPropagation(); setPassageHighlighter('yellow', this);">
-          <span class="hl-swatch hl-swatch-yellow"></span><span class="hl-flank-label">Confusing</span>
-        </button>
-        <button class="hl-flank-btn ${state.activeTool.vocab === 'pink' ? 'active' : ''}" data-color="pink" title="Repeated" aria-label="Highlight: Repeated" onclick="event.stopPropagation(); setPassageHighlighter('pink', this);">
-          <span class="hl-swatch hl-swatch-pink"></span><span class="hl-flank-label">Repeated</span>
-        </button>
-      </div>
-    `;
-  } else if (b.id === 'char-verse-pick') {
-    island.style.display = 'flex';
-    const isPicked = state.charVerse !== null;
-    island.innerHTML = `
-      <button class="action-gate-pill ${isPicked ? 'ready' : ''}" id="verseActionPill" onclick="event.stopPropagation(); handleForwardAttempt();">
-        ${isPicked ? '<i class="fa-solid fa-check"></i> Continue' : 'Spot a God Shot'}
-      </button>
-    `;
-  } else {
-    island.style.display = 'none';
-  }
-}
-
-/* Grain+blob glow themes for every screen besides intro/quest (those
-   have their own bespoke multi-blob treatment above). Each entry's
-   base/base2 IS that screen's own identity color — the accents are
-   just soft blooms layered on top, never the dominant color, so a
-   cream screen still reads as cream, a navy screen still reads navy. */
-const GLOW_THEMES = {
-  /* Every accent color below is one of the 5 baseline D-W-E-L-L hues
-     (as rgba, for opacity) — never an accent-set color (lime/yellow/
-     pink/purple/blue/green are reserved for UI chrome: buttons,
-     badges, correct/incorrect states) and never an invented one-off
-     hex. That's what keeps every screen's texture feeling like the
-     same system instead of a different hand-picked palette each time. */
-  'reveal-context':   { base:'var(--d-discover)', base2:'var(--d-wordwork)', p1:'85% 80%', a1:'rgba(93,88,126,0.42)',  p2:'10% 10%', a2:'rgba(255,255,255,0.28)', p3:'20% 85%', a3:'rgba(158,100,136,0.38)' },
-  'breath-prayer':     { base:'var(--bg-cream)',   base2:'var(--bg-cream)',   p1:'18% 82%', a1:'rgba(158,100,136,0.30)', p2:'85% 15%', a2:'rgba(215,107,101,0.22)' },
-  'reading-intro':     { base:'var(--bg-cream)',   base2:'var(--bg-cream)',   p1:'15% 15%', a1:'rgba(226,138,92,0.30)',  p2:'85% 85%', a2:'rgba(158,100,136,0.20)' },
-  'vocab-scan':        { base:'var(--bg-cream)',   base2:'var(--bg-cream)',   p1:'8% 8%',   a1:'rgba(226,138,92,0.16)',  p2:'92% 92%', a2:'rgba(93,88,126,0.14)' },
-  'vocab-review':      { base:'var(--d-wordwork)', base2:'var(--d-expand)',  p1:'85% 20%', a1:'rgba(255,255,255,0.22)', p2:'15% 85%', a2:'rgba(226,138,92,0.35)' },
-  'character-prompt':  { base:'var(--bg-cream)',   base2:'var(--bg-cream)',   p1:'85% 20%', a1:'rgba(158,100,136,0.28)', p2:'15% 85%', a2:'rgba(93,88,126,0.20)' },
-  'char-verse-pick':   { base:'var(--bg-cream)',   base2:'var(--bg-cream)',   p1:'15% 80%', a1:'rgba(93,88,126,0.26)',   p2:'85% 15%', a2:'rgba(158,100,136,0.22)' },
-  'char-coaching':     { base:'var(--d-live)',     base2:'var(--d-learn)',   p1:'85% 80%', a1:'rgba(158,100,136,0.30)', p2:'15% 15%', a2:'rgba(255,255,255,0.20)' },
-};
-
-function renderBeat(i){
-  document.querySelectorAll('.beat').forEach(el=>el.classList.remove('active'));
-  document.getElementById(`beat-${i}`).classList.add('active');
-  renderGen++;
-  const b = beats[i];
-
-  phoneEl.style.background = b.bgGrad;
-  phoneEl.classList.toggle('intro-glow', b.id === 'intro');
-  phoneEl.classList.toggle('quest-glow', b.id === 'quest-testament' || b.id === 'quest-section');
-  phoneEl.classList.toggle('variant-b', b.id === 'quest-section');
-  phoneEl.classList.toggle('final-glow', b.id === 'final');
-  const glowTheme = GLOW_THEMES[b.id];
-  phoneEl.classList.toggle('beat-glow', !!glowTheme);
-  if (glowTheme) {
-    phoneEl.style.setProperty('--glow-base', glowTheme.base);
-    phoneEl.style.setProperty('--glow-base2', glowTheme.base2);
-    phoneEl.style.setProperty('--glow-p1', glowTheme.p1);
-    phoneEl.style.setProperty('--glow-a1', glowTheme.a1);
-    phoneEl.style.setProperty('--glow-p2', glowTheme.p2);
-    phoneEl.style.setProperty('--glow-a2', glowTheme.a2);
-    phoneEl.style.setProperty('--glow-p3', glowTheme.p3 || '50% 50%');
-    phoneEl.style.setProperty('--glow-a3', glowTheme.a3 || 'rgba(255,255,255,0)');
-  }
-  if (b.text === 'light') {
-    phoneEl.classList.add('tx-light');
-    phoneEl.classList.remove('tx-dark');
-    document.getElementById('hudHeader').className = 'hud-header tx-light';
-  } else {
-    phoneEl.classList.add('tx-dark');
-    phoneEl.classList.remove('tx-light');
-    document.getElementById('hudHeader').className = 'hud-header tx-dark';
-  }
-
-  updateHeaderMeta();
-  updateNavShell();
-
-  if (b.id === 'char-coaching') {
-    const activeVerse = state.charVerse || 21;
-    document.getElementById('charRef').textContent = 'Mark 1:' + activeVerse;
-    document.getElementById('charText').textContent = quoteVerse(passage[activeVerse-21]);
-    const arcStem = document.getElementById('arcStemText');
-    if (arcStem) arcStem.textContent = `BASED ON VERSE ${activeVerse}:`;
-    const inp = document.getElementById('customTraitInput');
-    if (inp) inp.value = state.trait || '';
-    requestAnimationFrame(() => requestAnimationFrame(fitCharVerseText));
-  } else if (b.id === 'char-verse-pick') {
-    document.querySelectorAll('#beat-'+i+' .verse-tile').forEach(t=>t.classList.toggle('selected', state.charVerse !== null && Number(t.dataset.v)===state.charVerse));
-  } else if (b.id === 'vocab-scan') {
-    checkPassageScroll();
-    updateHoverPreviewColor();
-  }
-
-  if (b.id === 'final') renderFinalReflection();
-  if (b.id === 'vocab-review') renderVocabReview();
-  updateProgressBar();
-  if (devMode) renderDevBubbles();
-}
-
-const answeredBeats = new Set();
-function questAnswer(e, el, gridId){
-  e.stopPropagation();
-  if (el.classList.contains('locked')) return;
-  const isCorrect = el.dataset.correct === 'true';
-  if (isCorrect) {
-    const grid = document.getElementById(gridId);
-    grid.querySelectorAll('.deck-card').forEach(t=>t.classList.add('locked'));
-    el.classList.add('correct');
-    answeredBeats.add(state.index);
-  } else {
-    el.classList.add('incorrect','shake');
-    setTimeout(()=>{ el.classList.remove('shake','incorrect'); }, 500);
-  }
-}
-
-function setPassageHighlighter(color, btnEl){
-  if (state.activeTool.vocab === color) {
-    state.activeTool.vocab = null;
-  } else {
-    state.activeTool.vocab = color;
-  }
-  updateHoverPreviewColor();
-  updateNavShell();
-}
-
-/* Keeps the word-hover preview matching whichever highlighter color is
-   currently selected, instead of always previewing yellow */
-const HOVER_PREVIEW_COLORS = {
-  blue:   'rgba(66, 153, 215, 0.28)',
-  green:  'rgba(48, 166, 142, 0.24)',
-  yellow: 'rgba(239, 172, 57, 0.32)',
-  pink:   'rgba(221, 85, 75, 0.24)'
-};
-function updateHoverPreviewColor(){
-  const el = document.getElementById('passageScrollEl');
-  if (!el) return;
-  const color = HOVER_PREVIEW_COLORS[state.activeTool.vocab] || 'rgba(13, 13, 13, 0.08)';
-  el.style.setProperty('--hover-preview', color);
-}
-
-function tapWord(e, el){
-  e.stopPropagation();
-  const key = el.dataset.word;
-  if (!key) return;
-  const word = el.textContent.trim().replace(/^[^A-Za-z']+/, '').replace(/[^A-Za-z']+$/, '');
-  const def = defs[key] || null;
-  const isStop = stopWords.has(key);
-
-  if (state.activeTool.vocab) {
-    const cls = 'hl-' + state.activeTool.vocab;
-    const alreadyThisColor = el.classList.contains(cls);
-    ['hl-blue','hl-green','hl-yellow','hl-pink','flagged'].forEach(c => el.classList.remove(c));
+  try {
+    const formattedRef = encodeURIComponent(`${book} ${chapter}`);
+    const res = await fetch(`https://bible-api.com/${formattedRef}?translation=web`);
+    const data = await res.json();
     
-    if (!alreadyThisColor) {
-      el.classList.add(cls);
-      state.wordTaps = state.wordTaps.filter(w => w.el !== el);
-      state.wordTaps.push({ el, word, def, isStop, key });
+    if (data && data.verses && data.verses.length > 0) {
+      currentPassageRawData = data.verses;
     } else {
-      state.wordTaps = state.wordTaps.filter(w => w.el !== el);
+      throw new Error("Invalid Bible API response");
     }
-  } else {
-    const isColored = ['hl-blue','hl-green','hl-yellow','hl-pink'].some(c=>el.classList.contains(c));
-    if (isColored) {
-      ['hl-blue','hl-green','hl-yellow','hl-pink'].forEach(c => el.classList.remove(c));
-      state.wordTaps = state.wordTaps.filter(w => w.el !== el);
-    } else if (el.classList.contains('flagged')) {
-      // second tap: fully unhighlight
-      el.classList.remove('flagged');
-      state.wordTaps = state.wordTaps.filter(w => w.el !== el);
-    } else {
-      el.classList.add('flagged');
-      state.wordTaps.push({ el, word, def, isStop, key });
+  } catch (err) {
+    currentPassageRawData = [
+      { verse: 1, text: "A few days later, when Jesus again entered Capernaum, the people heard that he had come home." },
+      { verse: 2, text: "They gathered in such large numbers that there was no room left, not even outside the door, and he preached the word to them." },
+      { verse: 3, text: "Some men came, bringing to him a paralyzed man, carried by four of them." },
+      { verse: 4, text: "Since they could not get him to Jesus because of the crowd, they made an opening in the roof above Jesus by digging through it and then lowered the mat the man was lying on." },
+      { verse: 5, text: "When Jesus saw their faith, he said to the paralyzed man, “Son, your sins are forgiven.”" },
+      { verse: 6, text: "Now some teachers of the law were sitting there, thinking to themselves," },
+      { verse: 7, text: "“Why does this fellow talk like that? He’s blaspheming! Who can forgive sins but God alone?”" },
+      { verse: 8, text: "Immediately Jesus knew in his spirit that this was what they were thinking in their hearts, and he said to them, “Why are you thinking these things?" },
+      { verse: 9, text: "Which is easier: to say to this paralyzed man, ‘Your sins are forgiven,’ or to say, ‘Get up, take your mat and walk’?" },
+      { verse: 10, text: "But I want you to know that the Son of Man has authority on earth to forgive sins.” So he said to the man," },
+      { verse: 11, text: "“I tell you, get up, take your mat and go home.”" },
+      { verse: 12, text: "He got up, took his mat and walked out in full view of them all. This amazed everyone and they praised God, saying, “We have never seen anything like this!”" },
+      { verse: 13, text: "Once again Jesus went out beside the lake. A large crowd came to him, and he began to teach them." },
+      { verse: 14, text: "As he walked along, he saw Levi son of Alphaeus sitting at the tax collector’s booth. “Follow me,” Jesus told him, and Levi got up and followed him." },
+      { verse: 15, text: "While Jesus was having dinner at Levi’s house, many tax collectors and sinners were eating with him and his disciples, for there were many who followed him." },
+      { verse: 16, text: "When the teachers of the law who were Pharisees saw him eating with the sinners and tax collectors, they asked his disciples: “Why does he eat with tax collectors and sinners?”" },
+      { verse: 17, text: "On hearing this, Jesus said to them, “It is not the healthy who need a doctor, but the sick. I have not come to call the righteous, but sinners.”" },
+      { verse: 18, text: "Now John’s disciples and the Pharisees were fasting. Some people came and asked Jesus, “How is it that John’s disciples and the disciples of the Pharisees are fasting, but yours are not?”" },
+      { verse: 19, text: "Jesus answered, “How can the guests of the bridegroom fast while he is with them? They cannot, so long as they have him with them." },
+      { verse: 20, text: "But the time will come when the bridegroom will be taken from them, and on that day they will fast." },
+      { verse: 21, text: "No one sews a patch of unshrunk cloth on an old garment. Otherwise, the new piece will pull away from the old, making the tear worse." },
+      { verse: 22, text: "And no one pours new wine into old wineskins. Otherwise, the wine will burst the skins, and both the wine and the wineskins will be ruined. No, they pour new wine into new wineskins.”" },
+      { verse: 23, text: "One Sabbath Jesus was going through the grainfields, and as his disciples walked along, they began to pick some heads of grain." },
+      { verse: 24, text: "The Pharisees said to him, “Look, why are they doing what is unlawful on the Sabbath?”" },
+      { verse: 25, text: "He answered, “Have you never read what David did when he and his companions were hungry and in need?" },
+      { verse: 26, text: "In the days of Abiathar the high priest, he entered the house of God and ate the consecrated bread, which is lawful only for priests to eat. And he also gave some to his companions.”" },
+      { verse: 27, text: "Then he said to them, “The Sabbath was made for man, not man for the Sabbath." },
+      { verse: 28, text: "So the Son of Man is Lord even of the Sabbath.”" }
+    ];
+  }
+
+  const generatedHTML = generateTokenizedHTML(currentPassageRawData);
+  document.querySelectorAll('.scripture-body').forEach(el => {
+    el.innerHTML = generatedHTML;
+  });
+
+  syncCanvases();
+}
+
+function handleCustomPassageSubmit() {
+  const book = document.getElementById("bookSelect").value;
+  const chapter = document.getElementById("chapterInput").value || 1;
+  loadInteractiveMode(book, chapter);
+}
+
+function quickSelectPassage(book, chapter) {
+  loadInteractiveMode(book, chapter);
+}
+
+function loadInteractiveMode(book, chapter) {
+  document.body.classList.add('interactive-mode');
+  closeModal();
+  fetchPassage(book, chapter);
+  
+  const discoverCol = document.querySelector('.col-discover');
+  if (discoverCol) {
+    const allCols = document.querySelectorAll('.dwell-column');
+    allCols.forEach(col => col.classList.remove('is-expanded'));
+    discoverCol.classList.add('is-expanded');
+  }
+}
+
+/* ── Live Multi-Translation & Cross-Reference Engine ── */
+async function fetchParallelTranslationVerse(book, chapter, verse, translation) {
+  try {
+    const formattedRef = encodeURIComponent(`${book} ${chapter}:${verse}`);
+    const res = await fetch(`https://bible-api.com/${formattedRef}?translation=${translation}`);
+    const data = await res.json();
+    if (data && data.text) {
+      return data.text.trim();
     }
+  } catch (e) {}
+  return null;
+}
+
+async function showExpandDetail(e, btn, verseNum, type) {
+  if (e) {
+    e.stopPropagation();
+    e.preventDefault();
   }
-  updateNavShell();
-}
+  const p = btn.closest('p');
+  if (!p) return;
 
-function tapVerseTile(e, v){
-  e.stopPropagation();
-  state.charVerse = v;
-  document.querySelectorAll('.verse-tile').forEach(t=>t.classList.toggle('selected', Number(t.dataset.v)===v));
-  updateNavShell();
-}
+  p.querySelectorAll('.expand-act-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
 
-function checkPassageScroll(){
-  const el = document.getElementById('passageScrollEl');
-  if (!el) return;
-  const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 45;
-  if (atBottom && !state.scrolledToEnd) {
-    state.scrolledToEnd = true;
-    updateNavShell();
+  let drawer = p.querySelector('.expand-detail-drawer');
+  if (!drawer) {
+    drawer = document.createElement('div');
+    drawer.className = 'expand-detail-drawer';
+    p.appendChild(drawer);
   }
+
+  drawer.innerHTML = `<em>Loading canonical data...</em>`;
+
+  if (type === 'cross') {
+    const tsk = mark2TSKCrossReferences[verseNum] || `Covenant echoes & thematic references for ${currentBook} ${currentChapter}:${verseNum}.`;
+    drawer.innerHTML = `<strong>Treasury of Scripture Knowledge (TSK) Cross-References</strong>${tsk}`;
+    expandInspections[verseNum] = { type: 'cross', text: tsk, heading: 'TSK Cross-Ref' };
+  } else if (type === 'nlt') {
+    const liveVerse = await fetchParallelTranslationVerse(currentBook, currentChapter, verseNum, 'bbe');
+    const text = liveVerse || `[Dynamic translation comparison for ${currentBook} ${currentChapter}:${verseNum}]`;
+    drawer.innerHTML = `<strong>Dynamic Thought-for-Thought (BBE / Clear Phrasing)</strong>“${text}”`;
+    expandInspections[verseNum] = { type: 'nlt', text: text, heading: 'Dynamic (BBE)' };
+  } else if (type === 'esv') {
+    const liveVerse = await fetchParallelTranslationVerse(currentBook, currentChapter, verseNum, 'kjv');
+    const text = liveVerse || `[Literal formal translation for ${currentBook} ${currentChapter}:${verseNum}]`;
+    drawer.innerHTML = `<strong>Literal Word-for-Word (KJV / Formal Equivalence)</strong>“${text}”`;
+    expandInspections[verseNum] = { type: 'esv', text: text, heading: 'Literal (KJV)' };
+  }
+
+  syncCanvases();
 }
 
-function renderVocabReview(){
-  const box = document.getElementById('vocabReviewBox');
-  if (state.wordTaps.length === 0) {
-    box.innerHTML = `<div class="glossary-panel"><div class="review-def-entry" style="border:none; opacity:0.7;">No words highlighted yet!</div></div>`;
+function toggleExpandVerse(pElement) {
+  const verseNum = pElement.getAttribute('data-verse') || "1";
+  const existingToolbar = pElement.querySelector('.expand-verse-actions');
+
+  if (existingToolbar) {
+    existingToolbar.remove();
+    const existingDrawer = pElement.querySelector('.expand-detail-drawer');
+    if (existingDrawer) existingDrawer.remove();
+    pElement.classList.remove('active-verse-inspect');
+    delete expandInspections[verseNum];
+    syncCanvases();
     return;
   }
-  
-  const defined = [];
-  const undefinedWords = [];
-  const seen = new Set();
 
-  state.wordTaps.forEach(w => {
-    const norm = normWord(w.word);
-    if (seen.has(norm)) return;
-    seen.add(norm);
+  document.querySelectorAll('.expand-verse-actions, .expand-detail-drawer').forEach(el => el.remove());
+  document.querySelectorAll('.active-verse-inspect').forEach(el => el.classList.remove('active-verse-inspect'));
 
-    const fullDef = defs[w.key] || defs[norm];
-    if (fullDef) {
-      defined.push({ word: w.word, def: fullDef });
-    } else {
-      undefinedWords.push(w.word);
-    }
-  });
+  pElement.classList.add('active-verse-inspect');
 
-  let html = '<div class="glossary-panel">';
-  if (defined.length > 0) {
-    html += `<div class="review-section-header"><i class="fa-solid fa-book-bookmark"></i> Defined Terms</div>`;
-    html += defined.map((w,i) => `<div class="review-def-entry"><span class="term-word"><span class="gloss-num">${i+1}</span>${w.word}</span>${w.def}</div>`).join('');
-  }
-  if (undefinedWords.length > 0) {
-    html += `<div class="review-section-header"><i class="fa-solid fa-magnifying-glass"></i> Terms to Define</div>
-             <div class="pill-cloud">${undefinedWords.map(word => `<div class="research-pill">${word}</div>`).join('')}</div>`;
-  }
-  html += '</div>';
-  box.innerHTML = html;
+  const toolbar = document.createElement('div');
+  toolbar.className = 'expand-verse-actions';
+  toolbar.innerHTML = `
+    <span style="opacity:0.75;">Compare v.${verseNum}:</span>
+    <button type="button" class="expand-act-btn" onclick="showExpandDetail(event, this, '${verseNum}', 'nlt')">Dynamic</button>
+    <button type="button" class="expand-act-btn" onclick="showExpandDetail(event, this, '${verseNum}', 'esv')">Literal</button>
+    <button type="button" class="expand-act-btn" onclick="showExpandDetail(event, this, '${verseNum}', 'cross')">TSK Cross-Ref</button>
+  `;
+  pElement.appendChild(toolbar);
 }
 
-function handleCustomTrait(val){ 
-  state.trait = val; 
-  updateNavShell();
+/* ── Isolated Step Canvas vs Cumulative Live Canvas Architecture ── */
+let currentHighlightColor = '#ff7875';
+
+function setHighlightColor(colorHex, el) {
+  currentHighlightColor = colorHex;
+  document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+  if (el) el.classList.add('active');
 }
 
-function renderFinalReflection(){
-  const trait = state.trait && state.trait.trim() ? state.trait.trim() : 'Holy';
-  const traitEl = document.getElementById('finalGodIsTrait');
-  if (traitEl) traitEl.textContent = trait;
-}
-
-/* 2 MINUTE TIMER LOGIC */
-let timerSeconds = 120;
-let timerInterval = null;
-let timerRunning = false;
-
-function toggleTimer(){
-  const card = document.getElementById('timerCard');
-  const btn = document.getElementById('timerBtn');
-  const digits = document.getElementById('timerDigits');
-  
-  if (timerRunning) {
-    clearInterval(timerInterval);
-    timerRunning = false;
-    card.classList.remove('running');
-    btn.innerHTML = '<i class="fa-solid fa-play"></i> Resume';
+function applyTokenHighlight(tokenKey, color) {
+  if (tokenHighlights[tokenKey] === color) {
+    delete tokenHighlights[tokenKey];
   } else {
-    if (timerSeconds <= 0) timerSeconds = 120;
-    timerRunning = true;
-    card.classList.add('running');
-    btn.innerHTML = '<i class="fa-solid fa-pause"></i> Pause';
-    
-    timerInterval = setInterval(() => {
-      timerSeconds--;
-      const mins = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
-      const secs = String(timerSeconds % 60).padStart(2, '0');
-      digits.textContent = `${mins}:${secs}`;
-      
-      if (timerSeconds <= 0) {
-        clearInterval(timerInterval);
-        timerRunning = false;
-        card.classList.remove('running');
-        btn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> Restart';
+    tokenHighlights[tokenKey] = color;
+  }
+  syncCanvases();
+}
+
+function syncCanvases() {
+  // 1. Discover Card: Clean text only
+  const discoverCard = document.querySelector('.scripture-body[data-step="discover"]');
+  if (discoverCard) {
+    discoverCard.querySelectorAll('.dw-word').forEach(w => w.style.backgroundColor = 'transparent');
+    discoverCard.querySelectorAll('p').forEach(p => p.classList.remove('character-underline'));
+  }
+
+  // 2. Word Work Card: ONLY Word Work Highlights
+  const wordworkCard = document.querySelector('.scripture-body[data-step="wordwork"]');
+  if (wordworkCard) {
+    wordworkCard.querySelectorAll('.dw-word').forEach(w => {
+      const key = w.getAttribute('data-token');
+      w.style.backgroundColor = tokenHighlights[key] || 'transparent';
+    });
+    wordworkCard.querySelectorAll('p').forEach(p => p.classList.remove('character-underline'));
+  }
+
+  // 3. Expand Card: Clean text + active verse inspection
+  const expandCard = document.querySelector('.scripture-body[data-step="expand"]');
+  if (expandCard) {
+    expandCard.querySelectorAll('.dw-word').forEach(w => w.style.backgroundColor = 'transparent');
+    expandCard.querySelectorAll('p').forEach(p => p.classList.remove('character-underline'));
+  }
+
+  // 4. Learn Card: ONLY Learn Underlines
+  const learnCard = document.querySelector('.scripture-body[data-step="learn"]');
+  if (learnCard) {
+    learnCard.querySelectorAll('.dw-word').forEach(w => w.style.backgroundColor = 'transparent');
+    learnCard.querySelectorAll('p[data-verse]').forEach(p => {
+      const vNum = p.getAttribute('data-verse');
+      if (verseUnderlines[vNum]) {
+        p.classList.add('character-underline');
+      } else {
+        p.classList.remove('character-underline');
       }
-    }, 1000);
+    });
   }
-}
 
-let clueTimeout = null;
-function showBadgeClue(text, iconClass){
-  const badge = document.getElementById('clueBadge');
-  const badgeText = document.getElementById('clueBadgeText');
-  const badgeIcon = badge ? badge.querySelector('i') : null;
-  if (!badge || !badgeText) return;
-  badgeText.textContent = text;
-  if (badgeIcon) badgeIcon.className = iconClass || 'fa-solid fa-circle-exclamation';
-  badge.style.display = 'flex';
-
-  clearTimeout(clueTimeout);
-  clueTimeout = setTimeout(() => {
-    badge.style.display = 'none';
-  }, 2200);
-}
-
-function triggerGateShake(msg, elementId, iconClass){
-  const el = document.getElementById(elementId) || document.getElementById('shellNextBtn');
-  if (el) {
-    el.classList.remove('shake-warn');
-    void el.offsetWidth;
-    el.classList.add('shake-warn');
-    setTimeout(() => el.classList.remove('shake-warn'), 600);
-  }
-  showBadgeClue(msg, iconClass);
-}
-
-function handleForwardAttempt(){
-  const b = beats[state.index];
-  if (b.blockTap) {
-    if ((b.id === 'quest-testament' || b.id === 'quest-section') && !answeredBeats.has(state.index)) { 
-      triggerGateShake('Pick an answer to continue', 'shellNextBtn', 'fa-solid fa-hand-point-up'); 
-      return; 
-    }
-    if (b.id === 'vocab-scan') {
-      if (!state.wordTaps.length && !state.scrolledToEnd) {
-        triggerGateShake('Highlight at least 1 word & scroll down!', 'vocabActionPill');
-        return;
-      } else if (!state.wordTaps.length) {
-        triggerGateShake('Highlight at least 1 word!', 'vocabActionPill');
-        return;
-      } else if (!state.scrolledToEnd) {
-        triggerGateShake('Scroll to the bottom first!', 'vocabActionPill');
-        return;
+  // 5. Live Card: CULMINATING CANVAS (Combines Highlights, Underlines & Expand notes)
+  const liveCard = document.querySelector('.scripture-body[data-step="live"]');
+  if (liveCard) {
+    liveCard.querySelectorAll('.dw-word').forEach(w => {
+      const key = w.getAttribute('data-token');
+      w.style.backgroundColor = tokenHighlights[key] || 'transparent';
+    });
+    liveCard.querySelectorAll('p[data-verse]').forEach(p => {
+      const vNum = p.getAttribute('data-verse');
+      if (verseUnderlines[vNum]) {
+        p.classList.add('character-underline');
+      } else {
+        p.classList.remove('character-underline');
       }
-    }
-    if (b.id === 'char-verse-pick' && state.charVerse === null) { 
-      triggerGateShake('Tap a verse to select!', 'verseActionPill'); 
-      return; 
-    }
-    if (b.id === 'char-coaching' && !(state.trait && state.trait.trim())) { 
-      triggerGateShake('Fill in the blank to continue!'); 
-      return; 
-    }
-  }
-  goNext();
-}
 
-function fitCharVerseText(){
-  const vt = document.getElementById('charText');
-  const card = vt ? vt.closest('.dark-scripture-card') : null;
-  const beatEl = card ? card.closest('.beat') : null;
-  if (!vt || !card || !beatEl) return;
-  vt.style.fontSize = '';
-  const maxFont = parseFloat(getComputedStyle(vt).fontSize);
-  let fontSize = maxFont;
-  const minFont = Math.max(11, maxFont * 0.5);
-  let guard = 0;
-  while (beatEl.scrollHeight > beatEl.clientHeight + 2 && fontSize > minFont && guard < 50) {
-    fontSize -= 0.5;
-    vt.style.fontSize = fontSize + 'px';
-    guard++;
-  }
-}
-
-const PAGE_FLIP_BEAT_IDS = ['reading-intro', 'character-prompt'];
-function goNext(){
-  if (state.index < beats.length - 1) {
-    const leavingBeat = beats[state.index];
-    if (PAGE_FLIP_BEAT_IDS.includes(leavingBeat.id)) {
-      const el = document.getElementById('beat-' + state.index);
-      if (el) {
-        el.classList.add('page-flip-exit');
-        setTimeout(() => {
-          el.classList.remove('page-flip-exit');
-          state.index++; renderBeat(state.index);
-        }, 380);
-        return;
+      // Render expand inspection notes inside Live step if referenced
+      const existingDrawer = p.querySelector('.expand-detail-drawer');
+      if (expandInspections[vNum]) {
+        if (!existingDrawer) {
+          const drawer = document.createElement('div');
+          drawer.className = 'expand-detail-drawer';
+          drawer.innerHTML = `<strong>${expandInspections[vNum].heading}</strong>${expandInspections[vNum].text}`;
+          p.appendChild(drawer);
+        }
+      } else if (existingDrawer) {
+        existingDrawer.remove();
       }
-    }
-    state.index++; renderBeat(state.index);
+    });
   }
+
+  syncLiveSynthesis();
 }
 
-function goPrev(){ 
-  if (state.index > 0) { 
-    state.index--; renderBeat(state.index); 
-  } 
-}
+// Global text selection and single-click interaction handler
+document.addEventListener('mouseup', handleInteraction);
+document.addEventListener('touchend', handleInteraction);
 
-/* DEV-ONLY: palette tester — literal swatch values per theme (not live CSS
-   vars) so both cards preview correctly regardless of which is active,
-   same approach as the adult site's tester widget. */
-const devPalettes = {
-  golden: {
-    name: 'Golden Hour',
-    discover: '#e28a5c',
-    wordwork: '#d76b65',
-    expand:   '#9e6488',
-    learn:    '#5d587e',
-    live:     '#2d324f'
-  },
-  northern: {
-    name: 'Northern Depths',
-    discover: '#2dd7b2',
-    wordwork: '#23bcdf',
-    expand:   '#4576ee',
-    learn:    '#5666e1',
-    live:     '#212a73'
-  }
-};
+function handleInteraction(e) {
+  const targetCard = e.target.closest('.scripture-body');
+  if (!targetCard) return;
 
-function renderPaletteTester() {
-  const list = document.getElementById('palettePanelList');
-  if (!list) return;
-  const current = document.documentElement.getAttribute('data-theme') || 'golden';
-  list.innerHTML = '';
-  Object.keys(devPalettes).forEach(key => {
-    const pal = devPalettes[key];
-    const card = document.createElement('button');
-    card.type = 'button';
-    card.className = 'ptp-card' + (key === current ? ' active' : '');
-    card.onclick = () => applyDevTheme(key);
-    card.innerHTML = `
-      <span class="ptp-name">${pal.name}</span>
-      <span class="ptp-swatches">
-        <span style="background:${pal.discover}"></span>
-        <span style="background:${pal.wordwork}"></span>
-        <span style="background:${pal.expand}"></span>
-        <span style="background:${pal.learn}"></span>
-        <span style="background:${pal.live}"></span>
-      </span>`;
-    list.appendChild(card);
-  });
-}
+  const step = targetCard.getAttribute('data-step');
+  const selection = window.getSelection();
+  const hasDragSelection = selection && selection.rangeCount > 0 && !selection.isCollapsed && selection.toString().trim().length > 0;
 
-function applyDevTheme(key) {
-  document.documentElement.setAttribute('data-theme', key);
-  renderPaletteTester();
-}
-
-function togglePaletteTester(event) {
-  if (event) event.stopPropagation();
-  document.getElementById('paletteTesterWrap').classList.toggle('open');
-}
-
-function toggleFullScreen() {
-  if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(err => console.log(err));
-  else if (document.exitFullscreen) document.exitFullscreen();
-}
-
-document.addEventListener('keydown', (e) => {
-  const inField = e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable;
-  if (!inField && (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'PageDown' || e.key === 'PageUp')) {
-    const scrollable = document.querySelector(
-      '.beat.active .passage-scroll, .beat.active .verse-pick-list, .beat.active .review-scroll'
-    );
-    if (scrollable) {
-      const amount = (e.key === 'PageDown' || e.key === 'PageUp')
-        ? scrollable.clientHeight * 0.9
-        : 220;
-      const dir = (e.key === 'ArrowDown' || e.key === 'PageDown') ? 1 : -1;
-      scrollable.scrollBy({ top: amount * dir, behavior: 'smooth' });
+  // 1. EXPAND STEP: Click verse to show comparison toolbar
+  if (step === 'expand') {
+    if (e.target.closest('.expand-verse-actions') || e.target.closest('.expand-detail-drawer')) {
       return;
     }
-  }
-  if (e.key === 'ArrowRight') handleForwardAttempt();
-  if (e.key === 'ArrowLeft') goPrev();
-  if (e.key.toLowerCase() === 'f' && e.target.tagName !== 'INPUT') toggleFullScreen();
-});
-
-/* TAP-ZONE + SWIPE NAVIGATION */
-(function initGestureNav(){
-  const stageEl = document.getElementById('stage');
-  if (!stageEl) return;
-  const LEFT_ZONE = 0.28;
-  const SWIPE_THRESHOLD = 60;
-  let lastSwipeTime = 0;
-
-  stageEl.addEventListener('click', (e) => {
-    if (Date.now() - lastSwipeTime < 500) return;
-    const b = beats[state.index];
-    const rect = stageEl.getBoundingClientRect();
-    const relX = (e.clientX - rect.left) / rect.width;
-    if (relX < LEFT_ZONE) {
-      goPrev();
-    } else if (!b.blockTap) {
-      goNext();
+    const p = e.target.closest('p');
+    if (p && targetCard.contains(p)) {
+      toggleExpandVerse(p);
     }
-  });
+    return;
+  }
 
-  let touchStartX = 0, touchStartY = 0, touchTracking = false;
-  stageEl.addEventListener('touchstart', (e) => {
-    if (e.touches.length !== 1) return;
-    touchStartX = e.touches[0].clientX;
-    touchStartY = e.touches[0].clientY;
-    touchTracking = true;
-  }, { passive: true });
-
-  stageEl.addEventListener('touchend', (e) => {
-    if (!touchTracking) return;
-    touchTracking = false;
-    const touch = e.changedTouches[0];
-    const dx = touch.clientX - touchStartX;
-    const dy = touch.clientY - touchStartY;
-    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > SWIPE_THRESHOLD) {
-      lastSwipeTime = Date.now();
-      const b = beats[state.index];
-      if (dx < 0) {
-        if (!b.blockTap) goNext();
-        else handleForwardAttempt();
+  // 2. LEARN STEP: Isolated Underline Toggle
+  if (step === 'learn') {
+    const p = e.target.closest('p');
+    if (p && targetCard.contains(p)) {
+      const vNum = p.getAttribute('data-verse');
+      if (verseUnderlines[vNum]) {
+        delete verseUnderlines[vNum];
       } else {
-        goPrev();
+        verseUnderlines[vNum] = true;
+      }
+      syncCanvases();
+    }
+    return;
+  }
+
+  // 3. WORD WORK STEP: Isolated Word Highlighting
+  if (step === 'wordwork') {
+    if (hasDragSelection) {
+      const range = selection.getRangeAt(0);
+      targetCard.querySelectorAll('.dw-word').forEach(wordEl => {
+        if (range.intersectsNode(wordEl)) {
+          const key = wordEl.getAttribute('data-token');
+          tokenHighlights[key] = currentHighlightColor;
+        }
+      });
+      selection.removeAllRanges();
+      syncCanvases();
+    } else {
+      const wordEl = e.target.closest('.dw-word');
+      if (wordEl && targetCard.contains(wordEl)) {
+        const key = wordEl.getAttribute('data-token');
+        applyTokenHighlight(key, currentHighlightColor);
       }
     }
-  }, { passive: true });
-
-  stageEl.addEventListener('touchcancel', () => { touchTracking = false; }, { passive: true });
-})();
-
-const passageScrollElInit = document.getElementById('passageScrollEl');
-if (passageScrollElInit) passageScrollElInit.addEventListener('scroll', checkPassageScroll, { passive: true });
-
-/* ===================== DEV MODE ===================== */
-let devMode = false;
-let devTapCount = 0;
-let devLastTapTime = 0;
-const DEV_NOTES_KEY = 'msHangDevNotes_1_21_45';
-
-function loadDevNotes(){
-  try { return JSON.parse(localStorage.getItem(DEV_NOTES_KEY) || '{}'); }
-  catch(e){ return {}; }
-}
-function saveDevNotes(obj){
-  try { localStorage.setItem(DEV_NOTES_KEY, JSON.stringify(obj)); } catch(e){}
-}
-
-function handleEmojiTap(){
-  const now = Date.now();
-  if (now - devLastTapTime > 1500) devTapCount = 0;
-  devTapCount++;
-  devLastTapTime = now;
-  if (devTapCount >= 10) {
-    devTapCount = 0;
-    enterDevMode();
   }
 }
 
-function enterDevMode(){
-  devMode = true;
-  document.getElementById('normalProgressWrap').style.display = 'none';
-  document.getElementById('devBubblesBar').style.display = 'flex';
-  updateHeaderMeta();
-  renderDevBubbles();
-}
-
-function exitDevMode(){
-  devMode = false;
-  document.getElementById('normalProgressWrap').style.display = 'block';
-  document.getElementById('devBubblesBar').style.display = 'none';
-  updateHeaderMeta();
-  closeDevNotesPanel();
-}
-
-function renderDevBubbles(){
-  const bar = document.getElementById('devBubblesBar');
-  const notes = loadDevNotes();
-  bar.innerHTML = '';
-  beats.forEach((b, i) => {
-    const bub = document.createElement('div');
-    bub.className = 'dev-bubble' + (i === state.index ? ' active' : '');
-    bub.style.background = b.bgGrad;
-    bub.style.color = b.text === 'light' ? '#FFF' : 'var(--ink)';
-    bub.textContent = i + 1;
-    bub.title = b.id;
-    if (notes[i + '_' + b.id] && notes[i + '_' + b.id].trim()) {
-      const dot = document.createElement('div');
-      dot.className = 'note-dot';
-      bub.appendChild(dot);
-    }
-    bub.onclick = (e) => { e.stopPropagation(); state.index = i; renderBeat(i); renderDevBubbles(); };
-    bar.appendChild(bub);
-  });
-  const activeBub = bar.querySelector('.dev-bubble.active');
-  if (activeBub) activeBub.scrollIntoView({ inline: 'center', block: 'nearest' });
-}
-
-function openDevNotesPanel(){
-  const b = beats[state.index];
-  document.getElementById('dnpTitle').textContent = `Slide ${state.index + 1}: ${b.id}`;
-  const notes = loadDevNotes();
-  document.getElementById('devNoteInput').value = notes[state.index + '_' + b.id] || '';
-  document.getElementById('devAllNotesSection').style.display = 'none';
-  document.getElementById('dnpStatus').textContent = '';
-  document.getElementById('dnpRetryBtn').style.display = 'none';
-  document.getElementById('paletteTesterWrap').classList.remove('open');
-  document.getElementById('devNotesOverlay').style.display = 'flex';
-}
-function closeDevNotesPanel(){
-  document.getElementById('devNotesOverlay').style.display = 'none';
-  document.getElementById('paletteTesterWrap').classList.remove('open');
-}
-function saveCurrentDevNote(val){
-  const b = beats[state.index];
-  const notes = loadDevNotes();
-  notes[state.index + '_' + b.id] = val;
-  saveDevNotes(notes);
-  if (devMode) renderDevBubbles();
-}
-
-function clearAllDevNotes(){
-  if (!confirm('Clear all slide notes? This cannot be undone.')) return;
-  saveDevNotes({});
-  const input = document.getElementById('devNoteInput');
-  if (input) input.value = '';
-  const allNotesPanel = document.getElementById('devAllNotesPanel');
-  if (allNotesPanel) allNotesPanel.value = '';
-  if (devMode) renderDevBubbles();
-}
-
-function compileAllNotes(){
-  const notes = loadDevNotes();
-  const lines = [];
-  beats.forEach((b, i) => {
-    const key = i + '_' + b.id;
-    const txt = notes[key];
-    if (txt && txt.trim()) lines.push(`[${i}] ${b.id}:\n${txt.trim()}`);
-  });
-  return lines.length ? lines.join('\n\n') : 'No notes yet.';
-}
-
-function copyAllDevNotes(){
-  const section = document.getElementById('devAllNotesSection');
-  const panel = document.getElementById('devAllNotesPanel');
-  section.style.display = 'flex';
-  panel.value = compileAllNotes();
-  panel.focus();
-  panel.select();
-  tryCopyAllNotes();
-}
-
-function tryCopyAllNotes(){
-  const panel = document.getElementById('devAllNotesPanel');
-  const status = document.getElementById('dnpStatus');
-  const retryBtn = document.getElementById('dnpRetryBtn');
-  panel.focus();
-  panel.select();
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(panel.value).then(() => {
-      status.textContent = '✓ Copied to clipboard';
-      status.className = 'dnp-status ok';
-      retryBtn.style.display = 'none';
-    }).catch(() => {
-      status.textContent = 'Copy failed — select the text above and copy manually.';
-      status.className = 'dnp-status warn';
-      retryBtn.style.display = 'inline-block';
-    });
+/* ── Live Step Compilation & Summary Sheet Modal ── */
+function syncLiveSynthesis() {
+  const inputVal = document.getElementById('learnStatementInput').value.trim();
+  const preview = document.getElementById('formulaLearnPreview');
+  if (inputVal) {
+    preview.textContent = inputVal;
+    preview.style.fontStyle = 'normal';
+    preview.style.fontWeight = '600';
   } else {
-    status.textContent = 'Clipboard unavailable — select the text above and copy manually.';
-    status.className = 'dnp-status warn';
-    retryBtn.style.display = 'inline-block';
+    preview.textContent = '[Complete the Learn step to populate God\'s character]';
+    preview.style.fontStyle = 'italic';
+    preview.style.fontWeight = 'normal';
   }
 }
 
-initNotches();
-renderPaletteTester();
-renderBeat(0);
+function openSummaryModal() {
+  const meta = fallbackMetadata[currentBook] || fallbackMetadata["default"];
+  document.getElementById('cardPassageHeading').textContent = `${currentBook} ${currentChapter} • Dwell Study Card`;
+  document.getElementById('summarySceneText').textContent = `Author: ${meta.author} • Audience: ${meta.audience} • Time: ${meta.time} • Purpose: ${meta.purpose}`;
+  
+  const mainPoint = document.getElementById('wordworkMainPointInput').value.trim();
+  document.getElementById('summaryMainPoint').textContent = mainPoint || "[No main point recorded in Word Work]";
+
+  const learnVal = document.getElementById('learnStatementInput').value.trim();
+  document.getElementById('summaryLearnText').textContent = learnVal ? `Because God is ${learnVal}` : "[Incomplete in Step 4: Learn]";
+
+  const liveVal = document.getElementById('liveTransformationInput').value.trim();
+  document.getElementById('summaryLiveText').textContent = liveVal ? `Therefore I will ${liveVal}` : "[Incomplete in Step 5: Live]";
+
+  document.getElementById('summaryModal').classList.add('active');
+}
+
+function closeSummaryModal(event) {
+  if (event) event.stopPropagation();
+  document.getElementById('summaryModal').classList.remove('active');
+}
+
+function copyDwellCard() {
+  const heading = document.getElementById('cardPassageHeading').textContent;
+  const scene = document.getElementById('summarySceneText').textContent;
+  const mainPoint = document.getElementById('summaryMainPoint').textContent;
+  const learn = document.getElementById('summaryLearnText').textContent;
+  const live = document.getElementById('summaryLiveText').textContent;
+
+  const textToCopy = `=== ${heading} ===\n\n1. DISCOVER (Historical Background)\n${scene}\n\n2. WORD WORK (Main Point)\n${mainPoint}\n\n3. LEARN (Timeless Truth)\n${learn}\n\n4. LIVE (Personal Practice & Prayer)\n${live}\n\n[Studied via Dwell Biblical Literacy Framework]`;
+
+  navigator.clipboard.writeText(textToCopy).then(() => {
+    const btn = document.getElementById('copyDwellBtn');
+    btn.innerHTML = `<span>✓ Copied to Clipboard!</span>`;
+    setTimeout(() => {
+      btn.innerHTML = `<span>Copy Completed Study</span>`;
+    }, 2500);
+  });
+}
+
+/* ── Palette Switcher ── */
+const palettes = [
+  {
+    id: "golden-hour-horizon",
+    name: "1. Golden Hour Horizon",
+    tag: "Contrast-Corrected",
+    tokens: {
+      "--ink": "#211a24",
+      "--paper": "#f2ece6",
+      "--paper-dim": "#e8e0d7",
+      "--d-discover": "#e28a5c",
+      "--d-wordwork": "#d76b65",
+      "--d-expand": "#9e6488",
+      "--d-learn": "#5d587e",
+      "--d-live": "#2d324f",
+      "--d-intro-text": "var(--ink)",
+      "--d-discover-text": "#ffffff",
+      "--d-wordwork-text": "#ffffff",
+      "--d-expand-text": "#ffffff",
+      "--d-learn-text": "#ffffff",
+      "--d-live-text": "#ffffff"
+    }
+  },
+  {
+    id: "northern-depths",
+    name: "2. Northern Depths",
+    tag: "Contrast-Corrected",
+    tokens: {
+      "--ink": "#142129",
+      "--paper": "#f5f9fb",
+      "--paper-dim": "#e2edf2",
+      "--d-discover": "#38b2a3",
+      "--d-wordwork": "#1d788a",
+      "--d-expand": "#295b87",
+      "--d-learn": "#2d3766",
+      "--d-live": "#141933",
+      "--d-intro-text": "var(--ink)",
+      "--d-discover-text": "#ffffff",
+      "--d-wordwork-text": "#ffffff",
+      "--d-expand-text": "#ffffff",
+      "--d-learn-text": "#ffffff",
+      "--d-live-text": "#ffffff"
+    }
+  },
+  {
+    id: "coastal-dusk-amber",
+    name: "3. Coastal Amber to Teal",
+    tag: "Original (WebAIM Compliant)",
+    tokens: {
+      "--ink": "#182326",
+      "--paper": "#f7faf9",
+      "--paper-dim": "#e8eeeb",
+      "--d-discover": "#e08d53",
+      "--d-wordwork": "#c27471",
+      "--d-expand": "#7d6e87",
+      "--d-learn": "#4c6674",
+      "--d-live": "#223942",
+      "--d-intro-text": "var(--ink)",
+      "--d-discover-text": "#ffffff",
+      "--d-wordwork-text": "#ffffff",
+      "--d-expand-text": "#ffffff",
+      "--d-learn-text": "#ffffff",
+      "--d-live-text": "#ffffff"
+    }
+  }
+];
+
+let activePaletteId = "golden-hour-horizon";
+
+function renderTester() {
+  const palList = document.getElementById("paletteList");
+  if (palList) {
+    palList.innerHTML = "";
+    palettes.forEach(pal => {
+      const card = document.createElement("div");
+      card.className = `tester-card ${pal.id === activePaletteId ? 'active' : ''}`;
+      card.onclick = (e) => { e.stopPropagation(); applyPalette(pal.id); };
+      card.innerHTML = `
+        <div class="tester-card-name"><span>${pal.name}</span><span class="tag">${pal.tag}</span></div>
+        <div class="tester-swatches">
+          <span style="background:${pal.tokens['--d-discover']}"></span>
+          <span style="background:${pal.tokens['--d-wordwork']}"></span>
+          <span style="background:${pal.tokens['--d-expand']}"></span>
+          <span style="background:${pal.tokens['--d-learn']}"></span>
+          <span style="background:${pal.tokens['--d-live']}"></span>
+        </div>
+      `;
+      palList.appendChild(card);
+    });
+  }
+}
+
+function applyPalette(id) {
+  const selected = palettes.find(c => c.id === id);
+  if (!selected) return;
+  activePaletteId = id;
+  const root = document.documentElement;
+  for (const [prop, val] of Object.entries(selected.tokens)) {
+    root.style.setProperty(prop, val);
+  }
+  renderTester();
+}
+
+function toggleTester(event) {
+  if (event) event.stopPropagation();
+  document.getElementById("testerPanel").classList.toggle("open");
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  populateBookDropdown();
+  renderTester();
+  applyPalette("golden-hour-horizon");
+});
 </script>
+
 </body>
 </html>
