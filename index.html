@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Dwell Guide — Mark 2</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -229,6 +230,8 @@
   .rail-font-btn:disabled{ opacity: 0.2; cursor: default; }
   .rail-font-btn:disabled:active{ transform: none; }
   @media (max-width: 767px) {
+    /* Mobile: keep just the two colors that match the highlighting instructions
+       (yellow = confusing, pink/red = repeated). Font size controls stay hidden. */
     .rail-swatch-btn[data-color="lime"],
     .rail-swatch-btn[data-color="purple"],
     .rail-font-btn { display: none; }
@@ -727,6 +730,7 @@
   .circle-hero .static-trait{ font-family:'Inter', sans-serif; font-size:clamp(16px, 2.2vh, 22px); font-weight:900; color:var(--purple); text-transform:capitalize; border-bottom:3px solid var(--ink); padding:2px 12px; margin-bottom:4px; }
   .blank-input{ width:88%; max-width:88%; border:none; border-bottom:3.5px solid var(--ink); background:transparent; font-family:'Inter', sans-serif; font-size:clamp(16px, 2.2vh, 20px); font-weight:800; text-align:center; outline:none; color:var(--purple); padding:2px 0; }
 
+  /* Beat 3 specific God Is Circle size boost */
   #beat-3 .circle-hero {
     width: clamp(200px, 28vh, 280px);
     height: clamp(200px, 28vh, 280px);
@@ -912,18 +916,18 @@
   }
   .verse-tile{ display:flex; gap:16px; align-items:flex-start; padding:14px 16px; cursor:pointer; transition:background .13s ease; color:var(--ink); border-radius:16px; width:100%; }
   .verse-tile.selected{ background:var(--lime); }
-  .verse-tile .vnum{ font-family:'Space Grotesk', sans-serif; font-weight:800; color:var(--purple); flex-shrink:0; width:34px; font-size:clamp(18px, 2.2vh, 22px); }
-  .verse-tile .vtext{ font-size:clamp(18px, 2.3vh, 22px); line-height:1.75; font-family:'Inter',sans-serif; font-weight:400; }
+  .verse-tile .vnum{ font-family:'Space Grotesk', sans-serif; font-weight:800; color:var(--purple); flex-shrink:0; width:34px; font-size:calc(clamp(18px, 2.2vh, 22px) * var(--char-font-scale, 1)); }
+  .verse-tile .vtext{ font-size:calc(clamp(18px, 2.3vh, 22px) * var(--char-font-scale, 1)); line-height:1.75; font-family:'Inter',sans-serif; font-weight:400; }
   @media (min-width: 768px) {
     .verse-pick-list{ max-width:960px; }
     .verse-tile{ padding:18px 22px; gap:20px; }
-    .verse-tile .vnum{ font-size:24px; width:40px; }
-    .verse-tile .vtext{ font-size:clamp(22px, 2.4vw, 26px); line-height:1.8; }
+    .verse-tile .vnum{ font-size:calc(24px * var(--char-font-scale, 1)); width:40px; }
+    .verse-tile .vtext{ font-size:calc(clamp(22px, 2.4vw, 26px) * var(--char-font-scale, 1)); line-height:1.8; }
   }
   @media (min-width: 1200px) {
     .verse-pick-list{ max-width:1300px; }
-    .verse-tile .vnum{ font-size:28px; width:48px; }
-    .verse-tile .vtext{ font-size:clamp(25px, 2vw, 32px); line-height:1.85; }
+    .verse-tile .vnum{ font-size:calc(28px * var(--char-font-scale, 1)); width:48px; }
+    .verse-tile .vtext{ font-size:calc(clamp(25px, 2vw, 32px) * var(--char-font-scale, 1)); line-height:1.85; }
   }
 
   .review-scroll{ flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; position:relative; z-index:2; padding:4px 8px 12px 4px; width:100%; max-width:1100px; margin:0 auto; display:flex; flex-direction:column; justify-content:flex-start; }
@@ -1215,7 +1219,7 @@
   .dev-bubble.active{ border:3px solid var(--ink); box-shadow:0 0 0 3px rgba(255,255,255,0.6); }
   .dev-bubble .note-dot{ position:absolute; top:-3px; right:-3px; width:9px; height:9px; border-radius:50%; background:var(--yellow); border:1.5px solid var(--ink); }
 
-  .dev-notes-overlay{ position:fixed; inset:0; z-index:9990; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; padding:24px; }
+  .dev-notes-overlay{ position:absolute; inset:0; z-index:200; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; padding:24px; }
   .dev-notes-panel{ background:#fff; color:var(--ink); border:4px solid var(--ink); border-radius:20px; padding:20px; width:100%; max-width:520px; max-height:85vh; overflow-y:auto; box-shadow:6px 6px 0 var(--ink); display:flex; flex-direction:column; gap:12px; font-family:'Inter',sans-serif; }
   .dev-notes-panel h3{ font-family:'Space Grotesk',sans-serif; margin:0; font-size:16px; text-transform:uppercase; }
   .dev-notes-panel textarea{ width:100%; min-height:90px; border:2.5px solid var(--ink); border-radius:10px; padding:10px; font-family:'Inter',sans-serif; font-size:14px; resize:vertical; }
@@ -1234,16 +1238,7 @@
   .share-trigger-btn:active{ transform:translate(2px,2px); box-shadow:1px 1px 0 var(--ink); }
   .share-trigger-btn i{ font-size:13px; }
 
-  .share-overlay{ 
-    position:fixed; 
-    inset:0; 
-    z-index:9999; 
-    background:rgba(0,0,0,0.65); 
-    display:flex; 
-    align-items:center; 
-    justify-content:center; 
-    padding:22px; 
-  }
+  .share-overlay{ position:absolute; inset:0; z-index:210; background:rgba(0,0,0,0.65); display:flex; align-items:center; justify-content:center; padding:22px; }
   .share-panel{ background:#fff; color:var(--ink); border:4px solid var(--ink); border-radius:20px; padding:22px; width:100%; max-width:380px; max-height:90vh; overflow-y:auto; box-shadow:6px 6px 0 var(--ink); display:flex; flex-direction:column; align-items:center; gap:16px; font-family:'Inter',sans-serif; }
   .share-panel h3{ font-family:'Space Grotesk',sans-serif; margin:0; font-size:13.5px; text-transform:uppercase; letter-spacing:1px; align-self:flex-start; }
   .share-card-stage{ width:100%; aspect-ratio:1/1; border-radius:16px; border:3.5px solid var(--ink); display:flex; align-items:center; justify-content:center; padding:22px; transition:background .25s ease; }
@@ -1257,6 +1252,7 @@
   .share-action-btn.secondary{ background:#eee; }
   .share-action-btn:disabled{ opacity:.6; cursor:default; }
   @media (min-width:768px){
+    .share-trigger-btn{ display:none; }
     .share-panel{ max-width:420px; padding:26px; }
   }
   .dnp-status.ok{ color:#1a7a3c; }
@@ -1331,7 +1327,6 @@
     </div>
   </div>
 
-  <!-- SHARE OVERLAY MODAL -->
   <div class="share-overlay" id="shareOverlay" style="display:none;" onclick="closeShareOverlay();">
     <div class="share-panel" onclick="event.stopPropagation();">
       <h3>Share Your Central Truth</h3>
@@ -1369,6 +1364,8 @@
     </div>
   </div>
 </div>
+
+<div id="exportTarget" style="position:fixed; left:-9999px; top:0; width:420px;"></div>
 
 <script>
 const PASSAGE_START_VERSE = 1;
@@ -1438,7 +1435,7 @@ const phrases = [
   { words:['lord','of','the','sabbath'], key:'lordofthesabbath' }
 ];
 
-const state = { index:0, wordTaps:[], charVerse:null, trait:'', scrolledToEnd:false, activeTool:{ vocab:null, char:null }, passageFontLevel:2 };
+const state = { index:0, wordTaps:[], charVerse:null, trait:'', scrolledToEnd:false, activeTool:{ vocab:null, char:null }, passageFontLevel:2, charFontLevel:2 };
 const FONT_LEVELS = [0.85, 0.925, 1, 1.1, 1.2, 1.3];
 let renderGen = 0;
 
@@ -1512,7 +1509,7 @@ const beats = [
             <div class="intro-duration"><i class="fa-regular fa-clock"></i> Prep Duration: 5 min</div>
           ` },
 
-  /* 1. LOCATE MARK: TESTAMENT */
+  /* 1. LOCATE MARK: TESTAMENT (MANILA TABBED FOLDER) */
   { id:'quest-testament', type:'input', blockTap:true, isInteractive:true, clue:'Pick an answer to continue', bgGrad:'var(--bg-expand)', text:'dark',
     html:`<div class="sketch-lead-title tight quest-question-title" style="color: #FFFFFF;">What testament is the book of <span class="locator-emphasis">Mark</span> in?</div>
           <div class="nt-folder-wrap">
@@ -1533,7 +1530,7 @@ const beats = [
             </div>
           </div>` },
 
-  /* 2. LOCATE MARK: SECTION */
+  /* 2. LOCATE MARK: SECTION (MANILA TABBED FOLDER) */
   { id:'quest-section', type:'input', blockTap:true, isInteractive:true, clue:'Pick an answer to continue', bgGrad:'var(--bg-expand)', text:'dark',
     html:`<div class="sketch-lead-title tight quest-question-title" style="color: #FFFFFF;">What section is the book of <span class="locator-emphasis">Mark</span> in?</div>
           <div class="nt-folder-wrap">
@@ -1691,7 +1688,7 @@ const beats = [
               <div class="final-mobile-subtext">
                 Take a few quiet minutes to journal and pray through this on your own.
               </div>
-              <button class="share-trigger-btn" id="shareTruthBtn" onclick="event.stopPropagation(); triggerShareFlow();" style="margin-top:14px;">
+              <button class="share-trigger-btn" id="shareTruthBtn" onclick="event.stopPropagation(); shareCentralTruthDirect();" style="margin-top:14px;">
                 <i class="fa-solid fa-arrow-up-from-bracket"></i> Share Your Central Truth
               </button>
             </div>
@@ -1830,6 +1827,14 @@ function updateNavShell(){
       ${swatchHtml}
       <button class="rail-font-btn" title="Decrease text size" aria-label="Decrease text size" ${atMin ? 'disabled' : ''} onclick="event.stopPropagation(); adjustPassageFont(-1);">−</button>
     `;
+  } else if (b.id === 'char-verse-pick') {
+    rail.style.display = 'flex';
+    const atMax = state.charFontLevel >= FONT_LEVELS.length - 1;
+    const atMin = state.charFontLevel <= 0;
+    rail.innerHTML = `
+      <button class="rail-font-btn" title="Increase text size" aria-label="Increase text size" ${atMax ? 'disabled' : ''} onclick="event.stopPropagation(); adjustCharFont(1);">+</button>
+      <button class="rail-font-btn" title="Decrease text size" aria-label="Decrease text size" ${atMin ? 'disabled' : ''} onclick="event.stopPropagation(); adjustCharFont(-1);">−</button>
+    `;
   } else {
     rail.style.display = 'none';
   }
@@ -1933,6 +1938,18 @@ function adjustPassageFont(delta){
   updateNavShell();
 }
 
+function applyCharFontScale(){
+  document.documentElement.style.setProperty('--char-font-scale', FONT_LEVELS[state.charFontLevel]);
+}
+
+function adjustCharFont(delta){
+  const next = state.charFontLevel + delta;
+  if (next < 0 || next >= FONT_LEVELS.length) return;
+  state.charFontLevel = next;
+  applyCharFontScale();
+  updateNavShell();
+}
+
 function tapWord(e, el){
   e.stopPropagation();
   const key = el.dataset.word;
@@ -1963,7 +1980,6 @@ function tapWord(e, el){
       state.wordTaps = state.wordTaps.filter(w => w.el !== el);
     } else {
       el.classList.add('flagged');
-      state.wordTaps = state.wordTaps.filter(w => w.el !== el);
       state.wordTaps.push({ el, word, def, isStop, key });
     }
   }
@@ -1973,8 +1989,8 @@ function tapWord(e, el){
 
 function tapVerseTile(e, v){
   e.stopPropagation();
-  state.charVerse = v;
-  document.querySelectorAll('.verse-tile').forEach(t=>t.classList.toggle('selected', Number(t.dataset.v)===v));
+  state.charVerse = (state.charVerse === v) ? null : v;
+  document.querySelectorAll('.verse-tile').forEach(t=>t.classList.toggle('selected', Number(t.dataset.v)===state.charVerse));
   updateNavShell();
 }
 
@@ -2365,6 +2381,124 @@ function renderDevBubbles(){
   if (activeBub) activeBub.scrollIntoView({ inline: 'center', block: 'nearest' });
 }
 
+const SHARE_BG_COLORS = {
+  discover: ['#d2f860', '#a2e014'],
+  wordwork: ['#fb5672', '#be123c'],
+  expand:   ['#b862f8', '#7e22ce'],
+  learn:    ['#ffd452', '#eab308'],
+  live:     ['#262626', '#050505'],
+  cream:    ['#f4f0e8', '#d8d2c7']
+};
+const SHARE_COLOR_KEYS = Object.keys(SHARE_BG_COLORS);
+
+function roundRectPath(ctx, x, y, w, h, r){
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+// Draws the Central Truth card directly with the Canvas 2D API (no DOM screenshotting).
+// This renders in a few ms, which keeps the tap's "user activation" alive long enough
+// for navigator.share() to be allowed to open the native share sheet.
+function drawCentralTruthCanvas(colorKey, verseNum, traitText){
+  const size = 1000;
+  const canvas = document.createElement('canvas');
+  canvas.width = size; canvas.height = size;
+  const ctx = canvas.getContext('2d');
+
+  const [c1, c2] = SHARE_BG_COLORS[colorKey] || SHARE_BG_COLORS.discover;
+  const grad = ctx.createLinearGradient(0, 0, size, size);
+  grad.addColorStop(0, c1);
+  grad.addColorStop(1, c2);
+  roundRectPath(ctx, 0, 0, size, size, 56);
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  const cx = size / 2, cy = size / 2;
+  const circleR = size * 0.335;
+  const shadowOffset = size * 0.02;
+
+  ctx.beginPath();
+  ctx.arc(cx + shadowOffset, cy + shadowOffset, circleR, 0, Math.PI * 2);
+  ctx.fillStyle = '#0D0D0D';
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.arc(cx, cy, circleR, 0, Math.PI * 2);
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fill();
+  ctx.lineWidth = size * 0.008;
+  ctx.strokeStyle = '#0D0D0D';
+  ctx.stroke();
+
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  ctx.fillStyle = 'rgba(13,13,13,0.65)';
+  ctx.font = `800 ${Math.round(size * 0.024)}px 'Space Grotesk', sans-serif`;
+  ctx.fillText(`MARK 2:${verseNum}`, cx, cy - circleR * 0.42);
+
+  ctx.fillStyle = '#0D0D0D';
+  ctx.font = `800 ${Math.round(size * 0.05)}px 'Space Grotesk', sans-serif`;
+  ctx.fillText('GOD IS...', cx, cy - circleR * 0.12);
+
+  const traitDisplay = traitText.charAt(0).toUpperCase() + traitText.slice(1);
+  const traitY = cy + circleR * 0.26;
+  const dy = traitY - cy;
+  const halfChord = Math.sqrt(Math.max(circleR * circleR - dy * dy, 0));
+  const maxTraitWidth = halfChord * 2 - size * 0.09;
+
+  let traitFontSize = Math.round(size * 0.05);
+  const minTraitFontSize = Math.round(size * 0.022);
+  ctx.fillStyle = '#A855F7';
+  ctx.font = `900 ${traitFontSize}px 'Inter', sans-serif`;
+  let traitWidth = ctx.measureText(traitDisplay).width;
+  while (traitWidth > maxTraitWidth && traitFontSize > minTraitFontSize) {
+    traitFontSize -= 2;
+    ctx.font = `900 ${traitFontSize}px 'Inter', sans-serif`;
+    traitWidth = ctx.measureText(traitDisplay).width;
+  }
+  ctx.fillText(traitDisplay, cx, traitY);
+  ctx.strokeStyle = '#0D0D0D';
+  ctx.lineWidth = size * 0.007;
+  ctx.beginPath();
+  ctx.moveTo(cx - traitWidth / 2 - 16, traitY + size * 0.032);
+  ctx.lineTo(cx + traitWidth / 2 + 16, traitY + size * 0.032);
+  ctx.stroke();
+
+  return canvas;
+}
+
+async function shareCentralTruthDirect(){
+  try {
+    const activeVerse = state.charVerse || PASSAGE_START_VERSE;
+    const traitText = (state.trait && state.trait.trim()) ? state.trait.trim() : 'Forgiving';
+    const colorKey = SHARE_COLOR_KEYS[Math.floor(Math.random() * SHARE_COLOR_KEYS.length)];
+    const canvas = drawCentralTruthCanvas(colorKey, activeVerse, traitText);
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+    if (!blob) throw new Error('canvas produced no image data');
+
+    const file = new File([blob], 'central-truth.png', { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: 'My Central Truth', text: `God is ${traitText}` });
+    } else {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'central-truth.png';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+  } catch(err){
+    if (err && err.name === 'AbortError') return; // user dismissed the native share sheet
+    console.error('Direct share failed, falling back to the picker', err);
+    openShareOverlay();
+  }
+}
+
 const SHARE_COLORS = [
   { key:'discover', dot:'var(--lime)' },
   { key:'wordwork', dot:'var(--pink)' },
@@ -2376,7 +2510,6 @@ const SHARE_COLORS = [
 
 function initShareSwatches(){
   const row = document.getElementById('shareSwatchRow');
-  if (!row) return;
   row.innerHTML = SHARE_COLORS.map(c =>
     `<button class="share-swatch-btn" data-key="${c.key}" style="background:${c.dot};" onclick="event.stopPropagation(); selectShareColor('${c.key}');" aria-label="${c.key} background"></button>`
   ).join('');
@@ -2389,162 +2522,51 @@ function selectShareColor(key){
   document.querySelectorAll('.share-swatch-btn').forEach(b => b.classList.toggle('active', b.dataset.key === key));
 }
 
-/* ===================== DIRECT PNG CANVAS GENERATION & SHARE ===================== */
-const COLOR_PALETTES = {
-  discover: { grad: ['#d2f860', '#a2e014'] },
-  wordwork: { grad: ['#fb5672', '#be123c'] },
-  expand:   { grad: ['#b862f8', '#7e22ce'] },
-  learn:    { grad: ['#ffd452', '#eab308'] },
-  live:     { grad: ['#262626', '#050505'] },
-  cream:    { grad: ['#f4f0e8', '#d8d2c7'] }
-};
-
-function drawCentralTruthBlob(verseNum, trait, colorKey) {
-  return new Promise((resolve) => {
-    const canvas = document.createElement('canvas');
-    canvas.width = 1080;
-    canvas.height = 1080;
-    const ctx = canvas.getContext('2d');
-
-    const palette = COLOR_PALETTES[colorKey] || COLOR_PALETTES.discover;
-
-    // 1. Background Gradient
-    const grad = ctx.createLinearGradient(0, 0, 1080, 1080);
-    grad.addColorStop(0, palette.grad[0]);
-    grad.addColorStop(1, palette.grad[1]);
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, 1080, 1080);
-
-    // 2. White Circle Card
-    const centerX = 540;
-    const centerY = 540;
-    const radius = 380;
-
-    // Circle drop shadow
-    ctx.save();
-    ctx.fillStyle = '#0D0D0D';
-    ctx.beginPath();
-    ctx.arc(centerX + 16, centerY + 16, radius, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-
-    // Circle Body
-    ctx.fillStyle = '#FFFFFF';
-    ctx.lineWidth = 14;
-    ctx.strokeStyle = '#0D0D0D';
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.stroke();
-
-    // 3. Text in Circle
-    ctx.fillStyle = 'rgba(13, 13, 13, 0.65)';
-    ctx.font = '800 32px "Space Grotesk", sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(`MARK 2:${verseNum}`.toUpperCase(), centerX, centerY - 140);
-
-    ctx.fillStyle = '#0D0D0D';
-    ctx.font = '900 68px "Space Grotesk", sans-serif';
-    ctx.fillText('GOD IS...', centerX, centerY - 50);
-
-    const traitCapitalized = trait.charAt(0).toUpperCase() + trait.slice(1);
-    ctx.fillStyle = '#A855F7';
-    ctx.font = '900 64px "Inter", sans-serif';
-    ctx.fillText(traitCapitalized, centerX, centerY + 60);
-
-    const textWidth = ctx.measureText(traitCapitalized).width;
-    ctx.strokeStyle = '#0D0D0D';
-    ctx.lineWidth = 8;
-    ctx.beginPath();
-    ctx.moveTo(centerX - (textWidth / 2) - 10, centerY + 105);
-    ctx.lineTo(centerX + (textWidth / 2) + 10, centerY + 105);
-    ctx.stroke();
-
-    canvas.toBlob((blob) => resolve(blob), 'image/png');
-  });
-}
-
-window.openShareOverlay = function() {
+function openShareOverlay(){
   const activeVerse = state.charVerse || PASSAGE_START_VERSE;
-  const arcStem = document.getElementById('shareArcStem');
-  const traitText = document.getElementById('shareTraitText');
-  const overlay = document.getElementById('shareOverlay');
-
-  if (arcStem) arcStem.textContent = `MARK 2:${activeVerse}`;
-  if (traitText) traitText.textContent = (state.trait && state.trait.trim()) ? state.trait.trim() : 'Forgiving';
+  document.getElementById('shareArcStem').textContent = `MARK 2:${activeVerse}`;
+  document.getElementById('shareTraitText').textContent = (state.trait && state.trait.trim()) ? state.trait.trim() : 'Forgiving';
   initShareSwatches();
   selectShareColor(state.shareColor || 'discover');
-  if (overlay) overlay.style.display = 'flex';
-};
+  document.getElementById('shareOverlay').style.display = 'flex';
+}
 
-window.closeShareOverlay = function() {
-  const overlay = document.getElementById('shareOverlay');
-  if (overlay) overlay.style.display = 'none';
-};
+function closeShareOverlay(){
+  document.getElementById('shareOverlay').style.display = 'none';
+}
 
-async function executeImageShare(btn, colorKey) {
-  const originalHtml = btn.innerHTML;
-  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sharing…';
+async function confirmShareImage(){
+  const btn = document.getElementById('shareConfirmBtn');
+  const original = btn.innerHTML;
+  btn.innerHTML = 'Preparing…';
   btn.disabled = true;
+  try{
+    const node = document.getElementById('shareCardStage');
+    const canvas = await html2canvas(node, { backgroundColor: null, scale: 3, useCORS: true });
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+    if (!blob) throw new Error('canvas produced no image data');
 
-  const activeVerse = state.charVerse || PASSAGE_START_VERSE;
-  const traitText = (state.trait && state.trait.trim()) ? state.trait.trim() : 'Forgiving';
-  const shareText = `Central Truth: God is ${traitText} (Mark 2:${activeVerse})`;
+    const file = new File([blob], 'central-truth.png', { type: 'image/png' });
+    const traitText = (state.trait && state.trait.trim()) ? state.trait.trim() : 'Forgiving';
 
-  try {
-    const blob = await drawCentralTruthBlob(activeVerse, traitText, colorKey);
-    if (!blob) throw new Error('Blob generation failed');
-
-    const file = new File([blob], `god-is-${traitText.toLowerCase()}.png`, { type: 'image/png' });
-
-    // 1. Mobile Native Image Share Sheet
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({
-        files: [file],
-        title: 'My Central Truth',
-        text: shareText
-      });
-      window.closeShareOverlay();
-      return;
+      await navigator.share({ files: [file], title: 'My Central Truth', text: `God is ${traitText}` });
+      closeShareOverlay();
+    } else {
+      // Device/browser doesn't support sharing image files — download as a last resort
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'central-truth.png';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     }
-
-    // 2. Direct PNG File Download Fallback (Desktop/unsupported browsers)
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `god-is-${traitText.toLowerCase()}.png`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    window.closeShareOverlay();
-
-  } catch (err) {
-    if (err.name !== 'AbortError') {
-      console.error('Share failure:', err);
-      window.openShareOverlay();
-    }
+  } catch(err){
+    if (err.name !== 'AbortError') console.error('Share image failed', err);
   } finally {
-    btn.innerHTML = originalHtml;
+    btn.innerHTML = original;
     btn.disabled = false;
   }
 }
-
-window.triggerShareFlow = async function() {
-  const shareBtn = document.getElementById('shareTruthBtn');
-  
-  // Pick a random color from the available palettes
-  const paletteKeys = Object.keys(COLOR_PALETTES);
-  const randomColorKey = paletteKeys[Math.floor(Math.random() * paletteKeys.length)];
-
-  await executeImageShare(shareBtn, randomColorKey);
-};
-
-window.confirmShareImage = async function() {
-  const confirmBtn = document.getElementById('shareConfirmBtn');
-  await executeImageShare(confirmBtn, state.shareColor || 'discover');
-};
 
 function openDevNotesPanel(){
   const b = beats[state.index];
@@ -2617,7 +2639,7 @@ function tryCopyAllNotes(){
   } else {
     status.textContent = 'Clipboard unavailable — select the text above and copy manually.';
     status.className = 'dnp-status warn';
-    retryBtn.style.display = 'inline-block';
+    retryBtn.style.display = 'inline-file';
   }
 }
 
