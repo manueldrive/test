@@ -2484,7 +2484,7 @@ async function shareCentralTruthDirect(){
 
     const file = new File([blob], 'central-truth.png', { type: 'image/png' });
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({ files: [file], title: 'My Central Truth', text: `God is ${traitText}` });
+      await navigator.share({ files: [file] });
     } else {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -2547,10 +2547,9 @@ async function confirmShareImage(){
     if (!blob) throw new Error('canvas produced no image data');
 
     const file = new File([blob], 'central-truth.png', { type: 'image/png' });
-    const traitText = (state.trait && state.trait.trim()) ? state.trait.trim() : 'Forgiving';
 
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({ files: [file], title: 'My Central Truth', text: `God is ${traitText}` });
+      await navigator.share({ files: [file] });
       closeShareOverlay();
     } else {
       // Device/browser doesn't support sharing image files — download as a last resort
