@@ -1248,9 +1248,6 @@
   .share-action-btn.primary{ background:var(--lime); }
   .share-action-btn.secondary{ background:#eee; }
   .share-action-btn:disabled{ opacity:.6; cursor:default; }
-  .share-result-wrap{ display:flex; flex-direction:column; align-items:center; gap:12px; width:100%; }
-  .share-result-wrap img{ width:100%; border-radius:16px; border:3.5px solid var(--ink); box-shadow:4px 4px 0 var(--ink); }
-  .share-result-hint{ font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:12px; text-transform:uppercase; letter-spacing:.4px; opacity:.65; text-align:center; }
   @media (min-width:768px){
     .share-trigger-btn{ display:none; }
     .share-panel{ max-width:420px; padding:26px; }
@@ -1341,11 +1338,6 @@
       <div class="share-action-row" id="shareActionRow">
         <button class="share-action-btn secondary" onclick="closeShareOverlay();">Cancel</button>
         <button class="share-action-btn primary" id="shareConfirmBtn" onclick="confirmShareImage();"><i class="fa-solid fa-arrow-up-from-bracket"></i> Share</button>
-      </div>
-      <div class="share-result-wrap" id="shareResultWrap" style="display:none;">
-        <img id="shareResultImg" alt="Your Central Truth card" />
-        <div class="share-result-hint">Press and hold the image to save or share it</div>
-        <button class="share-action-btn secondary" style="width:100%;" onclick="backToShareEdit();">Back</button>
       </div>
     </div>
   </div>
@@ -2397,19 +2389,11 @@ function openShareOverlay(){
   document.getElementById('shareTraitText').textContent = (state.trait && state.trait.trim()) ? state.trait.trim() : 'Forgiving';
   initShareSwatches();
   selectShareColor(state.shareColor || 'discover');
-  backToShareEdit();
   document.getElementById('shareOverlay').style.display = 'flex';
 }
 
 function closeShareOverlay(){
   document.getElementById('shareOverlay').style.display = 'none';
-}
-
-function backToShareEdit(){
-  document.getElementById('shareCardStage').style.display = 'flex';
-  document.getElementById('shareSwatchRow').style.display = 'flex';
-  document.getElementById('shareActionRow').style.display = 'flex';
-  document.getElementById('shareResultWrap').style.display = 'none';
 }
 
 async function confirmShareImage(){
@@ -2420,31 +2404,25 @@ async function confirmShareImage(){
   try{
     const node = document.getElementById('shareCardStage');
     const canvas = await html2canvas(node, { backgroundColor: null, scale: 3, useCORS: true });
-    const dataUrl = canvas.toDataURL('image/png');
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+    if (!blob) throw new Error('canvas produced no image data');
 
-    // Always show the rendered image so there's a guaranteed way to save/share it
-    // (long-press works on iOS/Android regardless of any share-API support or preview sandboxing)
-    document.getElementById('shareResultImg').src = dataUrl;
-    document.getElementById('shareCardStage').style.display = 'none';
-    document.getElementById('shareSwatchRow').style.display = 'none';
-    document.getElementById('shareActionRow').style.display = 'none';
-    document.getElementById('shareResultWrap').style.display = 'flex';
+    const file = new File([blob], 'central-truth.png', { type: 'image/png' });
+    const traitText = (state.trait && state.trait.trim()) ? state.trait.trim() : 'Forgiving';
 
-    // Best-effort bonus: pop the native share sheet directly when the browser supports it
-    canvas.toBlob(async (blob) => {
-      if (!blob) return;
-      const file = new File([blob], 'central-truth.png', { type: 'image/png' });
-      const traitText = (state.trait && state.trait.trim()) ? state.trait.trim() : 'Forgiving';
-      try {
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          await navigator.share({ files: [file], title: 'My Central Truth', text: `God is ${traitText}` });
-        }
-      } catch(shareErr) {
-        // Share sheet unsupported or cancelled here — the image above still works
-      }
-    }, 'image/png');
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: 'My Central Truth', text: `God is ${traitText}` });
+      closeShareOverlay();
+    } else {
+      // Device/browser doesn't support sharing image files — download as a last resort
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'central-truth.png';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
   } catch(err){
-    console.error('Share image failed', err);
+    if (err.name !== 'AbortError') console.error('Share image failed', err);
   } finally {
     btn.innerHTML = original;
     btn.disabled = false;
