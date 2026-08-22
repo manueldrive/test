@@ -1098,7 +1098,9 @@
   .glossary-drawer-body .review-section-header{ margin-top: 4px; }
 
   .video-drawer{ display: none; }
-  .video-drawer.vd-visible{ display: block; }
+  @media (min-width: 768px) {
+    .video-drawer.vd-visible{ display: block; }
+  }
   .video-tab{
     position: fixed;
     right: 0;
@@ -1437,7 +1439,7 @@
   <!-- VIDEO SIDE PANEL -->
   <div class="video-drawer" id="videoDrawer">
     <button class="video-tab" id="videoTabBtn" onclick="event.stopPropagation(); toggleVideoDrawer();" aria-label="Toggle video panel">
-      <i class="fa-solid fa-play"></i>
+      <i class="fa-brands fa-youtube"></i>
       <span>Video</span>
     </button>
     <div class="video-drawer-scrim" onclick="closeVideoDrawer();"></div>
