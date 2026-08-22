@@ -156,6 +156,36 @@
     opacity: 1;
   }
 
+  .quest-nav-hint{
+    position: absolute;
+    left: 50%;
+    bottom: clamp(14px, 2.5vh, 22px);
+    transform: translateX(-50%);
+    z-index: 91;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 7px;
+    pointer-events: none;
+    color: #FFFFFF;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  .quest-nav-hint.visible{ opacity: 1; }
+  .quest-nav-hint i{ font-size: 15px; }
+  .quest-nav-hint span{
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 10.5px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  @media (min-width: 1024px) {
+    .quest-nav-hint i{ font-size: 19px; }
+    .quest-nav-hint span{ font-size: 13px; }
+  }
+
   .floating-context-island {
     position: absolute;
     left: 50%;
@@ -1305,6 +1335,11 @@
     </button>
   </div>
 
+  <div class="quest-nav-hint" id="questNavHint">
+    <i class="fa-solid fa-hand-point-up"></i>
+    <span id="questNavHintText">Make a selection</span>
+  </div>
+
   <!-- FLOATING CONTEXT ISLAND FOR INTERACTION SLIDES -->
   <div class="floating-context-island" id="floatingContextIsland" style="display:none;"></div>
 
@@ -1784,7 +1819,7 @@ function updateNavShell(){
   else ready = !b.blockTap;
   nextBtn.classList.toggle('ready', ready);
 
-  const hideArrows = (b.id === 'quest-testament' || b.id === 'quest-section') && !answeredBeats.has(state.index);
+  const hideArrows = false;
   prevBtn.style.display = hideArrows ? 'none' : '';
   nextBtn.style.display = (hideArrows || isFinalSlide) ? 'none' : '';
 
@@ -2175,27 +2210,58 @@ function triggerGateShake(msg, elementId, iconClass){
   showBadgeClue(msg, iconClass);
 }
 
+const pillMsgTimeouts = {};
+function triggerPillMessage(pillId, tempText){
+  const pill = document.getElementById(pillId);
+  if (!pill) return;
+  pill.classList.remove('shake-warn');
+  void pill.offsetWidth;
+  pill.classList.add('shake-warn');
+  setTimeout(() => pill.classList.remove('shake-warn'), 600);
+
+  pill.textContent = tempText;
+
+  clearTimeout(pillMsgTimeouts[pillId]);
+  pillMsgTimeouts[pillId] = setTimeout(() => {
+    updateNavShell();
+  }, 1500);
+}
+
+let questNavHintTimeout = null;
+function triggerQuestNavHint(){
+  const nextBtn = document.getElementById('shellNextBtn');
+  if (nextBtn) {
+    nextBtn.classList.remove('shake-warn');
+    void nextBtn.offsetWidth;
+    nextBtn.classList.add('shake-warn');
+    setTimeout(() => nextBtn.classList.remove('shake-warn'), 600);
+  }
+  const hint = document.getElementById('questNavHint');
+  if (hint) {
+    hint.classList.add('visible');
+    clearTimeout(questNavHintTimeout);
+    questNavHintTimeout = setTimeout(() => hint.classList.remove('visible'), 1800);
+  }
+}
+
 function handleForwardAttempt(){
   const b = beats[state.index];
   if (b.blockTap) {
     if ((b.id === 'quest-testament' || b.id === 'quest-section') && !answeredBeats.has(state.index)) { 
-      triggerGateShake('Pick an answer to continue', null, 'fa-solid fa-hand-point-up'); 
+      triggerQuestNavHint(); 
       return; 
     }
     if (b.id === 'vocab-scan') {
-      if (!state.wordTaps.length && !state.scrolledToEnd) {
-        triggerGateShake('Highlight at least 1 word & scroll down!', 'vocabActionPill');
-        return;
-      } else if (!state.wordTaps.length) {
-        triggerGateShake('Highlight at least 1 word!', 'vocabActionPill');
+      if (!state.wordTaps.length) {
+        triggerPillMessage('vocabActionPill', 'Select 1-2 Words');
         return;
       } else if (!state.scrolledToEnd) {
-        triggerGateShake('Scroll to the bottom first!', 'vocabActionPill');
+        triggerPillMessage('vocabActionPill', 'Finish Reading');
         return;
       }
     }
     if (b.id === 'char-verse-pick' && state.charVerse === null) { 
-      triggerGateShake('Tap a verse to select!', 'verseActionPill'); 
+      triggerPillMessage('verseActionPill', 'Select a Verse'); 
       return; 
     }
     if (b.id === 'char-coaching' && !(state.trait && state.trait.trim())) { 
@@ -2279,6 +2345,8 @@ document.addEventListener('keydown', (e) => {
       goPrev();
     } else if (!b.blockTap) {
       goNext();
+    } else {
+      handleForwardAttempt();
     }
   });
 
@@ -2300,7 +2368,7 @@ document.addEventListener('keydown', (e) => {
       lastSwipeTime = Date.now();
       const b = beats[state.index];
       if (dx < 0) {
-        if (!b.blockTap) goNext();
+        if (!b.blockTap) goNext(); else handleForwardAttempt();
       } else {
         goPrev();
       }
