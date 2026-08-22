@@ -1332,6 +1332,7 @@
     </div>
   </div>
 
+  <!-- SHARE OVERLAY MODAL -->
   <div class="share-overlay" id="shareOverlay" style="display:none;" onclick="closeShareOverlay();">
     <div class="share-panel" onclick="event.stopPropagation();">
       <h3>Share Your Central Truth</h3>
@@ -1369,8 +1370,6 @@
     </div>
   </div>
 </div>
-
-<div id="exportTarget" style="position:fixed; left:-9999px; top:0; width:420px;"></div>
 
 <script>
 const PASSAGE_START_VERSE = 1;
@@ -1514,7 +1513,7 @@ const beats = [
             <div class="intro-duration"><i class="fa-regular fa-clock"></i> Prep Duration: 5 min</div>
           ` },
 
-  /* 1. LOCATE MARK: TESTAMENT (MANILA TABBED FOLDER) */
+  /* 1. LOCATE MARK: TESTAMENT */
   { id:'quest-testament', type:'input', blockTap:true, isInteractive:true, clue:'Pick an answer to continue', bgGrad:'var(--bg-expand)', text:'dark',
     html:`<div class="sketch-lead-title tight quest-question-title" style="color: #FFFFFF;">What testament is the book of <span class="locator-emphasis">Mark</span> in?</div>
           <div class="nt-folder-wrap">
@@ -1535,7 +1534,7 @@ const beats = [
             </div>
           </div>` },
 
-  /* 2. LOCATE MARK: SECTION (MANILA TABBED FOLDER) */
+  /* 2. LOCATE MARK: SECTION */
   { id:'quest-section', type:'input', blockTap:true, isInteractive:true, clue:'Pick an answer to continue', bgGrad:'var(--bg-expand)', text:'dark',
     html:`<div class="sketch-lead-title tight quest-question-title" style="color: #FFFFFF;">What section is the book of <span class="locator-emphasis">Mark</span> in?</div>
           <div class="nt-folder-wrap">
@@ -1965,7 +1964,8 @@ function tapWord(e, el){
       state.wordTaps = state.wordTaps.filter(w => w.el !== el);
     } else {
       el.classList.add('flagged');
-      state.wordTaps = state.wordTaps.push ? state.wordTaps.concat([{ el, word, def, isStop, key }]) : [{ el, word, def, isStop, key }];
+      state.wordTaps = state.wordTaps.filter(w => w.el !== el);
+      state.wordTaps.push({ el, word, def, isStop, key });
     }
   }
   updateNavShell();
@@ -2390,7 +2390,7 @@ function selectShareColor(key){
   document.querySelectorAll('.share-swatch-btn').forEach(b => b.classList.toggle('active', b.dataset.key === key));
 }
 
-/* ===================== SHARING LOGIC ===================== */
+/* ===================== DIRECT PNG IMAGE SHARING LOGIC ===================== */
 window.openShareOverlay = function() {
   const activeVerse = state.charVerse || PASSAGE_START_VERSE;
   const arcStem = document.getElementById('shareArcStem');
@@ -2409,107 +2409,81 @@ window.closeShareOverlay = function() {
   if (overlay) overlay.style.display = 'none';
 };
 
+async function generateAndShareCard(nodeElement, triggerBtn, shareText) {
+  const originalHtml = triggerBtn.innerHTML;
+  triggerBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Preparing Image…';
+  triggerBtn.disabled = true;
+
+  try {
+    const canvas = await html2canvas(nodeElement, { 
+      backgroundColor: null, 
+      scale: 2, 
+      useCORS: true,
+      logging: false 
+    });
+    
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+    if (!blob) throw new Error('Canvas conversion produced no data');
+
+    const file = new File([blob], 'central-truth.png', { type: 'image/png' });
+
+    // 1. Native Image Sharing (Directly shares PNG to iOS / Android share sheet)
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({
+        files: [file],
+        title: 'Central Truth',
+        text: shareText
+      });
+      window.closeShareOverlay();
+      return;
+    }
+
+    // 2. Direct PNG file download fallback for desktop/browsers without file share support
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `central-truth-mark-2.png`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    window.closeShareOverlay();
+
+  } catch (err) {
+    if (err.name !== 'AbortError') {
+      console.error('Sharing failed', err);
+      window.openShareOverlay();
+    }
+  } finally {
+    triggerBtn.innerHTML = originalHtml;
+    triggerBtn.disabled = false;
+  }
+}
+
 window.triggerShareFlow = async function() {
   const activeVerse = state.charVerse || PASSAGE_START_VERSE;
   const traitText = (state.trait && state.trait.trim()) ? state.trait.trim() : 'Forgiving';
   const shareText = `Central Truth: God is ${traitText} (Mark 2:${activeVerse})`;
+  const shareBtn = document.getElementById('shareTruthBtn');
 
-  // If mobile with native text share support, execute immediately (like biblecompass)
-  if (navigator.share && /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) {
-    try {
-      await navigator.share({
-        title: 'Central Truth',
-        text: shareText,
-        url: window.location.href
-      });
-      return;
-    } catch (err) {
-      if (err.name === 'AbortError') return;
-    }
-  }
+  const arcStem = document.getElementById('shareArcStem');
+  const traitTextEl = document.getElementById('shareTraitText');
+  if (arcStem) arcStem.textContent = `MARK 2:${activeVerse}`;
+  if (traitTextEl) traitTextEl.textContent = traitText;
+  selectShareColor(state.shareColor || 'discover');
 
-  // Otherwise, open the card builder overlay
-  window.openShareOverlay();
+  const stageNode = document.getElementById('shareCardStage');
+  await generateAndShareCard(stageNode, shareBtn, shareText);
 };
 
 window.confirmShareImage = async function() {
-  const btn = document.getElementById('shareConfirmBtn');
-  const original = btn.innerHTML;
-  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Preparing…';
-  btn.disabled = true;
-
   const activeVerse = state.charVerse || PASSAGE_START_VERSE;
   const traitText = (state.trait && state.trait.trim()) ? state.trait.trim() : 'Forgiving';
   const shareText = `Central Truth: God is ${traitText} (Mark 2:${activeVerse})`;
+  const confirmBtn = document.getElementById('shareConfirmBtn');
+  const stageNode = document.getElementById('shareCardStage');
 
-  try {
-    const node = document.getElementById('shareCardStage');
-    const canvas = await html2canvas(node, { backgroundColor: null, scale: 2, useCORS: true });
-    
-    canvas.toBlob(async (blob) => {
-      if (!blob) {
-        throw new Error('Canvas conversion returned empty');
-      }
-
-      const file = new File([blob], 'central-truth.png', { type: 'image/png' });
-
-      // Native image sharing where supported
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        try {
-          await navigator.share({
-            files: [file],
-            title: 'Central Truth',
-            text: shareText
-          });
-          window.closeShareOverlay();
-          return;
-        } catch (e) {
-          if (e.name === 'AbortError') return;
-        }
-      }
-
-      // Web share text fallback
-      if (navigator.share) {
-        try {
-          await navigator.share({
-            title: 'Central Truth',
-            text: shareText,
-            url: window.location.href
-          });
-          window.closeShareOverlay();
-          return;
-        } catch (e) {
-          if (e.name === 'AbortError') return;
-        }
-      }
-
-      // Download file fallback
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `central-truth-mark-2.png`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      window.closeShareOverlay();
-    }, 'image/png');
-
-  } catch(err) {
-    console.error('Share image failed', err);
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: 'Central Truth', text: shareText });
-        window.closeShareOverlay();
-      } catch(e){}
-    } else {
-      alert('Could not generate image. Text copied to clipboard: ' + shareText);
-      navigator.clipboard?.writeText(shareText);
-    }
-  } finally {
-    btn.innerHTML = original;
-    btn.disabled = false;
-  }
+  await generateAndShareCard(stageNode, confirmBtn, shareText);
 };
 
 function openDevNotesPanel(){
