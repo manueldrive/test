@@ -1097,6 +1097,82 @@
   .gd-row.revealed .gd-row-def{ max-height: 240px; padding: 10px 14px 14px; }
   .glossary-drawer-body .review-section-header{ margin-top: 4px; }
 
+  .video-drawer{ display: none; }
+  .video-drawer.vd-visible{ display: block; }
+  .video-tab{
+    position: fixed;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 130;
+    background: var(--pink);
+    color: #FFF;
+    border: 3px solid var(--ink);
+    border-right: none;
+    border-radius: 14px 0 0 14px;
+    padding: 16px 9px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    box-shadow: -4px 4px 0 var(--ink);
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 800;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: right .3s ease, transform .15s ease;
+  }
+  .video-tab span{ writing-mode: vertical-rl; }
+  .video-tab i{ font-size: 15px; }
+  .video-tab:active{ transform: translateY(-50%) scale(0.96); }
+  .video-drawer.open .video-tab{ right: min(360px, 84vw); }
+  .video-drawer-scrim{
+    position: fixed; inset: 0; z-index: 105;
+    background: rgba(13,13,29,0.28);
+    opacity: 0; pointer-events: none;
+    transition: opacity .25s ease;
+  }
+  .video-drawer.open .video-drawer-scrim{ opacity: 1; pointer-events: auto; }
+  .video-drawer-panel{
+    position: fixed;
+    right: 0; top: 0; bottom: 0;
+    width: min(360px, 84vw);
+    background: #FFF;
+    border-left: 4px solid var(--ink);
+    box-shadow: -8px 0 0 rgba(0,0,0,0.12);
+    transform: translateX(100%);
+    transition: transform .3s ease;
+    z-index: 110;
+    display: flex;
+    flex-direction: column;
+    padding: 22px 20px;
+    gap: 14px;
+  }
+  .video-drawer.open .video-drawer-panel{ transform: translateX(0); }
+  .video-drawer-header{
+    display: flex; align-items: center; justify-content: space-between;
+    font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 17px; text-transform: uppercase;
+    flex-shrink: 0;
+  }
+  .video-drawer-close{ background:none; border:none; font-size:20px; cursor:pointer; color:var(--ink); padding:4px; line-height:1; }
+  .video-drawer-body{ flex: 1; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; }
+  .video-embed-wrap{ position: relative; width: 100%; aspect-ratio: 16/9; border-radius: 12px; overflow: hidden; border: 2.5px solid var(--ink); background: #000; flex-shrink: 0; }
+  .video-embed-wrap iframe{ position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  .video-drawer-link{
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 12.5px; text-transform: uppercase; letter-spacing: .4px;
+    color: var(--ink); text-decoration: none;
+    border: 2.5px solid var(--ink); border-radius: 100px; padding: 11px 16px;
+    transition: background .15s ease;
+  }
+  .video-drawer-link:active{ background: rgba(0,0,0,0.06); }
+  @media (min-width: 768px) {
+    .video-drawer-panel{ padding: 26px; }
+    .video-drawer-header{ font-size: 19px; }
+  }
+
   .coaching-scene {
     display: flex;
     flex-direction: column;
@@ -1355,6 +1431,27 @@
         <button class="glossary-drawer-close" onclick="event.stopPropagation(); closeGlossaryDrawer();" aria-label="Close glossary panel"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div class="glossary-drawer-body" id="glossaryDrawerBody"></div>
+    </div>
+  </div>
+
+  <!-- VIDEO SIDE PANEL -->
+  <div class="video-drawer" id="videoDrawer">
+    <button class="video-tab" id="videoTabBtn" onclick="event.stopPropagation(); toggleVideoDrawer();" aria-label="Toggle video panel">
+      <i class="fa-solid fa-play"></i>
+      <span>Video</span>
+    </button>
+    <div class="video-drawer-scrim" onclick="closeVideoDrawer();"></div>
+    <div class="video-drawer-panel">
+      <div class="video-drawer-header">
+        <span>The Book of Mark</span>
+        <button class="video-drawer-close" onclick="event.stopPropagation(); closeVideoDrawer();" aria-label="Close video panel"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="video-drawer-body">
+        <div class="video-embed-wrap">
+          <iframe id="markVideoFrame" src="" title="The Book of Mark" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <a class="video-drawer-link" href="https://www.youtube.com/watch?v=dlBOmQ1PaMY" target="_blank" rel="noopener">Watch on YouTube <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+      </div>
     </div>
   </div>
 
@@ -1927,6 +2024,16 @@ function renderBeat(i){
     }
   }
 
+  const videoDrawerEl = document.getElementById('videoDrawer');
+  if (videoDrawerEl) {
+    if (b.id === 'reveal-context') {
+      videoDrawerEl.classList.add('vd-visible');
+    } else {
+      videoDrawerEl.classList.remove('vd-visible');
+      toggleVideoDrawer(false);
+    }
+  }
+
   if (b.id === 'final') renderFinalReflection();
   if (b.id === 'vocab-review') renderVocabReview();
   updateProgressBar();
@@ -1945,8 +2052,6 @@ function questAnswer(e, el, gridId){
     el.classList.add('correct');
     answeredBeats.add(state.index);
     updateNavShell();
-    const myGen = renderGen;
-    setTimeout(()=>{ if (renderGen === myGen) goNext(); }, 600);
   } else {
     el.classList.add('incorrect','shake');
     setTimeout(()=>{ el.classList.remove('shake','incorrect'); }, 500);
@@ -2135,6 +2240,20 @@ function toggleGlossaryDrawer(force){
 }
 function openGlossaryDrawer(){ toggleGlossaryDrawer(true); }
 function closeGlossaryDrawer(){ toggleGlossaryDrawer(false); }
+
+const MARK_VIDEO_ID = 'dlBOmQ1PaMY';
+function toggleVideoDrawer(force){
+  const d = document.getElementById('videoDrawer');
+  if (!d) return;
+  const willOpen = typeof force === 'boolean' ? force : !d.classList.contains('open');
+  d.classList.toggle('open', willOpen);
+  const frame = document.getElementById('markVideoFrame');
+  if (frame) {
+    frame.src = willOpen ? `https://www.youtube.com/embed/${MARK_VIDEO_ID}` : '';
+  }
+}
+function openVideoDrawer(){ toggleVideoDrawer(true); }
+function closeVideoDrawer(){ toggleVideoDrawer(false); }
 
 function handleCustomTrait(val){ 
   state.trait = val; 
