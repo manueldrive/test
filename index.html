@@ -156,7 +156,7 @@
     opacity: 1;
   }
 
-  .quest-nav-hint{
+  .gate-nav-hint{
     position: absolute;
     left: 50%;
     bottom: clamp(14px, 2.5vh, 22px);
@@ -167,14 +167,22 @@
     align-items: center;
     gap: 7px;
     pointer-events: none;
-    color: #FFFFFF;
     text-align: center;
     opacity: 0;
-    transition: opacity 0.2s ease;
   }
-  .quest-nav-hint.visible{ opacity: 1; }
-  .quest-nav-hint i{ font-size: 15px; }
-  .quest-nav-hint span{
+  .gate-nav-hint.light{ color: #FFFFFF; }
+  .gate-nav-hint.dark{ color: #0D0D0D; }
+  .gate-nav-hint.visible{ animation: hintShakeIn 0.5s ease forwards; }
+  @keyframes hintShakeIn{
+    0%   { opacity: 0; transform: translateX(calc(-50% - 14px)); }
+    20%  { opacity: 1; transform: translateX(calc(-50% + 10px)); }
+    40%  { transform: translateX(calc(-50% - 7px)); }
+    60%  { transform: translateX(calc(-50% + 4px)); }
+    80%  { transform: translateX(calc(-50% - 2px)); }
+    100% { opacity: 1; transform: translateX(-50%); }
+  }
+  .gate-nav-hint i{ font-size: 15px; }
+  .gate-nav-hint span{
     font-family: 'Space Grotesk', sans-serif;
     font-size: 10.5px;
     font-weight: 800;
@@ -182,8 +190,8 @@
     letter-spacing: 1px;
   }
   @media (min-width: 1024px) {
-    .quest-nav-hint i{ font-size: 19px; }
-    .quest-nav-hint span{ font-size: 13px; }
+    .gate-nav-hint i{ font-size: 19px; }
+    .gate-nav-hint span{ font-size: 13px; }
   }
 
   .floating-context-island {
@@ -308,21 +316,6 @@
     50% { transform: scale(1.02); }
   }
   @keyframes shakeX{ 10%,90%{transform:translateX(-3px);} 20%,80%{transform:translateX(5px);} 30%,50%{transform:translateX(-8px);} 40%,60%{transform:translateX(8px);} }
-
-  .clue-badge{
-    position: absolute;
-    left: 50%;
-    bottom: clamp(76px, 12vh, 96px);
-    transform: translateX(-50%);
-    display: flex; align-items: center; gap: 8px;
-    background: var(--ink); color: #FFF;
-    font-family:'Space Grotesk', sans-serif; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: .4px;
-    padding: 10px 18px; border-radius: 100px;
-    box-shadow: 3px 3px 0 rgba(0,0,0,0.3);
-    z-index: 100;
-    white-space: nowrap;
-  }
-  .clue-badge i{ color: var(--yellow); }
 
   .hud-header{ 
     position:relative; 
@@ -1309,8 +1302,6 @@
     <i class="fa-solid fa-expand"></i>
   </button>
 
-  <div class="clue-badge" id="clueBadge" style="display:none;"><i class="fa-solid fa-circle-exclamation"></i><span id="clueBadgeText"></span></div>
-
   <div class="hud-header" id="hudHeader">
     <div class="progress-container" id="normalProgressWrap">
       <div class="progress-bar-fill" id="progressBarFill"></div>
@@ -1335,9 +1326,14 @@
     </button>
   </div>
 
-  <div class="quest-nav-hint" id="questNavHint">
+  <div class="gate-nav-hint light" id="questNavHint">
     <i class="fa-solid fa-hand-point-up"></i>
     <span id="questNavHintText">Make a selection</span>
+  </div>
+
+  <div class="gate-nav-hint dark" id="charNavHint">
+    <i class="fa-solid fa-pencil"></i>
+    <span id="charNavHintText">Fill in the blank</span>
   </div>
 
   <!-- FLOATING CONTEXT ISLAND FOR INTERACTION SLIDES -->
@@ -1828,9 +1824,14 @@ function updateNavShell(){
   } else if (b.id === 'vocab-scan') {
     island.style.display = 'flex';
     const isDone = isVocabComplete();
+    const hasWords = state.wordTaps.length > 0;
+    let pillLabel;
+    if (isDone) pillLabel = '<i class="fa-solid fa-check"></i> Continue';
+    else if (hasWords) pillLabel = 'Finish Reading';
+    else pillLabel = 'Highlight Words';
     island.innerHTML = `
       <button class="action-gate-pill ${isDone ? 'ready' : ''}" id="vocabActionPill" onclick="event.stopPropagation(); handleForwardAttempt();">
-        ${isDone ? '<i class="fa-solid fa-check"></i> Continue' : 'Highlight Words'}
+        ${pillLabel}
       </button>
     `;
   } else if (b.id === 'char-verse-pick') {
@@ -2183,33 +2184,6 @@ function toggleTimer(){
   }
 }
 
-let clueTimeout = null;
-function showBadgeClue(text, iconClass){
-  const badge = document.getElementById('clueBadge');
-  const badgeText = document.getElementById('clueBadgeText');
-  const badgeIcon = badge ? badge.querySelector('i') : null;
-  if (!badge || !badgeText) return;
-  badgeText.textContent = text;
-  if (badgeIcon) badgeIcon.className = iconClass || 'fa-solid fa-circle-exclamation';
-  badge.style.display = 'flex';
-
-  clearTimeout(clueTimeout);
-  clueTimeout = setTimeout(() => {
-    badge.style.display = 'none';
-  }, 2200);
-}
-
-function triggerGateShake(msg, elementId, iconClass){
-  const el = document.getElementById(elementId) || document.getElementById('shellNextBtn');
-  if (el) {
-    el.classList.remove('shake-warn');
-    void el.offsetWidth;
-    el.classList.add('shake-warn');
-    setTimeout(() => el.classList.remove('shake-warn'), 600);
-  }
-  showBadgeClue(msg, iconClass);
-}
-
 const pillMsgTimeouts = {};
 function triggerPillMessage(pillId, tempText){
   const pill = document.getElementById(pillId);
@@ -2227,8 +2201,8 @@ function triggerPillMessage(pillId, tempText){
   }, 1500);
 }
 
-let questNavHintTimeout = null;
-function triggerQuestNavHint(){
+const gateHintTimeouts = {};
+function triggerGateNavHint(hintId){
   const nextBtn = document.getElementById('shellNextBtn');
   if (nextBtn) {
     nextBtn.classList.remove('shake-warn');
@@ -2236,11 +2210,13 @@ function triggerQuestNavHint(){
     nextBtn.classList.add('shake-warn');
     setTimeout(() => nextBtn.classList.remove('shake-warn'), 600);
   }
-  const hint = document.getElementById('questNavHint');
+  const hint = document.getElementById(hintId);
   if (hint) {
+    hint.classList.remove('visible');
+    void hint.offsetWidth;
     hint.classList.add('visible');
-    clearTimeout(questNavHintTimeout);
-    questNavHintTimeout = setTimeout(() => hint.classList.remove('visible'), 1800);
+    clearTimeout(gateHintTimeouts[hintId]);
+    gateHintTimeouts[hintId] = setTimeout(() => hint.classList.remove('visible'), 1800);
   }
 }
 
@@ -2248,7 +2224,7 @@ function handleForwardAttempt(){
   const b = beats[state.index];
   if (b.blockTap) {
     if ((b.id === 'quest-testament' || b.id === 'quest-section') && !answeredBeats.has(state.index)) { 
-      triggerQuestNavHint(); 
+      triggerGateNavHint('questNavHint'); 
       return; 
     }
     if (b.id === 'vocab-scan') {
@@ -2265,7 +2241,7 @@ function handleForwardAttempt(){
       return; 
     }
     if (b.id === 'char-coaching' && !(state.trait && state.trait.trim())) { 
-      triggerGateShake('Fill in the blank to continue!'); 
+      triggerGateNavHint('charNavHint'); 
       return; 
     }
   }
