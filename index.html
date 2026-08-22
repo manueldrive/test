@@ -2533,7 +2533,12 @@ async function executeImageShare(btn, colorKey) {
 
 window.triggerShareFlow = async function() {
   const shareBtn = document.getElementById('shareTruthBtn');
-  await executeImageShare(shareBtn, state.shareColor || 'discover');
+  
+  // Pick a random color from the available palettes
+  const paletteKeys = Object.keys(COLOR_PALETTES);
+  const randomColorKey = paletteKeys[Math.floor(Math.random() * paletteKeys.length)];
+
+  await executeImageShare(shareBtn, randomColorKey);
 };
 
 window.confirmShareImage = async function() {
