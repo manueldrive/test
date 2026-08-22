@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Dwell Guide — Mark 2</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -2390,7 +2389,82 @@ function selectShareColor(key){
   document.querySelectorAll('.share-swatch-btn').forEach(b => b.classList.toggle('active', b.dataset.key === key));
 }
 
-/* ===================== DIRECT PNG IMAGE SHARING LOGIC ===================== */
+/* ===================== DIRECT PNG CANVAS GENERATION & SHARE ===================== */
+const COLOR_PALETTES = {
+  discover: { grad: ['#d2f860', '#a2e014'] },
+  wordwork: { grad: ['#fb5672', '#be123c'] },
+  expand:   { grad: ['#b862f8', '#7e22ce'] },
+  learn:    { grad: ['#ffd452', '#eab308'] },
+  live:     { grad: ['#262626', '#050505'] },
+  cream:    { grad: ['#f4f0e8', '#d8d2c7'] }
+};
+
+function drawCentralTruthBlob(verseNum, trait, colorKey) {
+  return new Promise((resolve) => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1080;
+    canvas.height = 1080;
+    const ctx = canvas.getContext('2d');
+
+    const palette = COLOR_PALETTES[colorKey] || COLOR_PALETTES.discover;
+
+    // 1. Background Gradient
+    const grad = ctx.createLinearGradient(0, 0, 1080, 1080);
+    grad.addColorStop(0, palette.grad[0]);
+    grad.addColorStop(1, palette.grad[1]);
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 1080, 1080);
+
+    // 2. White Circle Card
+    const centerX = 540;
+    const centerY = 540;
+    const radius = 380;
+
+    // Circle drop shadow
+    ctx.save();
+    ctx.fillStyle = '#0D0D0D';
+    ctx.beginPath();
+    ctx.arc(centerX + 16, centerY + 16, radius, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    // Circle Body
+    ctx.fillStyle = '#FFFFFF';
+    ctx.lineWidth = 14;
+    ctx.strokeStyle = '#0D0D0D';
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    // 3. Text in Circle
+    ctx.fillStyle = 'rgba(13, 13, 13, 0.65)';
+    ctx.font = '800 32px "Space Grotesk", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(`MARK 2:${verseNum}`.toUpperCase(), centerX, centerY - 140);
+
+    ctx.fillStyle = '#0D0D0D';
+    ctx.font = '900 68px "Space Grotesk", sans-serif';
+    ctx.fillText('GOD IS...', centerX, centerY - 50);
+
+    const traitCapitalized = trait.charAt(0).toUpperCase() + trait.slice(1);
+    ctx.fillStyle = '#A855F7';
+    ctx.font = '900 64px "Inter", sans-serif';
+    ctx.fillText(traitCapitalized, centerX, centerY + 60);
+
+    const textWidth = ctx.measureText(traitCapitalized).width;
+    ctx.strokeStyle = '#0D0D0D';
+    ctx.lineWidth = 8;
+    ctx.beginPath();
+    ctx.moveTo(centerX - (textWidth / 2) - 10, centerY + 105);
+    ctx.lineTo(centerX + (textWidth / 2) + 10, centerY + 105);
+    ctx.stroke();
+
+    canvas.toBlob((blob) => resolve(blob), 'image/png');
+  });
+}
+
 window.openShareOverlay = function() {
   const activeVerse = state.charVerse || PASSAGE_START_VERSE;
   const arcStem = document.getElementById('shareArcStem');
@@ -2409,40 +2483,37 @@ window.closeShareOverlay = function() {
   if (overlay) overlay.style.display = 'none';
 };
 
-async function generateAndShareCard(nodeElement, triggerBtn, shareText) {
-  const originalHtml = triggerBtn.innerHTML;
-  triggerBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Preparing Image…';
-  triggerBtn.disabled = true;
+async function executeImageShare(btn, colorKey) {
+  const originalHtml = btn.innerHTML;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sharing…';
+  btn.disabled = true;
+
+  const activeVerse = state.charVerse || PASSAGE_START_VERSE;
+  const traitText = (state.trait && state.trait.trim()) ? state.trait.trim() : 'Forgiving';
+  const shareText = `Central Truth: God is ${traitText} (Mark 2:${activeVerse})`;
 
   try {
-    const canvas = await html2canvas(nodeElement, { 
-      backgroundColor: null, 
-      scale: 2, 
-      useCORS: true,
-      logging: false 
-    });
-    
-    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-    if (!blob) throw new Error('Canvas conversion produced no data');
+    const blob = await drawCentralTruthBlob(activeVerse, traitText, colorKey);
+    if (!blob) throw new Error('Blob generation failed');
 
-    const file = new File([blob], 'central-truth.png', { type: 'image/png' });
+    const file = new File([blob], `god-is-${traitText.toLowerCase()}.png`, { type: 'image/png' });
 
-    // 1. Native Image Sharing (Directly shares PNG to iOS / Android share sheet)
+    // 1. Mobile Native Image Share Sheet
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
       await navigator.share({
         files: [file],
-        title: 'Central Truth',
+        title: 'My Central Truth',
         text: shareText
       });
       window.closeShareOverlay();
       return;
     }
 
-    // 2. Direct PNG file download fallback for desktop/browsers without file share support
+    // 2. Direct PNG File Download Fallback (Desktop/unsupported browsers)
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `central-truth-mark-2.png`;
+    a.download = `god-is-${traitText.toLowerCase()}.png`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -2451,39 +2522,23 @@ async function generateAndShareCard(nodeElement, triggerBtn, shareText) {
 
   } catch (err) {
     if (err.name !== 'AbortError') {
-      console.error('Sharing failed', err);
+      console.error('Share failure:', err);
       window.openShareOverlay();
     }
   } finally {
-    triggerBtn.innerHTML = originalHtml;
-    triggerBtn.disabled = false;
+    btn.innerHTML = originalHtml;
+    btn.disabled = false;
   }
 }
 
 window.triggerShareFlow = async function() {
-  const activeVerse = state.charVerse || PASSAGE_START_VERSE;
-  const traitText = (state.trait && state.trait.trim()) ? state.trait.trim() : 'Forgiving';
-  const shareText = `Central Truth: God is ${traitText} (Mark 2:${activeVerse})`;
   const shareBtn = document.getElementById('shareTruthBtn');
-
-  const arcStem = document.getElementById('shareArcStem');
-  const traitTextEl = document.getElementById('shareTraitText');
-  if (arcStem) arcStem.textContent = `MARK 2:${activeVerse}`;
-  if (traitTextEl) traitTextEl.textContent = traitText;
-  selectShareColor(state.shareColor || 'discover');
-
-  const stageNode = document.getElementById('shareCardStage');
-  await generateAndShareCard(stageNode, shareBtn, shareText);
+  await executeImageShare(shareBtn, state.shareColor || 'discover');
 };
 
 window.confirmShareImage = async function() {
-  const activeVerse = state.charVerse || PASSAGE_START_VERSE;
-  const traitText = (state.trait && state.trait.trim()) ? state.trait.trim() : 'Forgiving';
-  const shareText = `Central Truth: God is ${traitText} (Mark 2:${activeVerse})`;
   const confirmBtn = document.getElementById('shareConfirmBtn');
-  const stageNode = document.getElementById('shareCardStage');
-
-  await generateAndShareCard(stageNode, confirmBtn, shareText);
+  await executeImageShare(confirmBtn, state.shareColor || 'discover');
 };
 
 function openDevNotesPanel(){
