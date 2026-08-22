@@ -1226,6 +1226,7 @@
   .dnp-status{ font-size:12px; font-weight:700; font-family:'Inter',sans-serif; }
 
   .share-trigger-btn{
+    position:relative; z-index:5; pointer-events:auto;
     background:#FFF; border:3.5px solid var(--ink); border-radius:100px; padding:12px 22px;
     box-shadow:4px 4px 0 var(--ink); display:inline-flex; align-items:center; gap:9px;
     cursor:pointer; transition:all .15s ease; color:var(--ink);
@@ -1328,7 +1329,7 @@
       <h3>Share Your Central Truth</h3>
       <div class="share-card-stage" id="shareCardStage">
         <div class="circle-hero" id="shareCircleHero">
-          <div class="arc-stem-text" id="shareArcStem">BASED ON VERSE:</div>
+          <div class="arc-stem-text" id="shareArcStem">MARK 2</div>
           <div class="label-god-is">GOD IS...</div>
           <div class="static-trait" id="shareTraitText">Forgiving</div>
         </div>
@@ -1689,7 +1690,6 @@ const beats = [
               <button class="share-trigger-btn" id="shareTruthBtn" onclick="event.stopPropagation(); openShareOverlay();" style="margin-top:14px;">
                 <i class="fa-solid fa-arrow-up-from-bracket"></i> Share Your Central Truth
               </button>
-              <div class="final-guide-complete">Guide Complete</div>
             </div>
           </div>` }
 ];
@@ -2385,7 +2385,7 @@ function selectShareColor(key){
 
 function openShareOverlay(){
   const activeVerse = state.charVerse || PASSAGE_START_VERSE;
-  document.getElementById('shareArcStem').textContent = `BASED ON VERSE ${activeVerse}:`;
+  document.getElementById('shareArcStem').textContent = `MARK 2:${activeVerse}`;
   document.getElementById('shareTraitText').textContent = (state.trait && state.trait.trim()) ? state.trait.trim() : 'Forgiving';
   initShareSwatches();
   selectShareColor(state.shareColor || 'discover');
