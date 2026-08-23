@@ -1,518 +1,516 @@
-l<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>ChoreTrail</title>
 <style>
-  html, body { margin: 0; padding: 0; background: #F3EEE7; }
+  @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@500;700;800&display=swap');
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #F3EEE7; font-family: 'Nunito', -apple-system, sans-serif; }
   #root { max-width: 460px; margin: 0 auto; padding: 16px; }
   @media (min-width: 480px) { #root { padding: 24px; } }
-</style>
+  button { font-family: inherit; }
 
-<!-- React itself, from a CDN -->
-<script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-<!-- Babel, to turn the JSX below into plain JS right in the browser -->
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-<!-- Icon set used throughout the app -->
-<script src="https://unpkg.com/lucide-react@0.383.0/dist/umd/lucide-react.js" crossorigin></script>
+  @keyframes fall { to { transform: translateY(140px) rotate(200deg); opacity: 0; } }
+  @keyframes bob {
+    0%, 100% { transform: translateY(0) rotate(-2deg); }
+    50% { transform: translateY(-5px) rotate(2deg); }
+  }
+  .bob { animation: bob 2.4s ease-in-out infinite; }
+  .bob-fast { animation: bob 1.5s ease-in-out infinite; }
+
+  .sky { border-radius: 28px; padding: 20px; position: relative; overflow: hidden; transition: background 1.2s ease; }
+  .row { display: flex; align-items: center; }
+  .row-between { display: flex; justify-content: space-between; align-items: center; }
+  .kid-btn { flex: 1; border: none; cursor: pointer; border-radius: 22px; display: flex; flex-direction: column; align-items: center; gap: 2px; transition: all 0.2s ease; }
+  .chore-card { position: relative; border-radius: 20px; padding: 14px 16px; display: flex; align-items: center; gap: 14px; transition: all 0.25s ease; }
+  .icon-box { width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: pointer; }
+  .done-btn { background: none; border: none; cursor: pointer; flex-shrink: 0; }
+  .footer-card { margin-top: 16px; background: white; border-radius: 22px; padding: 16px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
+  .week-strip { display: flex; gap: 6px; margin-top: 6px; }
+  .week-dot { width: 26px; height: 26px; border-radius: 999px; display: flex; align-items: center; justify-content: center; font-family: 'Nunito', sans-serif; font-size: 11px; font-weight: 800; }
+  .lock-btn { background: #ffffff33; border: none; border-radius: 999px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .confetti-wrap { position: absolute; inset: 0; pointer-events: none; overflow: hidden; border-radius: 20px; }
+  .confetti-piece { position: absolute; top: -10%; width: 7px; height: 7px; }
+  .timer-row { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+  .timer-btn { border: none; border-radius: 999px; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 0 rgba(0,0,0,0.15); }
+</style>
 </head>
 <body>
 <div id="root"></div>
 
-<script type="text/babel" data-presets="react">
-const { useState, useEffect, useRef, useCallback } = React;
-const {
-  Sun, Moon, CheckCircle2, Circle, Play, Pause, RotateCcw,
-  Lock, Unlock, Coins, Award, Shirt, Backpack, Bed, Utensils,
-  Sparkles, Dog,
-} = LucideReact;
+<script>
+"use strict";
 
 /* ---------------------------------------------------------------
-   ChoreTrail — a walk-the-path chore/timer/reward app for kids.
-   Signature idea: each routine is a little path across a sky that
-   actually shifts with the time of day. Every chore is a stepping
-   stone; finishing one moves the kid's marker further down the
-   path toward home (morning) or bed (evening).
+   ChoreTrail — vanilla JS build (no React, no build step).
+   Each routine is a little path across a sky that shifts with the
+   time of day. Every chore is a stepping stone with its own timer.
 ----------------------------------------------------------------- */
 
-const FONT_IMPORT = `@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@500;700;800&display=swap');`;
-
-function MilesLionCub({ size = 64, mood = "idle" }) {
-  const petals = 10;
-  return (
-    <svg width={size} height={size} viewBox="0 0 100 100">
-      <g>
-        {Array.from({ length: petals }).map((_, i) => {
-          const angle = (360 / petals) * i;
-          return (
-            <ellipse
-              key={i}
-              cx="50" cy="16" rx="12" ry="16"
-              fill={i % 2 === 0 ? "#FF9B42" : "#FFC15E"}
-              transform={`rotate(${angle} 50 50)`}
-            />
-          );
-        })}
-      </g>
-      <circle cx="50" cy="50" r="27" fill="#FFE3B0" />
-      <ellipse cx="34" cy="34" rx="7" ry="6" fill="#FF9B42" />
-      <ellipse cx="66" cy="34" rx="7" ry="6" fill="#FF9B42" />
-      <circle cx="40" cy="49" r="4.4" fill="#4A2E15" />
-      <circle cx="60" cy="49" r="4.4" fill="#4A2E15" />
-      <circle cx="41.3" cy="47.5" r="1.3" fill="#fff" />
-      <circle cx="61.3" cy="47.5" r="1.3" fill="#fff" />
-      <ellipse cx="46" cy="60" rx="4.5" ry="10" fill="#F7C9A0" opacity="0.6" />
-      <ellipse cx="54" cy="60" rx="4.5" ry="10" fill="#F7C9A0" opacity="0.6" />
-      <ellipse cx="50" cy="57" rx="3.6" ry="2.6" fill="#E8895A" />
-      {mood === "happy" ? (
-        <path d="M40 63 Q50 72 60 63" stroke="#4A2E15" strokeWidth="2.6" fill="none" strokeLinecap="round" />
-      ) : (
-        <path d="M42 64 Q50 69 58 64" stroke="#4A2E15" strokeWidth="2.6" fill="none" strokeLinecap="round" />
-      )}
-    </svg>
-  );
-}
-
-function LinaButterflyPixie({ size = 64, mood = "idle" }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 100 100">
-      <g opacity="0.9">
-        <path d="M46 50 C20 20, 4 24, 8 46 C4 66, 24 66, 46 54 Z" fill="#7DD8C6" />
-        <path d="M54 50 C80 20, 96 24, 92 46 C96 66, 76 66, 54 54 Z" fill="#5B7FFF" />
-        <path d="M46 54 C26 62, 16 78, 26 84 C36 88, 44 70, 48 58 Z" fill="#7DD8C6" opacity="0.85" />
-        <path d="M54 54 C74 62, 84 78, 74 84 C64 88, 56 70, 52 58 Z" fill="#5B7FFF" opacity="0.85" />
-      </g>
-      <path d="M46 22 Q40 10 33 9" stroke="#5B7FFF" strokeWidth="2.4" fill="none" strokeLinecap="round" />
-      <path d="M54 22 Q60 10 67 9" stroke="#5B7FFF" strokeWidth="2.4" fill="none" strokeLinecap="round" />
-      <circle cx="33" cy="9" r="2.4" fill="#5B7FFF" />
-      <circle cx="67" cy="9" r="2.4" fill="#5B7FFF" />
-      <circle cx="50" cy="50" r="24" fill="#FFF3E9" />
-      <path d="M28 40 Q34 22 50 24" stroke="#4A3A6B" strokeWidth="6" fill="none" strokeLinecap="round" />
-      <circle cx="41" cy="49" r="4.2" fill="#3F2E5C" />
-      <circle cx="59" cy="49" r="4.2" fill="#3F2E5C" />
-      <circle cx="42.3" cy="47.5" r="1.2" fill="#fff" />
-      <circle cx="60.3" cy="47.5" r="1.2" fill="#fff" />
-      <ellipse cx="47" cy="59" rx="3.6" ry="8" fill="#FFC9B8" opacity="0.55" />
-      <ellipse cx="53" cy="59" rx="3.6" ry="8" fill="#FFC9B8" opacity="0.55" />
-      {mood === "happy" ? (
-        <path d="M41 62 Q50 70 59 62" stroke="#3F2E5C" strokeWidth="2.4" fill="none" strokeLinecap="round" />
-      ) : (
-        <path d="M43 63 Q50 68 57 63" stroke="#3F2E5C" strokeWidth="2.4" fill="none" strokeLinecap="round" />
-      )}
-    </svg>
-  );
-}
-
-const KIDS = {
-  miles: { name: "Miles", age: 3, accent: "#FF9B42", accent2: "#FFD166", Character: MilesLionCub },
-  lina: { name: "Lina", age: 7, accent: "#5B7FFF", accent2: "#7DD8C6", Character: LinaButterflyPixie },
+var KIDS = {
+  miles: { name: "Miles", age: 3, accent: "#FF9B42", accent2: "#FFD166", mascot: "lion" },
+  lina:  { name: "Lina",  age: 7, accent: "#5B7FFF", accent2: "#7DD8C6", mascot: "butterfly" }
 };
 
-const CHORE_LIBRARY = {
+var CHORE_LIBRARY = {
   miles: {
     morning: [
-      { id: "m1", label: "Get dressed", minutes: 5, icon: Shirt },
-      { id: "m2", label: "Brush teeth", minutes: 2, icon: Sparkles },
-      { id: "m3", label: "Eat breakfast", minutes: 10, icon: Utensils },
-      { id: "m4", label: "Pack backpack", minutes: 3, icon: Backpack },
+      { id: "m1", label: "Get dressed",   minutes: 5,  icon: "shirt" },
+      { id: "m2", label: "Brush teeth",   minutes: 2,  icon: "sparkles" },
+      { id: "m3", label: "Eat breakfast", minutes: 10, icon: "utensils" },
+      { id: "m4", label: "Pack backpack", minutes: 3,  icon: "backpack" }
     ],
     evening: [
-      { id: "e1", label: "Clean up toys", minutes: 5, icon: Circle },
-      { id: "e2", label: "Bath time", minutes: 10, icon: Dog },
-      { id: "e3", label: "Brush teeth", minutes: 2, icon: Sparkles },
-      { id: "e4", label: "Pajamas + bed", minutes: 5, icon: Bed },
-    ],
+      { id: "e1", label: "Clean up toys", minutes: 5,  icon: "circle" },
+      { id: "e2", label: "Bath time",     minutes: 10, icon: "dog" },
+      { id: "e3", label: "Brush teeth",   minutes: 2,  icon: "sparkles" },
+      { id: "e4", label: "Pajamas + bed", minutes: 5,  icon: "bed" }
+    ]
   },
   lina: {
     morning: [
-      { id: "m1", label: "Make bed", minutes: 3, icon: Bed },
-      { id: "m2", label: "Get dressed", minutes: 5, icon: Shirt },
-      { id: "m3", label: "Brush teeth", minutes: 2, icon: Sparkles },
-      { id: "m4", label: "Eat breakfast", minutes: 10, icon: Utensils },
-      { id: "m5", label: "Pack backpack", minutes: 3, icon: Backpack },
+      { id: "m1", label: "Make bed",      minutes: 3,  icon: "bed" },
+      { id: "m2", label: "Get dressed",   minutes: 5,  icon: "shirt" },
+      { id: "m3", label: "Brush teeth",   minutes: 2,  icon: "sparkles" },
+      { id: "m4", label: "Eat breakfast", minutes: 10, icon: "utensils" },
+      { id: "m5", label: "Pack backpack", minutes: 3,  icon: "backpack" }
     ],
     evening: [
-      { id: "e1", label: "Tidy room", minutes: 8, icon: Circle },
-      { id: "e2", label: "Shower", minutes: 10, icon: Dog },
-      { id: "e3", label: "Brush teeth", minutes: 2, icon: Sparkles },
-      { id: "e4", label: "Read + lights out", minutes: 10, icon: Bed },
-    ],
-  },
+      { id: "e1", label: "Tidy room",           minutes: 8,  icon: "circle" },
+      { id: "e2", label: "Shower",              minutes: 10, icon: "dog" },
+      { id: "e3", label: "Brush teeth",         minutes: 2,  icon: "sparkles" },
+      { id: "e4", label: "Read + lights out",   minutes: 10, icon: "bed" }
+    ]
+  }
 };
 
-function useClock() {
-  const [now, setNow] = useState(new Date());
-  useEffect(() => {
-    const t = setInterval(() => setNow(new Date()), 1000 * 15);
-    return () => clearInterval(t);
-  }, []);
-  return now;
+/* ---------------- state ---------------- */
+var state = {
+  kidId: "lina",
+  parentMode: false,
+  periodOverride: null,
+  done: {},        // choreKey -> true
+  timerUI: {},      // choreKey -> bool, is the timer row expanded
+  timers: {},       // choreKey -> { totalSeconds, remainingSeconds, running, endTimestamp }
+  badges: { miles: 2, lina: 5 },
+  lastRenderedPeriod: null
+};
+
+function naturalPeriod() {
+  var h = new Date().getHours();
+  return (h >= 4 && h < 15) ? "morning" : "evening";
+}
+function currentPeriod() {
+  return state.periodOverride || naturalPeriod();
+}
+function choreKey(kidId, period, choreId) {
+  return kidId + "-" + period + "-" + choreId;
+}
+function ensureTimer(key, minutes) {
+  if (!state.timers[key]) {
+    state.timers[key] = { totalSeconds: minutes * 60, remainingSeconds: minutes * 60, running: false, endTimestamp: null };
+  }
+  return state.timers[key];
+}
+function formatClock(d) {
+  var h = d.getHours();
+  var m = d.getMinutes();
+  var ampm = h >= 12 ? "PM" : "AM";
+  h = h % 12 || 12;
+  return h + ":" + (m < 10 ? "0" + m : m) + " " + ampm;
 }
 
+/* ---------------- sound ---------------- */
 function playChime() {
   try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const notes = [523.25, 659.25, 783.99];
-    notes.forEach((freq, i) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
+    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    var notes = [523.25, 659.25, 783.99];
+    notes.forEach(function (freq, i) {
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
       osc.type = "sine";
       osc.frequency.value = freq;
       osc.connect(gain);
       gain.connect(ctx.destination);
-      const start = ctx.currentTime + i * 0.09;
+      var start = ctx.currentTime + i * 0.09;
       gain.gain.setValueAtTime(0.0001, start);
       gain.gain.exponentialRampToValueAtTime(0.18, start + 0.02);
       gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.35);
       osc.start(start);
       osc.stop(start + 0.4);
     });
-  } catch (e) {}
+  } catch (e) { /* audio unavailable, ignore */ }
 }
 
-function formatClock(d) {
-  let h = d.getHours();
-  const m = d.getMinutes();
-  const ampm = h >= 12 ? "PM" : "AM";
-  h = h % 12 || 12;
-  return `${h}:${m.toString().padStart(2, "0")} ${ampm}`;
+/* ---------------- confetti (DOM-injected, independent of render cycle) ---------------- */
+function spawnConfetti(containerEl) {
+  if (!containerEl) return;
+  var wrap = document.createElement("div");
+  wrap.className = "confetti-wrap";
+  var colors = ["#FF9B42", "#FFD166", "#5B7FFF", "#7DD8C6", "#FF6B6B"];
+  for (var i = 0; i < 14; i++) {
+    var span = document.createElement("span");
+    span.className = "confetti-piece";
+    var left = Math.random() * 100;
+    var delay = Math.random() * 0.2;
+    var dur = 0.7 + Math.random() * 0.5;
+    var color = colors[i % colors.length];
+    span.style.left = left + "%";
+    span.style.background = color;
+    span.style.borderRadius = (i % 2) ? "50%" : "2px";
+    span.style.animation = "fall " + dur + "s ease-in " + delay + "s forwards";
+    wrap.appendChild(span);
+  }
+  containerEl.appendChild(wrap);
+  setTimeout(function () { if (wrap.parentNode) wrap.parentNode.removeChild(wrap); }, 1200);
 }
 
-function ChoreTimer({ minutes, active, onComplete, accent }) {
-  const [secondsLeft, setSecondsLeft] = useState(minutes * 60);
-  const [running, setRunning] = useState(false);
-  const intervalRef = useRef(null);
-
-  useEffect(() => {
-    if (running) {
-      intervalRef.current = setInterval(() => {
-        setSecondsLeft((s) => {
-          if (s <= 1) {
-            clearInterval(intervalRef.current);
-            setRunning(false);
-            playChime();
-            onComplete();
-            return 0;
-          }
-          return s - 1;
-        });
-      }, 1000);
-    }
-    return () => clearInterval(intervalRef.current);
-  }, [running, onComplete]);
-
-  const reset = () => {
-    clearInterval(intervalRef.current);
-    setRunning(false);
-    setSecondsLeft(minutes * 60);
-  };
-
-  const pct = 1 - secondsLeft / (minutes * 60);
-  const mm = Math.floor(secondsLeft / 60);
-  const ss = secondsLeft % 60;
-
-  if (!active) return null;
-
-  return (
-    <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 8 }}>
-      <div style={{ position: "relative", width: 44, height: 44 }}>
-        <svg width="44" height="44" viewBox="0 0 44 44">
-          <circle cx="22" cy="22" r="18" fill="none" stroke="#ffffff55" strokeWidth="5" />
-          <circle
-            cx="22" cy="22" r="18" fill="none"
-            stroke={accent} strokeWidth="5" strokeLinecap="round"
-            strokeDasharray={2 * Math.PI * 18}
-            strokeDashoffset={2 * Math.PI * 18 * (1 - pct)}
-            transform="rotate(-90 22 22)"
-            style={{ transition: "stroke-dashoffset 1s linear" }}
-          />
-        </svg>
-        <div style={{
-          position: "absolute", inset: 0, display: "flex", alignItems: "center",
-          justifyContent: "center", fontFamily: "'Nunito', sans-serif",
-          fontWeight: 800, fontSize: 11, color: "#3a2e2e",
-        }}>
-          {mm}:{ss.toString().padStart(2, "0")}
-        </div>
-      </div>
-      <button onClick={() => setRunning((r) => !r)} style={btnStyle(accent)} aria-label={running ? "Pause timer" : "Start timer"}>
-        {running ? <Pause size={16} /> : <Play size={16} />}
-      </button>
-      <button onClick={reset} style={btnStyle("#ffffffcc", "#3a2e2e")} aria-label="Reset timer">
-        <RotateCcw size={15} />
-      </button>
-    </div>
-  );
+/* ---------------- icons (small hand-drawn SVGs, no library needed) ---------------- */
+function svgOpen(size, color, filled) {
+  if (filled) return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="' + (color || "currentColor") + '">';
+  return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="' + (color || "currentColor") + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">';
+}
+function iconSun(size, color) {
+  return svgOpen(size, color) + '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+}
+function iconMoon(size, color) {
+  return svgOpen(size, color) + '<path d="M21 12.8A9 9 0 1111.2 3 7 7 0 0021 12.8z"/></svg>';
+}
+function iconCheckCircle(size, color) {
+  return svgOpen(size, color) + '<circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 5-5"/></svg>';
+}
+function iconCircle(size, color) {
+  return svgOpen(size, color) + '<circle cx="12" cy="12" r="9"/></svg>';
+}
+function iconPlay(size, color) {
+  return svgOpen(size, color, true) + '<path d="M6 4l14 8-14 8V4z"/></svg>';
+}
+function iconPause(size, color) {
+  return svgOpen(size, color, true) + '<rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>';
+}
+function iconReset(size, color) {
+  return svgOpen(size, color) + '<path d="M3 12a9 9 0 109-9 9 9 0 00-6.7 3"/><path d="M3 4v5h5"/></svg>';
+}
+function iconLock(size, color) {
+  return svgOpen(size, color) + '<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>';
+}
+function iconUnlock(size, color) {
+  return svgOpen(size, color) + '<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 017.5-2"/></svg>';
+}
+function iconCoins(size, color) {
+  return svgOpen(size, color) + '<circle cx="9" cy="10" r="6"/><circle cx="15" cy="14" r="6"/></svg>';
+}
+function iconAward(size, color) {
+  return svgOpen(size, color) + '<circle cx="12" cy="8" r="6"/><path d="M9 13l-2 8 5-3 5 3-2-8"/></svg>';
+}
+function choreIcon(name, size, color) {
+  switch (name) {
+    case "shirt": return svgOpen(size, color) + '<path d="M8 4l4 2 4-2 4 4-3 3v9H7v-9L4 8z"/></svg>';
+    case "backpack": return svgOpen(size, color) + '<rect x="6" y="7" width="12" height="14" rx="3"/><path d="M9 7V5a3 3 0 016 0v2"/><rect x="9" y="11" width="6" height="4" rx="1"/></svg>';
+    case "bed": return svgOpen(size, color) + '<path d="M3 18v-6a2 2 0 012-2h14a2 2 0 012 2v6"/><path d="M3 18v2M21 18v2"/><path d="M3 12V8a2 2 0 012-2h4v6"/><path d="M11 12V8h6a2 2 0 012 2v2"/></svg>';
+    case "utensils": return svgOpen(size, color) + '<path d="M7 3v7a2 2 0 002 2v9M7 3v4M9 3v4M11 3v7"/><path d="M17 3c-2 0-3 2-3 5s1 4 3 4v9"/></svg>';
+    case "sparkles": return svgOpen(size, color, true) + '<path d="M12 2l1.6 5.4L19 9l-5.4 1.6L12 16l-1.6-5.4L5 9l5.4-1.6L12 2z"/><path d="M19 14l.8 2.2L22 17l-2.2.8L19 20l-.8-2.2L16 17l2.2-.8L19 14z"/></svg>';
+    case "dog": return svgOpen(size, color) + '<path d="M5 8c-2 0-3 2-2 4l1 2"/><path d="M19 8c2 0 3 2 2 4l-1 2"/><circle cx="12" cy="13" r="7"/><circle cx="9.5" cy="12" r="0.8" fill="' + (color || "currentColor") + '"/><circle cx="14.5" cy="12" r="0.8" fill="' + (color || "currentColor") + '"/><path d="M10.5 16c.5 1 2.5 1 3 0"/></svg>';
+    case "circle":
+    default: return iconCircle(size, color);
+  }
 }
 
-function btnStyle(bg, color = "white") {
-  return {
-    background: bg, color, border: "none", borderRadius: 999,
-    width: 34, height: 34, display: "flex", alignItems: "center",
-    justifyContent: "center", cursor: "pointer", boxShadow: "0 2px 0 rgba(0,0,0,0.15)",
-  };
+/* ---------------- mascots ---------------- */
+function mascotLion(size, mood) {
+  var petals = "";
+  for (var i = 0; i < 10; i++) {
+    var angle = (360 / 10) * i;
+    petals += '<ellipse cx="50" cy="16" rx="12" ry="16" fill="' + (i % 2 === 0 ? "#FF9B42" : "#FFC15E") + '" transform="rotate(' + angle + ' 50 50)"/>';
+  }
+  var mouth = (mood === "happy")
+    ? '<path d="M40 63 Q50 72 60 63" stroke="#4A2E15" stroke-width="2.6" fill="none" stroke-linecap="round"/>'
+    : '<path d="M42 64 Q50 69 58 64" stroke="#4A2E15" stroke-width="2.6" fill="none" stroke-linecap="round"/>';
+  return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 100 100">' +
+    '<g>' + petals + '</g>' +
+    '<circle cx="50" cy="50" r="27" fill="#FFE3B0"/>' +
+    '<ellipse cx="34" cy="34" rx="7" ry="6" fill="#FF9B42"/>' +
+    '<ellipse cx="66" cy="34" rx="7" ry="6" fill="#FF9B42"/>' +
+    '<circle cx="40" cy="49" r="4.4" fill="#4A2E15"/>' +
+    '<circle cx="60" cy="49" r="4.4" fill="#4A2E15"/>' +
+    '<circle cx="41.3" cy="47.5" r="1.3" fill="#fff"/>' +
+    '<circle cx="61.3" cy="47.5" r="1.3" fill="#fff"/>' +
+    '<ellipse cx="46" cy="60" rx="4.5" ry="10" fill="#F7C9A0" opacity="0.6"/>' +
+    '<ellipse cx="54" cy="60" rx="4.5" ry="10" fill="#F7C9A0" opacity="0.6"/>' +
+    '<ellipse cx="50" cy="57" rx="3.6" ry="2.6" fill="#E8895A"/>' +
+    mouth + '</svg>';
+}
+function mascotButterfly(size, mood) {
+  var mouth = (mood === "happy")
+    ? '<path d="M41 62 Q50 70 59 62" stroke="#3F2E5C" stroke-width="2.4" fill="none" stroke-linecap="round"/>'
+    : '<path d="M43 63 Q50 68 57 63" stroke="#3F2E5C" stroke-width="2.4" fill="none" stroke-linecap="round"/>';
+  return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 100 100">' +
+    '<g opacity="0.9">' +
+    '<path d="M46 50 C20 20, 4 24, 8 46 C4 66, 24 66, 46 54 Z" fill="#7DD8C6"/>' +
+    '<path d="M54 50 C80 20, 96 24, 92 46 C96 66, 76 66, 54 54 Z" fill="#5B7FFF"/>' +
+    '<path d="M46 54 C26 62, 16 78, 26 84 C36 88, 44 70, 48 58 Z" fill="#7DD8C6" opacity="0.85"/>' +
+    '<path d="M54 54 C74 62, 84 78, 74 84 C64 88, 56 70, 52 58 Z" fill="#5B7FFF" opacity="0.85"/>' +
+    '</g>' +
+    '<path d="M46 22 Q40 10 33 9" stroke="#5B7FFF" stroke-width="2.4" fill="none" stroke-linecap="round"/>' +
+    '<path d="M54 22 Q60 10 67 9" stroke="#5B7FFF" stroke-width="2.4" fill="none" stroke-linecap="round"/>' +
+    '<circle cx="33" cy="9" r="2.4" fill="#5B7FFF"/>' +
+    '<circle cx="67" cy="9" r="2.4" fill="#5B7FFF"/>' +
+    '<circle cx="50" cy="50" r="24" fill="#FFF3E9"/>' +
+    '<path d="M28 40 Q34 22 50 24" stroke="#4A3A6B" stroke-width="6" fill="none" stroke-linecap="round"/>' +
+    '<circle cx="41" cy="49" r="4.2" fill="#3F2E5C"/>' +
+    '<circle cx="59" cy="49" r="4.2" fill="#3F2E5C"/>' +
+    '<circle cx="42.3" cy="47.5" r="1.2" fill="#fff"/>' +
+    '<circle cx="60.3" cy="47.5" r="1.2" fill="#fff"/>' +
+    '<ellipse cx="47" cy="59" rx="3.6" ry="8" fill="#FFC9B8" opacity="0.55"/>' +
+    '<ellipse cx="53" cy="59" rx="3.6" ry="8" fill="#FFC9B8" opacity="0.55"/>' +
+    mouth + '</svg>';
+}
+function mascotSVG(kind, size, mood) {
+  return kind === "lion" ? mascotLion(size, mood) : mascotButterfly(size, mood);
 }
 
-function Confetti({ show }) {
-  if (!show) return null;
-  const pieces = Array.from({ length: 14 });
-  return (
-    <div style={{ position: "absolute", inset: 0, pointerEvents: "none", overflow: "hidden", borderRadius: 20 }}>
-      {pieces.map((_, i) => {
-        const left = Math.random() * 100;
-        const delay = Math.random() * 0.2;
-        const dur = 0.7 + Math.random() * 0.5;
-        const colors = ["#FF9B42", "#FFD166", "#5B7FFF", "#7DD8C6", "#FF6B6B"];
-        const color = colors[i % colors.length];
-        return (
-          <span key={i} style={{
-            position: "absolute", left: `${left}%`, top: "-10%",
-            width: 7, height: 7, background: color,
-            borderRadius: i % 2 ? "50%" : 2,
-            animation: `fall ${dur}s ease-in ${delay}s forwards`,
-          }} />
-        );
-      })}
-    </div>
-  );
-}
+/* ---------------- render ---------------- */
+function render() {
+  var kidId = state.kidId;
+  var kid = KIDS[kidId];
+  var period = currentPeriod();
+  state.lastRenderedPeriod = period;
+  var isMorning = period === "morning";
+  var chores = CHORE_LIBRARY[kidId][period];
 
-function ChoreStone({ chore, done, onToggle, accent }) {
-  const Icon = chore.icon || Circle;
-  const [showConfetti, setShowConfetti] = useState(false);
-  const [timerActive, setTimerActive] = useState(false);
+  var doneCount = 0;
+  chores.forEach(function (c) {
+    if (state.done[choreKey(kidId, period, c.id)]) doneCount++;
+  });
+  var allDone = doneCount === chores.length;
 
-  const handleComplete = useCallback(() => {
-    if (!done) {
-      onToggle(true);
-      setShowConfetti(true);
-      setTimeout(() => setShowConfetti(false), 1000);
-    }
-  }, [done, onToggle]);
-
-  const handleCardTap = () => {
-    if (done) { onToggle(false); return; }
-    playChime();
-    onToggle(true);
-    setShowConfetti(true);
-    setTimeout(() => setShowConfetti(false), 1000);
-  };
-
-  return (
-    <div style={{
-      position: "relative",
-      background: done ? `linear-gradient(135deg, ${accent}, ${accent}cc)` : "#ffffffee",
-      borderRadius: 20, padding: "14px 16px", display: "flex", alignItems: "center", gap: 14,
-      boxShadow: done ? `0 4px 0 ${accent}88, 0 8px 20px rgba(0,0,0,0.12)` : "0 4px 0 rgba(0,0,0,0.08), 0 8px 20px rgba(0,0,0,0.06)",
-      transition: "all 0.25s ease",
-    }}>
-      <Confetti show={showConfetti} />
-      <div
-        onClick={() => setTimerActive((t) => !t)}
-        style={{
-          width: 48, height: 48, borderRadius: 14,
-          background: done ? "#ffffff33" : `${accent}22`,
-          display: "flex", alignItems: "center", justifyContent: "center",
-          flexShrink: 0, cursor: "pointer",
-        }}
-        title="Tap for a timer"
-      >
-        <Icon size={24} color={done ? "white" : accent} />
-      </div>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 700, fontSize: 17, color: done ? "white" : "#3a2e2e", lineHeight: 1.15 }}>
-          {chore.label}
-        </div>
-        <div style={{ fontFamily: "'Nunito', sans-serif", fontSize: 12.5, fontWeight: 700, color: done ? "#ffffffcc" : "#8a7f7f", marginTop: 1 }}>
-          {chore.minutes} min · tap the icon for a timer
-        </div>
-        <ChoreTimer minutes={chore.minutes} active={timerActive && !done} onComplete={handleComplete} accent={accent} />
-      </div>
-      <button onClick={handleCardTap} style={{ background: "none", border: "none", cursor: "pointer", color: done ? "white" : "#c9c2c2", flexShrink: 0 }} aria-label={done ? "Mark not done" : "Mark done"}>
-        {done ? <CheckCircle2 size={30} /> : <Circle size={30} />}
-      </button>
-    </div>
-  );
-}
-
-function WeekStrip({ accent }) {
-  const days = ["S", "M", "T", "W", "T", "F", "S"];
-  const todayIdx = new Date().getDay();
-  return (
-    <div style={{ display: "flex", gap: 6, marginTop: 6 }}>
-      {days.map((d, i) => (
-        <div key={i} style={{
-          width: 26, height: 26, borderRadius: 999,
-          background: i < todayIdx ? accent : i === todayIdx ? `${accent}55` : "#ffffff40",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          fontFamily: "'Nunito', sans-serif", fontSize: 11, fontWeight: 800,
-          color: i <= todayIdx ? "white" : "#ffffffaa",
-          border: i === todayIdx ? `2px solid ${accent}` : "none",
-        }}>
-          {d}
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function ChoreTrail() {
-  const now = useClock();
-  const hour = now.getHours();
-  const autoPeriod = hour >= 4 && hour < 15 ? "morning" : "evening";
-
-  const [kidId, setKidId] = useState("lina");
-  const [period, setPeriod] = useState(autoPeriod);
-  const [parentMode, setParentMode] = useState(false);
-  const [doneMap, setDoneMap] = useState({});
-  const [badges] = useState({ miles: 2, lina: 5 });
-
-  useEffect(() => setPeriod(autoPeriod), [autoPeriod]);
-
-  const kid = KIDS[kidId];
-  const chores = CHORE_LIBRARY[kidId][period];
-  const key = (choreId) => `${kidId}-${period}-${choreId}`;
-  const doneCount = chores.filter((c) => doneMap[key(c.id)]).length;
-  const allDone = doneCount === chores.length;
-
-  const toggle = (choreId, val) => {
-    setDoneMap((prev) => ({ ...prev, [key(choreId)]: val }));
-  };
-
-  const isMorning = period === "morning";
-  const sky = isMorning
+  var sky = isMorning
     ? "linear-gradient(180deg, #FFE5A3 0%, #FFB683 45%, #FF9B7A 100%)"
     : "linear-gradient(180deg, #1B2A6B 0%, #3B3F8C 55%, #6B5B95 100%)";
-  const textOnSky = isMorning ? "#5A3A1A" : "#EAE6FF";
+  var textOnSky = isMorning ? "#5A3A1A" : "#EAE6FF";
 
-  return (
-    <div style={{ fontFamily: "'Nunito', sans-serif", minHeight: 560, position: "relative" }}>
-      <style>{`
-        ${FONT_IMPORT}
-        @keyframes fall { to { transform: translateY(140px) rotate(200deg); opacity: 0; } }
-        @keyframes bob {
-          0%, 100% { transform: translateY(0) rotate(-2deg); }
-          50% { transform: translateY(-5px) rotate(2deg); }
-        }
-        .bob { animation: bob 2.4s ease-in-out infinite; }
-        .bob-fast { animation: bob 1.5s ease-in-out infinite; }
-        * { box-sizing: border-box; }
-      `}</style>
+  var html = "";
+  html += '<div class="sky" style="background:' + sky + '">';
 
-      <div style={{ background: sky, borderRadius: 28, padding: 20, position: "relative", overflow: "hidden", transition: "background 1.2s ease" }}>
-        <div style={{ position: "absolute", top: 18, right: 24, opacity: 0.9 }}>
-          {isMorning ? <Sun size={38} color="#FFDE7A" /> : <Moon size={34} color="#EAE6FF" />}
-        </div>
+  html += '<div style="position:absolute;top:18px;right:24px;opacity:0.9">' +
+    (isMorning ? iconSun(38, "#FFDE7A") : iconMoon(34, "#EAE6FF")) + '</div>';
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <div style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 800, fontSize: 26, color: textOnSky, letterSpacing: 0.3 }}>
-            {formatClock(now)}
-          </div>
-          <button
-            onClick={() => setParentMode((p) => !p)}
-            style={{ background: "#ffffff33", border: "none", borderRadius: 999, width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: textOnSky }}
-            aria-label="Toggle parent mode"
-          >
-            {parentMode ? <Unlock size={17} /> : <Lock size={17} />}
-          </button>
-        </div>
+  html += '<div class="row-between">' +
+    '<div id="clock-el" style="font-family:\'Baloo 2\',sans-serif;font-weight:800;font-size:26px;color:' + textOnSky + ';letter-spacing:0.3px">' + formatClock(new Date()) + '</div>' +
+    '<button class="lock-btn" data-action="toggle-parent" style="color:' + textOnSky + '" aria-label="Toggle parent mode">' + (state.parentMode ? iconUnlock(17) : iconLock(17)) + '</button>' +
+    '</div>';
 
-        <div style={{ display: "flex", gap: 12, marginTop: 14 }}>
-          {Object.entries(KIDS).map(([id, k]) => {
-            const selected = kidId === id;
-            const Character = k.Character;
-            return (
-              <button
-                key={id}
-                onClick={() => setKidId(id)}
-                style={{
-                  flex: 1, border: "none", cursor: "pointer",
-                  borderRadius: 22, padding: selected ? "12px 10px 10px" : "10px 10px 8px",
-                  background: selected ? "white" : "#ffffff2e",
-                  display: "flex", flexDirection: "column", alignItems: "center", gap: 2,
-                  boxShadow: selected ? "0 4px 0 rgba(0,0,0,0.1), 0 10px 18px rgba(0,0,0,0.12)" : "none",
-                  transition: "all 0.2s ease",
-                }}
-              >
-                <div className={selected ? "bob-fast" : "bob"} style={{ filter: selected ? "none" : "grayscale(0.15) opacity(0.85)" }}>
-                  <Character size={selected ? 60 : 46} mood={selected ? "happy" : "idle"} />
-                </div>
-                <span style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 800, fontSize: selected ? 16 : 13.5, color: selected ? "#3a2e2e" : textOnSky, marginTop: 2 }}>
-                  {k.name}
-                </span>
-              </button>
-            );
-          })}
-        </div>
+  html += '<div class="row" style="gap:12px;margin-top:14px">';
+  Object.keys(KIDS).forEach(function (id) {
+    var k = KIDS[id];
+    var selected = kidId === id;
+    html += '<button class="kid-btn" data-action="select-kid" data-kid="' + id + '" style="padding:' + (selected ? "12px 10px 10px" : "10px 10px 8px") +
+      ';background:' + (selected ? "white" : "#ffffff2e") +
+      ';box-shadow:' + (selected ? "0 4px 0 rgba(0,0,0,0.1), 0 10px 18px rgba(0,0,0,0.12)" : "none") + '">' +
+      '<div class="' + (selected ? "bob-fast" : "bob") + '" style="filter:' + (selected ? "none" : "grayscale(0.15) opacity(0.85)") + '">' +
+      mascotSVG(k.mascot, selected ? 60 : 46, selected ? "happy" : "idle") + '</div>' +
+      '<span style="font-family:\'Baloo 2\',sans-serif;font-weight:800;font-size:' + (selected ? "16px" : "13.5px") + ';color:' + (selected ? "#3a2e2e" : textOnSky) + ';margin-top:2px">' + k.name + '</span>' +
+      '</button>';
+  });
+  html += '</div>';
 
-        <div style={{ marginTop: 18, display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-          <div style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 700, fontSize: 19, color: textOnSky }}>
-            {isMorning ? "☀️ Morning routine" : "🌙 Evening routine"}
-          </div>
-          <div style={{ fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: 13, color: textOnSky }}>
-            {doneCount}/{chores.length} done
-          </div>
-        </div>
-        {parentMode && (
-          <button
-            onClick={() => setPeriod((p) => (p === "morning" ? "evening" : "morning"))}
-            style={{ marginTop: 8, background: "#ffffff40", border: "none", borderRadius: 12, padding: "6px 10px", color: textOnSky, fontFamily: "'Nunito', sans-serif", fontWeight: 800, fontSize: 12, cursor: "pointer" }}
-          >
-            Parent: preview {isMorning ? "evening" : "morning"} list
-          </button>
-        )}
+  html += '<div class="row-between" style="margin-top:18px;align-items:baseline">' +
+    '<div style="font-family:\'Baloo 2\',sans-serif;font-weight:700;font-size:19px;color:' + textOnSky + '">' + (isMorning ? "\u2600\uFE0F Morning routine" : "\uD83C\uDF19 Evening routine") + '</div>' +
+    '<div style="font-family:\'Nunito\',sans-serif;font-weight:800;font-size:13px;color:' + textOnSky + '">' + doneCount + '/' + chores.length + ' done</div>' +
+    '</div>';
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 16 }}>
-          {chores.map((c) => (
-            <ChoreStone key={c.id} chore={c} done={!!doneMap[key(c.id)]} onToggle={(val) => toggle(c.id, val)} accent={kid.accent} />
-          ))}
-        </div>
+  if (state.parentMode) {
+    html += '<button data-action="toggle-period-preview" style="margin-top:8px;background:#ffffff40;border:none;border-radius:12px;padding:6px 10px;color:' + textOnSky + ';font-family:\'Nunito\',sans-serif;font-weight:800;font-size:12px;cursor:pointer">' +
+      'Parent: preview ' + (isMorning ? "evening" : "morning") + ' list</button>';
+  }
 
-        {allDone && (
-          <div style={{ marginTop: 14, background: "#ffffff", borderRadius: 16, padding: "10px 14px", display: "flex", alignItems: "center", gap: 10 }}>
-            <div className="bob-fast">
-              <kid.Character size={36} mood="happy" />
-            </div>
-            <div style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 700, color: "#3a2e2e", fontSize: 14 }}>
-              All done, {kid.name}! Great {isMorning ? "morning" : "evening"}!
-            </div>
-          </div>
-        )}
-      </div>
+  html += '<div style="display:flex;flex-direction:column;gap:12px;margin-top:16px">';
+  chores.forEach(function (c) {
+    var key = choreKey(kidId, period, c.id);
+    var done = !!state.done[key];
+    var timer = ensureTimer(key, c.minutes);
+    var showTimer = !!state.timerUI[key] && !done;
+    var accent = kid.accent;
 
-      <div style={{ marginTop: 16, background: "white", borderRadius: 22, padding: 16, display: "flex", justifyContent: "space-between", alignItems: "center", boxShadow: "0 4px 16px rgba(0,0,0,0.06)" }}>
-        <div>
-          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <Award size={18} color={kid.accent} />
-            <span style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 700, fontSize: 14, color: "#3a2e2e" }}>
-              {badges[kidId]} badges earned
-            </span>
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 8 }}>
-            <Coins size={18} color="#E0A526" />
-            <span style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 700, fontSize: 14, color: "#3a2e2e" }}>
-              $2 this week if every day is checked off
-            </span>
-          </div>
-          <WeekStrip accent={kid.accent} />
-        </div>
-        <div className="bob" style={{ width: 60, height: 60, borderRadius: "50%", background: `${kid.accent}22`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <kid.Character size={44} mood={allDone ? "happy" : "idle"} />
-        </div>
-      </div>
+    html += '<div class="chore-card" data-chorekey="' + key + '" style="background:' + (done ? "linear-gradient(135deg," + accent + "," + accent + "cc)" : "#ffffffee") +
+      ';box-shadow:' + (done ? "0 4px 0 " + accent + "88, 0 8px 20px rgba(0,0,0,0.12)" : "0 4px 0 rgba(0,0,0,0.08), 0 8px 20px rgba(0,0,0,0.06)") + '">';
 
-      {parentMode && (
-        <div style={{ marginTop: 12, background: "#3a2e2e", borderRadius: 16, padding: 12, color: "white", fontFamily: "'Nunito', sans-serif", fontSize: 12.5 }}>
-          Parent mode: tap any checkmark to undo a chore. Data resets each day — this is a click-through prototype, so nothing is saved between visits yet.
-        </div>
-      )}
-    </div>
-  );
+    html += '<div class="icon-box" data-action="toggle-timer-ui" data-key="' + key + '" style="background:' + (done ? "#ffffff33" : accent + "22") + '" title="Tap for a timer">' +
+      choreIcon(c.icon, 24, done ? "white" : accent) + '</div>';
+
+    html += '<div style="flex:1;min-width:0">';
+    html += '<div style="font-family:\'Baloo 2\',sans-serif;font-weight:700;font-size:17px;color:' + (done ? "white" : "#3a2e2e") + ';line-height:1.15">' + c.label + '</div>';
+    html += '<div style="font-family:\'Nunito\',sans-serif;font-size:12.5px;font-weight:700;color:' + (done ? "#ffffffcc" : "#8a7f7f") + ';margin-top:1px">' + c.minutes + ' min \u00B7 tap the icon for a timer</div>';
+
+    if (showTimer) {
+      var pct = 1 - timer.remainingSeconds / timer.totalSeconds;
+      var mm = Math.floor(timer.remainingSeconds / 60);
+      var ss = timer.remainingSeconds % 60;
+      var circumference = 2 * Math.PI * 18;
+      html += '<div class="timer-row">' +
+        '<div style="position:relative;width:44px;height:44px">' +
+        '<svg width="44" height="44" viewBox="0 0 44 44">' +
+        '<circle cx="22" cy="22" r="18" fill="none" stroke="#ffffff55" stroke-width="5"/>' +
+        '<circle id="ring-' + key + '" cx="22" cy="22" r="18" fill="none" stroke="' + accent + '" stroke-width="5" stroke-linecap="round" ' +
+        'stroke-dasharray="' + circumference + '" stroke-dashoffset="' + (circumference * (1 - pct)) + '" transform="rotate(-90 22 22)" style="transition:stroke-dashoffset 0.4s linear"/>' +
+        '</svg>' +
+        '<div id="time-' + key + '" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:\'Nunito\',sans-serif;font-weight:800;font-size:11px;color:#3a2e2e">' +
+        mm + ':' + (ss < 10 ? "0" + ss : ss) + '</div>' +
+        '</div>' +
+        '<button class="timer-btn" data-action="timer-toggle-run" data-key="' + key + '" style="background:' + accent + ';color:white" aria-label="Start or pause timer">' +
+        (timer.running ? iconPause(16, "white") : iconPlay(16, "white")) + '</button>' +
+        '<button class="timer-btn" data-action="timer-reset" data-key="' + key + '" style="background:#ffffffcc;color:#3a2e2e" aria-label="Reset timer">' +
+        iconReset(15, "#3a2e2e") + '</button>' +
+        '</div>';
+    }
+    html += '</div>'; // end text column
+
+    html += '<button class="done-btn" data-action="toggle-done" data-key="' + key + '" style="color:' + (done ? "white" : "#c9c2c2") + '" aria-label="Toggle done">' +
+      (done ? iconCheckCircle(30, "white") : iconCircle(30, "#c9c2c2")) + '</button>';
+
+    html += '</div>'; // end chore-card
+  });
+  html += '</div>'; // end chore list
+
+  if (allDone) {
+    html += '<div style="margin-top:14px;background:#ffffff;border-radius:16px;padding:10px 14px;display:flex;align-items:center;gap:10px">' +
+      '<div class="bob-fast">' + mascotSVG(kid.mascot, 36, "happy") + '</div>' +
+      '<div style="font-family:\'Baloo 2\',sans-serif;font-weight:700;color:#3a2e2e;font-size:14px">All done, ' + kid.name + '! Great ' + (isMorning ? "morning" : "evening") + '!</div>' +
+      '</div>';
+  }
+
+  html += '</div>'; // end .sky
+
+  html += '<div class="footer-card">' +
+    '<div>' +
+    '<div class="row" style="gap:6px">' + iconAward(18, kid.accent) +
+    '<span style="font-family:\'Baloo 2\',sans-serif;font-weight:700;font-size:14px;color:#3a2e2e">' + state.badges[kidId] + ' badges earned</span></div>' +
+    '<div class="row" style="gap:6px;margin-top:8px">' + iconCoins(18, "#E0A526") +
+    '<span style="font-family:\'Baloo 2\',sans-serif;font-weight:700;font-size:14px;color:#3a2e2e">$2 this week if every day is checked off</span></div>';
+
+  var days = ["S", "M", "T", "W", "T", "F", "S"];
+  var todayIdx = new Date().getDay();
+  html += '<div class="week-strip">';
+  days.forEach(function (d, i) {
+    var bg = i < todayIdx ? kid.accent : (i === todayIdx ? kid.accent + "55" : "#ffffff40");
+    var color = i <= todayIdx ? "white" : "#ffffffaa"; // note: on white footer card background
+    html += '<div class="week-dot" style="background:' + bg + ';color:' + (i <= todayIdx ? "white" : "#b8afa6") + ';border:' + (i === todayIdx ? "2px solid " + kid.accent : "none") + '">' + d + '</div>';
+  });
+  html += '</div></div>';
+
+  html += '<div class="bob" style="width:60px;height:60px;border-radius:50%;background:' + kid.accent + '22;display:flex;align-items:center;justify-content:center">' +
+    mascotSVG(kid.mascot, 44, allDone ? "happy" : "idle") + '</div>';
+  html += '</div>'; // end footer-card
+
+  if (state.parentMode) {
+    html += '<div style="margin-top:12px;background:#3a2e2e;border-radius:16px;padding:12px;color:white;font-family:\'Nunito\',sans-serif;font-size:12.5px">' +
+      'Parent mode: tap any checkmark to undo a chore. Data resets each day \u2014 nothing is saved between visits yet.</div>';
+  }
+
+  document.getElementById("root").innerHTML = html;
 }
 
-ReactDOM.createRoot(document.getElementById("root")).render(<ChoreTrail />);
+/* ---------------- actions ---------------- */
+function completeChore(kidId, period, choreId) {
+  var key = choreKey(kidId, period, choreId);
+  state.done[key] = true;
+  if (state.timers[key]) { state.timers[key].running = false; }
+  playChime();
+  render();
+  var card = document.querySelector('[data-chorekey="' + key + '"]');
+  spawnConfetti(card);
+}
+
+document.getElementById("root").addEventListener("click", function (e) {
+  var el = e.target.closest("[data-action]");
+  if (!el) return;
+  var action = el.dataset.action;
+  var key = el.dataset.key;
+
+  if (action === "select-kid") {
+    state.kidId = el.dataset.kid;
+    render();
+  } else if (action === "toggle-parent") {
+    state.parentMode = !state.parentMode;
+    render();
+  } else if (action === "toggle-period-preview") {
+    state.periodOverride = state.periodOverride ? null : (naturalPeriod() === "morning" ? "evening" : "morning");
+    render();
+  } else if (action === "toggle-timer-ui") {
+    state.timerUI[key] = !state.timerUI[key];
+    render();
+  } else if (action === "timer-toggle-run") {
+    var t = state.timers[key];
+    if (!t) return;
+    if (t.running) {
+      t.remainingSeconds = Math.max(0, Math.round((t.endTimestamp - Date.now()) / 1000));
+      t.running = false;
+    } else {
+      t.endTimestamp = Date.now() + t.remainingSeconds * 1000;
+      t.running = true;
+    }
+    render();
+  } else if (action === "timer-reset") {
+    var t2 = state.timers[key];
+    if (!t2) return;
+    t2.running = false;
+    t2.remainingSeconds = t2.totalSeconds;
+    render();
+  } else if (action === "toggle-done") {
+    var parts = key.split("-");
+    var kidId = parts[0], period = parts[1], choreId = parts[2];
+    var wasDone = !!state.done[key];
+    if (wasDone) {
+      state.done[key] = false;
+      render();
+    } else {
+      completeChore(kidId, period, choreId);
+    }
+  }
+});
+
+/* ---------------- ticker: updates clock + running timers without a full re-render ---------------- */
+setInterval(function () {
+  // clock
+  var clockEl = document.getElementById("clock-el");
+  if (clockEl) clockEl.textContent = formatClock(new Date());
+
+  // auto period switch (rare — only matters right around the morning/evening boundary)
+  if (!state.periodOverride && naturalPeriod() !== state.lastRenderedPeriod) {
+    render();
+    return;
+  }
+
+  // running timers
+  Object.keys(state.timers).forEach(function (key) {
+    var t = state.timers[key];
+    if (!t.running) return;
+    var remaining = Math.max(0, Math.round((t.endTimestamp - Date.now()) / 1000));
+    if (remaining !== t.remainingSeconds) {
+      t.remainingSeconds = remaining;
+      var timeEl = document.getElementById("time-" + key);
+      var ringEl = document.getElementById("ring-" + key);
+      if (timeEl) {
+        var mm = Math.floor(remaining / 60), ss = remaining % 60;
+        timeEl.textContent = mm + ":" + (ss < 10 ? "0" + ss : ss);
+      }
+      if (ringEl) {
+        var circumference = 2 * Math.PI * 18;
+        var pct = 1 - remaining / t.totalSeconds;
+        ringEl.setAttribute("stroke-dashoffset", circumference * (1 - pct));
+      }
+    }
+    if (remaining <= 0) {
+      var parts = key.split("-");
+      completeChore(parts[0], parts[1], parts[2]);
+    }
+  });
+}, 500);
+
+render();
 </script>
 </body>
 </html>
