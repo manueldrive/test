@@ -185,6 +185,9 @@ var state = {
   squishSwitcher: null, // kidId whose switcher mascot should play the squish animation this render, or null
   squishBanner: false,  // whether the all-done banner mascot should play the squish animation this render
   celebrateKid: null,   // kidId whose all-done banner should play the celebration pop-in this render, or null
+  bunColors: { miles: null, lina: null }, // custom recolor per kid, null = use default color
+  playModalFor: null,   // kidId whose "Bao Play" modal is open (long-press unlock, only once all done), or null
+  pokeBao: null,         // kidId whose bao should play the poke squish this render, or null
   lastRenderedPeriod: null
 };
 
@@ -207,6 +210,7 @@ function savePersisted() {
       weekly: state.weekly,
       lastActiveDate: state.lastActiveDate,
       customChores: state.customChores,
+      bunColors: state.bunColors,
       nextChoreId: state.nextChoreId
     }));
   } catch (e) { /* storage unavailable, continue without persistence */ }
@@ -234,6 +238,7 @@ function initPersistence() {
     if (saved.weekly) state.weekly = saved.weekly;
     if (saved.lastActiveDate) state.lastActiveDate = saved.lastActiveDate;
     if (saved.customChores) state.customChores = saved.customChores;
+    if (saved.bunColors) state.bunColors = saved.bunColors;
     if (saved.nextChoreId) state.nextChoreId = saved.nextChoreId;
   }
 
@@ -378,6 +383,25 @@ function playFanfare() {
   } catch (e) { /* audio unavailable, ignore */ }
 }
 
+/* A quick, playful "boop" for poking the bao in the play modal. */
+function playPoke() {
+  try {
+    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(280, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(420, ctx.currentTime + 0.08);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.2, ctx.currentTime + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.15);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.16);
+  } catch (e) { /* audio unavailable, ignore */ }
+}
+
 /* ---------------- confetti (DOM-injected, independent of render cycle) ---------------- */
 function spawnConfetti(containerEl) {
   if (!containerEl) return;
@@ -510,16 +534,22 @@ function bunFace(bodyColor, pleatColor, blushColor, mood) {
     '<ellipse cx="72" cy="67" rx="6" ry="4" fill="' + blushColor + '" opacity="0.6"/>' +
     mouth + zzz;
 }
-function mascotBaoMiles(size, mood) {
+var DEFAULT_BUN_COLORS = {
+  miles: { body: "#C9EFC0", pleat: "#8FDDA0", blush: "#FF9B7A" },
+  lina:  { body: "#E3E9FF", pleat: "#B9C6FF", blush: "#FFB8CE" }
+};
+var BUN_PALETTE = [
+  { body: "#C9EFC0", pleat: "#8FDDA0", blush: "#FF9B7A", name: "Green" },
+  { body: "#FFD9B0", pleat: "#FFB877", blush: "#FF9B7A", name: "Orange" },
+  { body: "#E3E9FF", pleat: "#B9C6FF", blush: "#FFB8CE", name: "Blue" },
+  { body: "#FFD9EC", pleat: "#FFB8D9", blush: "#FF8FBF", name: "Pink" },
+  { body: "#FFF3B0", pleat: "#FFE066", blush: "#FFB877", name: "Yellow" },
+  { body: "#E0D4FF", pleat: "#C9B3FF", blush: "#FFB8D9", name: "Purple" }
+];
+function mascotSVG(kidId, size, mood) {
+  var c = (state.bunColors && state.bunColors[kidId]) || DEFAULT_BUN_COLORS[kidId];
   return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 100 100">' +
-    bunFace("#C9EFC0", "#8FDDA0", "#FF9B7A", mood) + '</svg>';
-}
-function mascotBaoLina(size, mood) {
-  return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 100 100">' +
-    bunFace("#E3E9FF", "#B9C6FF", "#FFB8CE", mood) + '</svg>';
-}
-function mascotSVG(kind, size, mood) {
-  return kind === "bao-miles" ? mascotBaoMiles(size, mood) : mascotBaoLina(size, mood);
+    bunFace(c.body, c.pleat, c.blush, mood) + '</svg>';
 }
 
 /* Narrative thread: the bun's expression reflects the moment — bright
@@ -534,7 +564,7 @@ function moodForKid(kId, isMorningNow) {
 }
 
 /* ---------------- render ---------------- */
-function renderKidChores(kidId, textOnSky, isMorning, squishSwitcherKid, squishBannerKid, celebrateKid) {
+function renderKidChores(kidId, textOnSky, isMorning, squishSwitcherKid, squishBannerKid, celebrateKid, pokeBaoKid) {
   var kid = KIDS[kidId];
   var period = isMorning ? "morning" : "evening";
   var chores = choresFor(kidId, period);
@@ -557,7 +587,7 @@ function renderKidChores(kidId, textOnSky, isMorning, squishSwitcherKid, squishB
       ';background:' + (selected ? "white" : "#ffffff85") +
       ';box-shadow:' + (selected ? "0 4px 0 rgba(0,0,0,0.1), 0 10px 18px rgba(0,0,0,0.12)" : "0 2px 6px rgba(0,0,0,0.08)") + '">' +
       '<div class="' + (selected ? "bob-fast" : "bob") + (justSquished ? " squish-anim" : "") + '" style="filter:' + (selected ? "none" : "grayscale(0.1) opacity(0.92)") + '">' +
-      mascotSVG(k.mascot, selected ? 84 : 64, moodForKid(id, isMorning)) + '</div>' +
+      mascotSVG(id, selected ? 84 : 64, moodForKid(id, isMorning)) + '</div>' +
       '<span style="font-family:\'Baloo 2\',sans-serif;font-weight:800;font-size:' + (selected ? "16px" : "13.5px") + ';color:' + (selected ? "#3a2e2e" : "#5a5252") + ';margin-top:2px">' + k.name + '</span>' +
       '</button>';
   });
@@ -569,7 +599,7 @@ function renderKidChores(kidId, textOnSky, isMorning, squishSwitcherKid, squishB
     : (isMorning ? "waking up!" : "getting sleepy\u2026");
   html += '<div class="wide-only row" style="align-items:center;gap:10px">' +
     '<button data-action="squish-switcher" data-kid="' + kidId + '" style="border:none;background:none;padding:0;cursor:pointer;line-height:0">' +
-    '<div class="bob wide-mascot' + (squishSwitcherKid === kidId ? " squish-anim" : "") + '">' + mascotSVG(kid.mascot, 56, moodForKid(kidId, isMorning)) + '</div>' +
+    '<div class="bob wide-mascot' + (squishSwitcherKid === kidId ? " squish-anim" : "") + '">' + mascotSVG(kidId, 56, moodForKid(kidId, isMorning)) + '</div>' +
     '</button>' +
     '<div>' +
     '<div style="font-family:\'Baloo 2\',sans-serif;font-weight:800;font-size:17px;color:' + textOnSky + '">' + kid.name + '</div>' +
@@ -663,10 +693,37 @@ function renderKidChores(kidId, textOnSky, isMorning, squishSwitcherKid, squishB
 
   if (allDone) {
     html += '<div data-all-done-banner="' + kidId + '" class="' + (celebrateKid === kidId ? "celebrate-pop" : "") + '" style="position:relative;margin-top:14px;background:linear-gradient(135deg,#ffffff,' + kid.accent + '22);border:2px solid ' + kid.accent + '55;border-radius:18px;padding:12px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 6px 18px rgba(0,0,0,0.1)">' +
-      '<button data-action="squish-banner" data-kid="' + kidId + '" style="border:none;background:none;padding:0;line-height:0" aria-label="Tap ' + kid.name + '">' +
-      '<div class="bob-fast mascot-tap' + (squishBannerKid === kidId ? " squish-anim" : "") + '">' + mascotSVG(kid.mascot, 56, "happy") + '</div>' +
+      '<button data-action="squish-banner" data-kid="' + kidId + '" style="border:none;background:none;padding:0;line-height:0" aria-label="Tap ' + kid.name + ' for a surprise">' +
+      '<div class="bob-fast mascot-tap' + (squishBannerKid === kidId ? " squish-anim" : "") + '">' + mascotSVG(kidId, 56, "happy") + '</div>' +
       '</button>' +
+      '<div>' +
       '<div style="font-family:\'Baloo 2\',sans-serif;font-weight:800;color:#3a2e2e;font-size:16px">\uD83C\uDF89 All done, ' + kid.name + '! Great ' + (isMorning ? "morning" : "evening") + '!</div>' +
+      '<div style="font-family:\'Nunito\',sans-serif;font-weight:700;color:#8a7f7f;font-size:11px;margin-top:2px">Tap him for a surprise!</div>' +
+      '</div>' +
+      '</div>';
+  }
+
+  if (state.playModalFor === kidId && allDone) {
+    html += '<div style="position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:25;padding:20px">' +
+      '<div style="background:white;border-radius:26px;padding:24px;width:100%;max-width:340px;text-align:center">' +
+      '<div class="row-between">' +
+      '<div style="font-family:\'Baloo 2\',sans-serif;font-weight:800;font-size:18px;color:#3a2e2e">' + kid.name + '\u2019s Bao</div>' +
+      '<button class="lock-btn" data-action="close-play-modal" aria-label="Close">\u2715</button>' +
+      '</div>' +
+      '<button data-action="poke-bao" data-kid="' + kidId + '" style="border:none;background:none;padding:0;cursor:pointer;margin:14px 0" aria-label="Poke!">' +
+      '<div class="bob-fast' + (pokeBaoKid === kidId ? " squish-anim" : "") + '">' + mascotSVG(kidId, 140, "happy") + '</div>' +
+      '</button>' +
+      '<div style="font-family:\'Nunito\',sans-serif;font-weight:700;color:#8a7f7f;font-size:12px;margin-bottom:12px">Tap him to poke, or pick a new color!</div>' +
+      '<div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap">' +
+      (function () {
+        var currentColor = state.bunColors[kidId] || DEFAULT_BUN_COLORS[kidId];
+        return BUN_PALETTE.map(function (p, i) {
+          var isCurrent = currentColor.body === p.body && currentColor.pleat === p.pleat;
+          return '<button data-action="bun-color" data-kid="' + kidId + '" data-color-index="' + i + '" title="' + p.name + '" style="width:36px;height:36px;border-radius:50%;background:' + p.body + ';border:3px solid ' + (isCurrent ? "#3a2e2e" : "#ffffff") + ';box-shadow:0 2px 6px rgba(0,0,0,0.15);cursor:pointer"></button>';
+        }).join("");
+      })() +
+      '</div>' +
+      '</div>' +
       '</div>';
   }
 
@@ -769,6 +826,8 @@ function render() {
   state.squishBanner = null;
   var celebrateKid = state.celebrateKid;
   state.celebrateKid = null;
+  var pokeBaoKid = state.pokeBao;
+  state.pokeBao = null;
 
   var period = currentPeriod();
   state.lastRenderedPeriod = period;
@@ -800,7 +859,7 @@ function render() {
   Object.keys(KIDS).forEach(function (id) {
     var active = state.kidId === id;
     html += '<div class="kid-piece' + (active ? " active" : "") + '" data-kid="' + id + '">' +
-      renderKidChores(id, textOnSky, isMorning, squishSwitcherKid, squishBannerKid, celebrateKid) +
+      renderKidChores(id, textOnSky, isMorning, squishSwitcherKid, squishBannerKid, celebrateKid, pokeBaoKid) +
       '</div>';
   });
   Object.keys(KIDS).forEach(function (id) {
@@ -887,6 +946,7 @@ document.getElementById("root").addEventListener("click", function (e) {
   if (action === "select-kid") {
     state.kidId = el.dataset.kid;
     state.accountOpenFor = null;
+    state.playModalFor = null;
     state.squishSwitcher = el.dataset.kid;
     render();
   } else if (action === "squish-switcher") {
@@ -894,6 +954,20 @@ document.getElementById("root").addEventListener("click", function (e) {
     render();
   } else if (action === "squish-banner") {
     state.squishBanner = el.dataset.kid;
+    state.playModalFor = el.dataset.kid;
+    render();
+  } else if (action === "close-play-modal") {
+    state.playModalFor = null;
+    render();
+  } else if (action === "poke-bao") {
+    state.pokeBao = el.dataset.kid;
+    playPoke();
+    render();
+  } else if (action === "bun-color") {
+    var colorKid = el.dataset.kid;
+    var colorIndex = parseInt(el.dataset.colorIndex, 10);
+    state.bunColors[colorKid] = BUN_PALETTE[colorIndex];
+    savePersisted();
     render();
   } else if (action === "toggle-parent") {
     state.parentMode = !state.parentMode;
