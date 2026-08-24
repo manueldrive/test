@@ -14,6 +14,8 @@
 
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; min-height: 100vh; background: #F3EEE7; font-family: 'Nunito', -apple-system, sans-serif; transition: background 1.2s ease; }
+  #sky-bg { position: fixed; inset: 0; z-index: 0; transition: background 1.2s ease; }
+  .moon-glow { width: 120px; height: 120px; }
   #root { max-width: 460px; margin: 0 auto; padding: 16px 16px 190px; position: relative; z-index: 1; }
   @keyframes twinkle {
     0%, 100% { opacity: 0.25; transform: scale(0.8); }
@@ -84,6 +86,7 @@
     .balance-amount { font-size: 38px !important; }
     .footer-card { padding: 20px !important; border-radius: 26px !important; }
     .wide-mascot svg { width: 112px !important; height: 112px !important; }
+    .moon-glow { width: 190px !important; height: 190px !important; }
   }
   .confetti-wrap { position: absolute; inset: 0; pointer-events: none; overflow: hidden; border-radius: 20px; }
   .confetti-piece { position: absolute; top: -10%; width: 7px; height: 7px; }
@@ -92,6 +95,7 @@
 </style>
 </head>
 <body>
+<div id="sky-bg"></div>
 <div id="root"></div>
 
 <script>
@@ -555,7 +559,7 @@ function cloudsFieldHtml() {
   return html;
 }
 function moonGlowHtml() {
-  return '<div style="position:fixed;top:-50px;right:-50px;width:190px;height:190px;border-radius:50%;background:radial-gradient(circle, #EAE6FF66 0%, #B9C6FF3a 45%, transparent 70%);pointer-events:none;z-index:0"></div>';
+  return '<div class="moon-glow" style="position:fixed;top:-50px;right:-50px;border-radius:50%;background:radial-gradient(circle, #EAE6FF66 0%, #B9C6FF3a 45%, transparent 70%);pointer-events:none;z-index:0"></div>';
 }
 
 /* ---------------- landscape: rolling hills + trees anchored to the bottom ---------------- */
@@ -936,7 +940,7 @@ function render() {
     textOnSky = "#EAE6FF";
     decorationHtml = moonGlowHtml() + starsFieldHtml() + landscapeHtml("night");
   }
-  document.body.style.background = sky;
+  document.getElementById("sky-bg").style.background = sky;
 
   var periodIconHtml = isMorning ? iconSun(24, "#FFDE7A") : iconMoon(21, "#EAE6FF");
   var clockParts = formatClockParts(new Date());
