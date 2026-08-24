@@ -14,7 +14,7 @@
 
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; min-height: 100vh; background: #F3EEE7; font-family: 'Nunito', -apple-system, sans-serif; transition: background 1.2s ease; }
-  #root { max-width: 460px; margin: 0 auto; padding: 16px 16px 130px; position: relative; z-index: 1; }
+  #root { max-width: 460px; margin: 0 auto; padding: 16px 16px 190px; position: relative; z-index: 1; }
   @keyframes twinkle {
     0%, 100% { opacity: 0.25; transform: scale(0.8); }
     50% { opacity: 1; transform: scale(1.15); }
@@ -25,7 +25,7 @@
     100% { transform: translateX(120vw); }
   }
   .drift-cloud { animation: driftCloud linear infinite; animation-fill-mode: both; left: 0; }
-  @media (min-width: 480px) { #root { padding: 24px 24px 140px; } }
+  @media (min-width: 480px) { #root { padding: 24px 24px 200px; } }
   button { font-family: inherit; }
 
   @keyframes fall { to { transform: translateY(140px) rotate(200deg); opacity: 0; } }
@@ -565,12 +565,12 @@ var LANDSCAPE_PALETTE = {
   night:     { back: "#2A3D74", front: "#1A2854", tree: "#141E42" }
 };
 function treeHtml(leftPercent, treeColor) {
-  return '<div style="position:fixed;left:' + leftPercent + '%;bottom:38px;width:34px;height:46px;transform:translateX(-50%);pointer-events:none;z-index:0">' +
-    '<svg width="34" height="46" viewBox="0 0 34 46">' +
-    '<rect x="15" y="22" width="4" height="24" fill="' + treeColor + '"/>' +
-    '<circle cx="10" cy="16" r="11" fill="' + treeColor + '"/>' +
-    '<circle cx="24" cy="16" r="11" fill="' + treeColor + '"/>' +
-    '<circle cx="17" cy="6" r="13" fill="' + treeColor + '"/>' +
+  return '<div style="position:fixed;left:' + leftPercent + '%;bottom:38px;width:36px;height:54px;transform:translateX(-50%);pointer-events:none;z-index:0">' +
+    '<svg width="36" height="54" viewBox="0 0 36 54">' +
+    '<rect x="16" y="30" width="4" height="24" fill="' + treeColor + '"/>' +
+    '<circle cx="11" cy="24" r="11" fill="' + treeColor + '"/>' +
+    '<circle cx="25" cy="24" r="11" fill="' + treeColor + '"/>' +
+    '<circle cx="18" cy="14" r="13" fill="' + treeColor + '"/>' +
     '</svg>' +
     '</div>';
 }
@@ -944,6 +944,7 @@ function render() {
   var isFullscreen = !!document.fullscreenElement;
 
   var html = decorationHtml;
+  html += '<div style="position:relative;z-index:1">';
   html += '<div class="row-between shared-header">' +
     '<div style="width:36px"></div>' +
     '<div class="clock-el" data-clock-el style="display:inline-flex;align-items:baseline;gap:8px;background:#00000020;padding:12px 24px;border-radius:20px;box-shadow:inset 0 2px 6px rgba(0,0,0,0.18)">' +
@@ -982,6 +983,7 @@ function render() {
     '<button class="lock-btn" data-action="toggle-parent" style="color:' + textOnSky + '" aria-label="Toggle parent mode">' + (state.parentMode ? iconUnlock(16) : iconLock(16)) + '</button>' +
     '</div>' +
     '</div>';
+  html += '</div>'; // end content layer
 
   document.getElementById("root").innerHTML = html;
 }
