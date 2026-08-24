@@ -530,12 +530,12 @@ function sunGlowHtml() {
   return '<div style="position:fixed;top:-50px;right:-50px;width:190px;height:190px;border-radius:50%;background:radial-gradient(circle, #FFDE7A77 0%, #FFB68A44 45%, transparent 70%);pointer-events:none;z-index:0"></div>';
 }
 var CLOUD_FIELD = [
-  { y: 6,  size: 46, duration: 58, delayFrac: 0.05 },
-  { y: 16, size: 34, duration: 74, delayFrac: 0.35 },
-  { y: 3,  size: 40, duration: 66, delayFrac: 0.6 },
-  { y: 24, size: 30, duration: 82, delayFrac: 0.15 },
-  { y: 12, size: 38, duration: 70, delayFrac: 0.8 },
-  { y: 30, size: 26, duration: 90, delayFrac: 0.45 }
+  { y: 6,  size: 46, duration: 120, delayFrac: 0.05 },
+  { y: 16, size: 34, duration: 150, delayFrac: 0.35 },
+  { y: 3,  size: 40, duration: 135, delayFrac: 0.6 },
+  { y: 24, size: 30, duration: 165, delayFrac: 0.15 },
+  { y: 12, size: 38, duration: 145, delayFrac: 0.8 },
+  { y: 30, size: 26, duration: 180, delayFrac: 0.45 }
 ];
 function cloudsFieldHtml() {
   var html = '<div style="position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0">';
@@ -543,11 +543,12 @@ function cloudsFieldHtml() {
     var negDelay = -(c.duration * c.delayFrac).toFixed(1);
     html += '<div class="drift-cloud" style="position:absolute;top:' + c.y + '%;animation-duration:' + c.duration + 's;animation-delay:' + negDelay + 's">' +
       '<svg width="' + c.size + '" height="' + Math.round(c.size * 0.57) + '" viewBox="0 0 60 34">' +
-      '<rect x="5" y="21" width="42" height="10" rx="5" fill="#E7EBF1" opacity="0.8"/>' +
-      '<circle cx="17" cy="17" r="9" fill="#FFFFFF" opacity="0.9"/>' +
-      '<circle cx="34" cy="14" r="12" fill="#FFFFFF" opacity="0.9"/>' +
-      '<circle cx="26" cy="8" r="7" fill="#FFFFFF" opacity="0.9"/>' +
-      '<circle cx="38" cy="18" r="7" fill="#E7EBF1" opacity="0.45"/>' +
+      '<g opacity="0.85">' +
+      '<circle cx="16" cy="22" r="9" fill="#FFFFFF"/>' +
+      '<circle cx="28" cy="20" r="13" fill="#FFFFFF"/>' +
+      '<circle cx="42" cy="21" r="10" fill="#FFFFFF"/>' +
+      '<circle cx="34" cy="11" r="8" fill="#FFFFFF"/>' +
+      '</g>' +
       '</svg>' +
       '</div>';
   });
