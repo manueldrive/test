@@ -74,6 +74,7 @@
     .chore-emoji { font-size: 34px !important; }
     .balance-amount { font-size: 38px !important; }
     .footer-card { padding: 20px !important; border-radius: 26px !important; }
+    .wide-mascot svg { width: 112px !important; height: 112px !important; }
   }
   .confetti-wrap { position: absolute; inset: 0; pointer-events: none; overflow: hidden; border-radius: 20px; }
   .confetti-piece { position: absolute; top: -10%; width: 7px; height: 7px; }
@@ -136,13 +137,29 @@ var CHORE_LIBRARY = {
 var GOALS = {
   miles: [
     { emoji: "\uD83C\uDF66", label: "Ice Cream", cost: 4 },
+    { emoji: "\uD83D\uDECC", label: "Sleepover", cost: 8 },
     { emoji: "\uD83C\uDFAF", label: "Target Toy", cost: 12 }
   ],
   lina: [
     { emoji: "\uD83C\uDF66", label: "Ice Cream", cost: 4 },
+    { emoji: "\uD83D\uDECC", label: "Sleepover", cost: 8 },
     { emoji: "\uD83C\uDFAF", label: "Target Toy", cost: 12 }
   ]
 };
+
+function cloneChoreList(list) {
+  return list.map(function (c) { return { id: c.id, label: c.label, minutes: c.minutes, emoji: c.emoji }; });
+}
+function defaultCustomChores() {
+  var out = {};
+  Object.keys(KIDS).forEach(function (kidId) {
+    out[kidId] = {
+      morning: cloneChoreList(CHORE_LIBRARY[kidId].morning),
+      evening: cloneChoreList(CHORE_LIBRARY[kidId].evening)
+    };
+  });
+  return out;
+}
 
 /* ---------------- state ---------------- */
 var state = {
@@ -161,6 +178,8 @@ var state = {
     miles: { weekStart: null, days: { mon: false, tue: false, wed: false, thu: false, fri: false }, awarded: false },
     lina:  { weekStart: null, days: { mon: false, tue: false, wed: false, thu: false, fri: false }, awarded: false }
   },
+  customChores: defaultCustomChores(), // parent-editable base chore lists (Lina's weekday homework/rotation are auto-added on top, not editable)
+  nextChoreId: 1,
   lastActiveDate: null,
   accountOpenFor: null, // kidId whose Give/Save/Spend account view is open, or null
   squishSwitcher: null, // kidId whose switcher mascot should play the squish animation this render, or null
@@ -186,7 +205,9 @@ function savePersisted() {
       balance: state.balance,
       jars: state.jars,
       weekly: state.weekly,
-      lastActiveDate: state.lastActiveDate
+      lastActiveDate: state.lastActiveDate,
+      customChores: state.customChores,
+      nextChoreId: state.nextChoreId
     }));
   } catch (e) { /* storage unavailable, continue without persistence */ }
 }
@@ -212,6 +233,8 @@ function initPersistence() {
     if (saved.jars) state.jars = saved.jars;
     if (saved.weekly) state.weekly = saved.weekly;
     if (saved.lastActiveDate) state.lastActiveDate = saved.lastActiveDate;
+    if (saved.customChores) state.customChores = saved.customChores;
+    if (saved.nextChoreId) state.nextChoreId = saved.nextChoreId;
   }
 
   var now = new Date();
@@ -258,13 +281,13 @@ function weekdayIndex() {
   return (d >= 1 && d <= 5) ? d - 1 : -1; // 0..4 for Mon..Fri, -1 for weekend
 }
 function choresFor(kidId, period) {
-  var base = CHORE_LIBRARY[kidId][period];
+  var base = state.customChores[kidId][period];
   var wIdx = weekdayIndex();
   if (kidId === "lina" && period === "evening" && wIdx >= 0) {
     var rotating = ROTATING_CHORES[wIdx];
     return base.concat([
-      { id: "hw", label: "Homework", minutes: 20, emoji: "\uD83D\uDCDA" },
-      { id: "dc" + wIdx, label: rotating.label, minutes: rotating.minutes, emoji: rotating.emoji }
+      { id: "hw", label: "Homework", minutes: 20, emoji: "\uD83D\uDCDA", auto: true },
+      { id: "dc" + wIdx, label: rotating.label, minutes: rotating.minutes, emoji: rotating.emoji, auto: true }
     ]);
   }
   return base;
@@ -440,6 +463,12 @@ function iconLock(size, color) {
 function iconUnlock(size, color) {
   return svgOpen(size, color) + '<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 017.5-2"/></svg>';
 }
+function iconExpand(size, color) {
+  return svgOpen(size, color) + '<path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>';
+}
+function iconCompress(size, color) {
+  return svgOpen(size, color) + '<path d="M8 3v3a2 2 0 0 1-2 2H3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M16 21v-3a2 2 0 0 1 2-2h3"/></svg>';
+}
 
 /* ---------------- mascots: little bao bun characters ---------------- */
 function bunFace(bodyColor, pleatColor, blushColor, mood) {
@@ -540,7 +569,7 @@ function renderKidChores(kidId, textOnSky, isMorning, squishSwitcherKid, squishB
     : (isMorning ? "waking up!" : "getting sleepy\u2026");
   html += '<div class="wide-only row" style="align-items:center;gap:10px">' +
     '<button data-action="squish-switcher" data-kid="' + kidId + '" style="border:none;background:none;padding:0;cursor:pointer;line-height:0">' +
-    '<div class="bob' + (squishSwitcherKid === kidId ? " squish-anim" : "") + '">' + mascotSVG(kid.mascot, 56, moodForKid(kidId, isMorning)) + '</div>' +
+    '<div class="bob wide-mascot' + (squishSwitcherKid === kidId ? " squish-anim" : "") + '">' + mascotSVG(kid.mascot, 56, moodForKid(kidId, isMorning)) + '</div>' +
     '</button>' +
     '<div>' +
     '<div style="font-family:\'Baloo 2\',sans-serif;font-weight:800;font-size:17px;color:' + textOnSky + '">' + kid.name + '</div>' +
@@ -607,12 +636,30 @@ function renderKidChores(kidId, textOnSky, isMorning, squishSwitcherKid, squishB
     }
     html += '</div>'; // end text column
 
+    if (state.parentMode && !c.auto) {
+      html += '<div style="display:flex;flex-direction:column;gap:2px;margin-right:4px">' +
+        '<button class="timer-btn" data-action="chore-move-up" data-kid="' + kidId + '" data-period="' + period + '" data-choreid="' + c.id + '" style="width:26px;height:22px;background:#ffffffcc;color:#3a2e2e" aria-label="Move up">\u25B2</button>' +
+        '<button class="timer-btn" data-action="chore-move-down" data-kid="' + kidId + '" data-period="' + period + '" data-choreid="' + c.id + '" style="width:26px;height:22px;background:#ffffffcc;color:#3a2e2e" aria-label="Move down">\u25BC</button>' +
+        '</div>' +
+        '<button class="timer-btn" data-action="chore-delete" data-kid="' + kidId + '" data-period="' + period + '" data-choreid="' + c.id + '" style="background:#FF6B6B;color:white;margin-right:4px" aria-label="Delete chore">\u2715</button>';
+    }
+
     html += '<button class="done-btn" data-action="toggle-done" data-key="' + key + '" style="color:' + (done ? doneCheckColor : "#c9c2c2") + '" aria-label="Toggle done">' +
       (done ? iconCheckCircle(30, doneCheckColor) : iconCircle(30, "#c9c2c2")) + '</button>';
 
     html += '</div>'; // end chore-card
   });
   html += '</div>'; // end chore list
+
+  if (state.parentMode) {
+    var addIdBase = "chore-add-" + kidId + "-" + period;
+    html += '<div style="margin-top:12px;background:#ffffffcc;border-radius:16px;padding:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">' +
+      '<input id="' + addIdBase + '-emoji" type="text" placeholder="\uD83D\uDFE2" maxlength="4" style="width:44px;text-align:center;font-size:18px;padding:8px 4px;border-radius:10px;border:1px solid #ddd" />' +
+      '<input id="' + addIdBase + '-label" type="text" placeholder="Chore name" style="flex:1;min-width:100px;padding:8px 10px;border-radius:10px;border:1px solid #ddd;font-family:\'Nunito\',sans-serif" />' +
+      '<input id="' + addIdBase + '-minutes" type="number" placeholder="Min" min="1" max="99" style="width:56px;padding:8px 6px;border-radius:10px;border:1px solid #ddd;font-family:\'Nunito\',sans-serif" />' +
+      '<button data-action="chore-add" data-kid="' + kidId + '" data-period="' + period + '" style="background:' + kid.accent + ';color:white;border:none;border-radius:10px;padding:8px 16px;font-family:\'Baloo 2\',sans-serif;font-weight:700;cursor:pointer">Add</button>' +
+      '</div>';
+  }
 
   if (allDone) {
     html += '<div data-all-done-banner="' + kidId + '" class="' + (celebrateKid === kidId ? "celebrate-pop" : "") + '" style="position:relative;margin-top:14px;background:linear-gradient(135deg,#ffffff,' + kid.accent + '22);border:2px solid ' + kid.accent + '55;border-radius:18px;padding:12px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 6px 18px rgba(0,0,0,0.1)">' +
@@ -736,21 +783,17 @@ function render() {
   var periodIconHtml = isMorning ? iconSun(24, "#FFDE7A") : iconMoon(21, "#EAE6FF");
   var clockParts = formatClockParts(new Date());
   var clockGlow = isMorning ? "#FF9B4266" : "#7DD8C666";
+  var isFullscreen = !!document.fullscreenElement;
 
   var html = "";
   html += '<div class="row-between shared-header">' +
     '<div style="width:36px"></div>' + // spacer so the clock stays visually centered
     '<div class="clock-el" data-clock-el style="display:inline-flex;align-items:baseline;gap:8px;background:#00000020;padding:12px 24px;border-radius:20px;box-shadow:inset 0 2px 6px rgba(0,0,0,0.18)">' +
-    '<span style="font-size:19px;opacity:0.6">\u23F0</span>' +
     '<span class="clock-time" data-clock-time style="font-family:\'Courier New\',monospace;font-weight:800;font-size:52px;color:' + textOnSky + ';letter-spacing:1px;text-shadow:0 0 16px ' + clockGlow + '">' + clockParts.hm + '</span>' +
     '<span class="clock-ampm" data-clock-ampm style="font-family:\'Nunito\',sans-serif;font-weight:800;font-size:16px;color:' + textOnSky + ';opacity:0.75">' + clockParts.ampm + '</span>' +
     '</div>' +
-    '<div class="row" style="gap:8px">' +
-    (state.parentMode
-      ? '<button class="lock-btn" data-action="toggle-period-preview" aria-label="Switch between morning and evening (parent check-in)">' + periodIconHtml + '</button>'
-      : '') +
-    '<button class="lock-btn" data-action="toggle-parent" style="color:' + textOnSky + '" aria-label="Toggle parent mode">' + (state.parentMode ? iconUnlock(18) : iconLock(18)) + '</button>' +
-    '</div>' +
+    '<button class="lock-btn" data-action="toggle-fullscreen" style="color:' + textOnSky + '" aria-label="' + (isFullscreen ? "Exit full screen" : "Enter full screen") + '">' +
+    (isFullscreen ? iconCompress(18) : iconExpand(18)) + '</button>' +
     '</div>';
 
   html += '<div class="kid-grid">';
@@ -767,6 +810,17 @@ function render() {
       '</div>';
   });
   html += '</div>';
+
+  // footer: parent mode lives here now, tucked out of the way of the kids' view
+  html += '<div class="row-between" style="margin-top:20px;opacity:0.85">' +
+    '<div style="font-family:\'Nunito\',sans-serif;font-weight:700;font-size:11px;color:' + textOnSky + ';opacity:0.6">ChoreTrail</div>' +
+    '<div class="row" style="gap:8px">' +
+    (state.parentMode
+      ? '<button class="lock-btn" data-action="toggle-period-preview" aria-label="Switch between morning and evening (parent check-in)">' + periodIconHtml + '</button>'
+      : '') +
+    '<button class="lock-btn" data-action="toggle-parent" style="color:' + textOnSky + '" aria-label="Toggle parent mode">' + (state.parentMode ? iconUnlock(16) : iconLock(16)) + '</button>' +
+    '</div>' +
+    '</div>';
 
   document.getElementById("root").innerHTML = html;
 }
@@ -844,6 +898,14 @@ document.getElementById("root").addEventListener("click", function (e) {
   } else if (action === "toggle-parent") {
     state.parentMode = !state.parentMode;
     render();
+  } else if (action === "toggle-fullscreen") {
+    try {
+      if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen().catch(function () {});
+      } else if (document.fullscreenElement && document.exitFullscreen) {
+        document.exitFullscreen().catch(function () {});
+      }
+    } catch (e) { /* fullscreen unsupported or blocked, ignore */ }
   } else if (action === "toggle-period-preview") {
     state.periodOverride = state.periodOverride ? null : (naturalPeriod() === "morning" ? "evening" : "morning");
     render();
@@ -874,6 +936,42 @@ document.getElementById("root").addEventListener("click", function (e) {
     var floor = adjJars.give + adjJars.save + adjJars.spend; // can't drop below what's already in the jars
     var newBalance = state.balance[adjKidId] + amount;
     state.balance[adjKidId] = Math.max(floor, newBalance);
+    savePersisted();
+    render();
+  } else if (action === "chore-move-up" || action === "chore-move-down") {
+    if (!state.parentMode) return;
+    var mvKid = el.dataset.kid, mvPeriod = el.dataset.period, mvId = el.dataset.choreid;
+    var list = state.customChores[mvKid][mvPeriod];
+    var i = list.findIndex(function (c) { return c.id === mvId; });
+    if (i < 0) return;
+    var j = action === "chore-move-up" ? i - 1 : i + 1;
+    if (j < 0 || j >= list.length) return;
+    var tmp = list[i]; list[i] = list[j]; list[j] = tmp;
+    savePersisted();
+    render();
+  } else if (action === "chore-delete") {
+    if (!state.parentMode) return;
+    var delKid = el.dataset.kid, delPeriod = el.dataset.period, delId = el.dataset.choreid;
+    var delList = state.customChores[delKid][delPeriod];
+    var delIdx = delList.findIndex(function (c) { return c.id === delId; });
+    if (delIdx >= 0) delList.splice(delIdx, 1);
+    savePersisted();
+    render();
+  } else if (action === "chore-add") {
+    if (!state.parentMode) return;
+    var addKid = el.dataset.kid, addPeriod = el.dataset.period;
+    var idBase = "chore-add-" + addKid + "-" + addPeriod;
+    var emojiEl = document.getElementById(idBase + "-emoji");
+    var labelEl = document.getElementById(idBase + "-label");
+    var minutesEl = document.getElementById(idBase + "-minutes");
+    var label = (labelEl.value || "").trim();
+    if (!label) { labelEl.focus(); return; }
+    var minutes = parseInt(minutesEl.value, 10);
+    if (!minutes || minutes < 1) minutes = 5;
+    var emoji = (emojiEl.value || "").trim() || "\u2B50";
+    var newChore = { id: "c" + state.nextChoreId, label: label, minutes: minutes, emoji: emoji };
+    state.nextChoreId += 1;
+    state.customChores[addKid][addPeriod].push(newChore);
     savePersisted();
     render();
   } else if (action === "toggle-timer-ui") {
@@ -951,6 +1049,8 @@ setInterval(function () {
     }
   });
 }, 500);
+
+document.addEventListener("fullscreenchange", function () { render(); });
 
 initPersistence();
 render();
