@@ -31,6 +31,13 @@
   }
   .squish-anim { animation: squish 0.55s cubic-bezier(0.34, 1.56, 0.64, 1); transform-origin: 50% 65%; }
   .mascot-tap { cursor: pointer; }
+  @keyframes celebratePop {
+    0% { transform: scale(0.7); opacity: 0; }
+    55% { transform: scale(1.06); opacity: 1; }
+    75% { transform: scale(0.97); }
+    100% { transform: scale(1); }
+  }
+  .celebrate-pop { animation: celebratePop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
 
   .kid-panel-content { position: relative; }
   .shared-header { margin-bottom: 18px; }
@@ -158,6 +165,7 @@ var state = {
   accountOpenFor: null, // kidId whose Give/Save/Spend account view is open, or null
   squishSwitcher: null, // kidId whose switcher mascot should play the squish animation this render, or null
   squishBanner: false,  // whether the all-done banner mascot should play the squish animation this render
+  celebrateKid: null,   // kidId whose all-done banner should play the celebration pop-in this render, or null
   lastRenderedPeriod: null
 };
 
@@ -308,6 +316,45 @@ function playChime() {
   } catch (e) { /* audio unavailable, ignore */ }
 }
 
+/* A bigger, distinct fanfare for finishing the WHOLE routine — this is
+   the peak moment of the experience (Peak-End Rule), so it should sound
+   more triumphant than the routine per-chore chime. */
+function playFanfare() {
+  try {
+    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    var notes = [523.25, 659.25, 783.99, 1046.5, 1318.5]; // C5 E5 G5 C6 E6, rising
+    notes.forEach(function (freq, i) {
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.type = "triangle";
+      osc.frequency.value = freq;
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      var start = ctx.currentTime + i * 0.1;
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.exponentialRampToValueAtTime(0.22, start + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.5);
+      osc.start(start);
+      osc.stop(start + 0.55);
+    });
+    // little final chord for extra sparkle
+    [1046.5, 1318.5, 1568].forEach(function (freq) {
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.value = freq;
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      var start = ctx.currentTime + notes.length * 0.1;
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.exponentialRampToValueAtTime(0.15, start + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.7);
+      osc.start(start);
+      osc.stop(start + 0.75);
+    });
+  } catch (e) { /* audio unavailable, ignore */ }
+}
+
 /* ---------------- confetti (DOM-injected, independent of render cycle) ---------------- */
 function spawnConfetti(containerEl) {
   if (!containerEl) return;
@@ -329,6 +376,34 @@ function spawnConfetti(containerEl) {
   }
   containerEl.appendChild(wrap);
   setTimeout(function () { if (wrap.parentNode) wrap.parentNode.removeChild(wrap); }, 1200);
+}
+
+/* A bigger burst for the "all done!" moment — more pieces, wider spread,
+   longer fall, since this is the peak celebration of the whole routine. */
+function spawnBigConfetti(containerEl) {
+  if (!containerEl) return;
+  var wrap = document.createElement("div");
+  wrap.className = "confetti-wrap";
+  wrap.style.borderRadius = "16px";
+  var colors = ["#FF9B42", "#FFD166", "#5B7FFF", "#7DD8C6", "#FF6B6B", "#BDEFC9", "#FFC9DE"];
+  for (var i = 0; i < 34; i++) {
+    var span = document.createElement("span");
+    span.className = "confetti-piece";
+    var left = Math.random() * 100;
+    var delay = Math.random() * 0.35;
+    var dur = 1.0 + Math.random() * 0.7;
+    var size = 6 + Math.random() * 6;
+    var color = colors[i % colors.length];
+    span.style.left = left + "%";
+    span.style.width = size + "px";
+    span.style.height = size + "px";
+    span.style.background = color;
+    span.style.borderRadius = (i % 2) ? "50%" : "2px";
+    span.style.animation = "fall " + dur + "s ease-in " + delay + "s forwards";
+    wrap.appendChild(span);
+  }
+  containerEl.appendChild(wrap);
+  setTimeout(function () { if (wrap.parentNode) wrap.parentNode.removeChild(wrap); }, 2000);
 }
 
 /* ---------------- icons (small hand-drawn SVGs, no library needed) ---------------- */
@@ -382,17 +457,29 @@ function bunFace(bodyColor, pleatColor, blushColor, mood) {
   var mouth = (mood === "happy")
     ? '<path d="M41 66 Q50 74 59 66" stroke="#3a2e2e" stroke-width="2.6" fill="none" stroke-linecap="round"/>'
     : '<path d="M43 67 Q50 71 57 67" stroke="#3a2e2e" stroke-width="2.6" fill="none" stroke-linecap="round"/>';
+
+  var eyes, zzz = "";
+  if (mood === "sleepy") {
+    // closed, drowsy curved eyes instead of open dots
+    eyes = '<path d="M32 57 Q37 61 42 57" stroke="#3a2e2e" stroke-width="2.4" fill="none" stroke-linecap="round"/>' +
+      '<path d="M58 57 Q63 61 68 57" stroke="#3a2e2e" stroke-width="2.4" fill="none" stroke-linecap="round"/>';
+    zzz = '<text x="74" y="30" font-family="\'Baloo 2\',sans-serif" font-weight="800" font-size="13" fill="' + pleatColor + '" opacity="0.85">z</text>' +
+      '<text x="80" y="22" font-family="\'Baloo 2\',sans-serif" font-weight="800" font-size="10" fill="' + pleatColor + '" opacity="0.7">z</text>';
+  } else {
+    eyes = '<circle cx="37" cy="58" r="5.2" fill="#3a2e2e"/>' +
+      '<circle cx="63" cy="58" r="5.2" fill="#3a2e2e"/>' +
+      '<circle cx="38.3" cy="56.3" r="1.4" fill="#fff"/>' +
+      '<circle cx="64.3" cy="56.3" r="1.4" fill="#fff"/>';
+  }
+
   return '<path d="M14,58 C14,32 30,25 50,25 C70,25 86,32 86,58 C86,80 70,88 50,88 C30,88 14,80 14,58 Z" fill="' + bodyColor + '"/>' +
     '<ellipse cx="40" cy="38" rx="15" ry="9" fill="#ffffff" opacity="0.2"/>' +
     '<g>' + pleatLines + '</g>' +
     '<circle cx="50" cy="24" r="2.6" fill="' + pleatColor + '"/>' +
-    '<circle cx="37" cy="58" r="5.2" fill="#3a2e2e"/>' +
-    '<circle cx="63" cy="58" r="5.2" fill="#3a2e2e"/>' +
-    '<circle cx="38.3" cy="56.3" r="1.4" fill="#fff"/>' +
-    '<circle cx="64.3" cy="56.3" r="1.4" fill="#fff"/>' +
+    eyes +
     '<ellipse cx="28" cy="67" rx="6" ry="4" fill="' + blushColor + '" opacity="0.6"/>' +
     '<ellipse cx="72" cy="67" rx="6" ry="4" fill="' + blushColor + '" opacity="0.6"/>' +
-    mouth;
+    mouth + zzz;
 }
 function mascotBaoMiles(size, mood) {
   return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 100 100">' +
@@ -406,8 +493,19 @@ function mascotSVG(kind, size, mood) {
   return kind === "bao-miles" ? mascotBaoMiles(size, mood) : mascotBaoLina(size, mood);
 }
 
+/* Narrative thread: the bun's expression reflects the moment — bright
+   and awake in the morning, drowsy by evening, delighted once the
+   routine is actually finished. */
+function moodForKid(kId, isMorningNow) {
+  var period = isMorningNow ? "morning" : "evening";
+  var kidChores = choresFor(kId, period);
+  var kidAllDone = kidChores.length > 0 && kidChores.every(function (c) { return !!state.done[choreKey(kId, period, c.id)]; });
+  if (kidAllDone) return "happy";
+  return isMorningNow ? "idle" : "sleepy";
+}
+
 /* ---------------- render ---------------- */
-function renderKidChores(kidId, textOnSky, isMorning, squishSwitcherKid, squishBannerKid) {
+function renderKidChores(kidId, textOnSky, isMorning, squishSwitcherKid, squishBannerKid, celebrateKid) {
   var kid = KIDS[kidId];
   var period = isMorning ? "morning" : "evening";
   var chores = choresFor(kidId, period);
@@ -430,17 +528,25 @@ function renderKidChores(kidId, textOnSky, isMorning, squishSwitcherKid, squishB
       ';background:' + (selected ? "white" : "#ffffff85") +
       ';box-shadow:' + (selected ? "0 4px 0 rgba(0,0,0,0.1), 0 10px 18px rgba(0,0,0,0.12)" : "0 2px 6px rgba(0,0,0,0.08)") + '">' +
       '<div class="' + (selected ? "bob-fast" : "bob") + (justSquished ? " squish-anim" : "") + '" style="filter:' + (selected ? "none" : "grayscale(0.1) opacity(0.92)") + '">' +
-      mascotSVG(k.mascot, selected ? 84 : 64, selected ? "happy" : "idle") + '</div>' +
+      mascotSVG(k.mascot, selected ? 84 : 64, moodForKid(id, isMorning)) + '</div>' +
       '<span style="font-family:\'Baloo 2\',sans-serif;font-weight:800;font-size:' + (selected ? "16px" : "13.5px") + ';color:' + (selected ? "#3a2e2e" : "#5a5252") + ';margin-top:2px">' + k.name + '</span>' +
       '</button>';
   });
   html += '</div>';
 
   // wide screens: both kids' columns are already visible side by side, so just a small label instead of a picker
-  html += '<button data-action="squish-switcher" data-kid="' + kidId + '" class="wide-only row" style="border:none;background:none;padding:0;cursor:pointer;align-items:center;gap:10px">' +
-    '<div class="bob' + (squishSwitcherKid === kidId ? " squish-anim" : "") + '">' + mascotSVG(kid.mascot, 56, "happy") + '</div>' +
-    '<span style="font-family:\'Baloo 2\',sans-serif;font-weight:800;font-size:17px;color:' + textOnSky + '">' + kid.name + '</span>' +
-    '</button>';
+  var narrativeCaption = allDone
+    ? ""
+    : (isMorning ? "waking up!" : "getting sleepy\u2026");
+  html += '<div class="wide-only row" style="align-items:center;gap:10px">' +
+    '<button data-action="squish-switcher" data-kid="' + kidId + '" style="border:none;background:none;padding:0;cursor:pointer;line-height:0">' +
+    '<div class="bob' + (squishSwitcherKid === kidId ? " squish-anim" : "") + '">' + mascotSVG(kid.mascot, 56, moodForKid(kidId, isMorning)) + '</div>' +
+    '</button>' +
+    '<div>' +
+    '<div style="font-family:\'Baloo 2\',sans-serif;font-weight:800;font-size:17px;color:' + textOnSky + '">' + kid.name + '</div>' +
+    (narrativeCaption ? '<div style="font-family:\'Nunito\',sans-serif;font-weight:700;font-size:12px;color:' + textOnSky + ';opacity:0.75">' + narrativeCaption + '</div>' : '') +
+    '</div>' +
+    '</div>';
 
   html += '<div class="row-between" style="margin-top:18px;align-items:baseline">' +
     '<div style="font-family:\'Baloo 2\',sans-serif;font-weight:700;font-size:19px;color:' + textOnSky + '">' + (isMorning ? "\u2600\uFE0F Morning routine" : "\uD83C\uDF19 Evening routine") + '</div>' +
@@ -509,11 +615,11 @@ function renderKidChores(kidId, textOnSky, isMorning, squishSwitcherKid, squishB
   html += '</div>'; // end chore list
 
   if (allDone) {
-    html += '<div style="margin-top:14px;background:#ffffff;border-radius:16px;padding:10px 14px;display:flex;align-items:center;gap:12px">' +
+    html += '<div data-all-done-banner="' + kidId + '" class="' + (celebrateKid === kidId ? "celebrate-pop" : "") + '" style="position:relative;margin-top:14px;background:linear-gradient(135deg,#ffffff,' + kid.accent + '22);border:2px solid ' + kid.accent + '55;border-radius:18px;padding:12px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 6px 18px rgba(0,0,0,0.1)">' +
       '<button data-action="squish-banner" data-kid="' + kidId + '" style="border:none;background:none;padding:0;line-height:0" aria-label="Tap ' + kid.name + '">' +
-      '<div class="bob-fast mascot-tap' + (squishBannerKid === kidId ? " squish-anim" : "") + '">' + mascotSVG(kid.mascot, 52, "happy") + '</div>' +
+      '<div class="bob-fast mascot-tap' + (squishBannerKid === kidId ? " squish-anim" : "") + '">' + mascotSVG(kid.mascot, 56, "happy") + '</div>' +
       '</button>' +
-      '<div style="font-family:\'Baloo 2\',sans-serif;font-weight:700;color:#3a2e2e;font-size:14px">All done, ' + kid.name + '! Great ' + (isMorning ? "morning" : "evening") + '!</div>' +
+      '<div style="font-family:\'Baloo 2\',sans-serif;font-weight:800;color:#3a2e2e;font-size:16px">\uD83C\uDF89 All done, ' + kid.name + '! Great ' + (isMorning ? "morning" : "evening") + '!</div>' +
       '</div>';
   }
 
@@ -614,6 +720,8 @@ function render() {
   state.squishSwitcher = null;
   var squishBannerKid = state.squishBanner;
   state.squishBanner = null;
+  var celebrateKid = state.celebrateKid;
+  state.celebrateKid = null;
 
   var period = currentPeriod();
   state.lastRenderedPeriod = period;
@@ -649,7 +757,7 @@ function render() {
   Object.keys(KIDS).forEach(function (id) {
     var active = state.kidId === id;
     html += '<div class="kid-piece' + (active ? " active" : "") + '" data-kid="' + id + '">' +
-      renderKidChores(id, textOnSky, isMorning, squishSwitcherKid, squishBannerKid) +
+      renderKidChores(id, textOnSky, isMorning, squishSwitcherKid, squishBannerKid, celebrateKid) +
       '</div>';
   });
   Object.keys(KIDS).forEach(function (id) {
@@ -690,13 +798,30 @@ function checkWeeklyAward(kidId) {
 
 function completeChore(kidId, period, choreId) {
   var key = choreKey(kidId, period, choreId);
+  var chores = choresFor(kidId, period);
+  var wasAllDone = chores.every(function (c) { return !!state.done[choreKey(kidId, period, c.id)]; });
+
   state.done[key] = true;
   if (state.timers[key]) { state.timers[key].running = false; }
-  playChime();
+
+  var isAllDoneNow = chores.every(function (c) { return !!state.done[choreKey(kidId, period, c.id)]; });
+  var justFinishedRoutine = isAllDoneNow && !wasAllDone;
+
+  if (justFinishedRoutine) {
+    playFanfare();
+    state.celebrateKid = kidId;
+  } else {
+    playChime();
+  }
   checkWeeklyAward(kidId);
   render();
+
   var card = document.querySelector('[data-chorekey="' + key + '"]');
   spawnConfetti(card);
+  if (justFinishedRoutine) {
+    var banner = document.querySelector('[data-all-done-banner="' + kidId + '"]');
+    if (banner) spawnBigConfetti(banner);
+  }
 }
 
 document.getElementById("root").addEventListener("click", function (e) {
