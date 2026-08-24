@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>ChoreTrail</title>
+<title>Bao Buddy</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@500;700;800&display=swap');
 
@@ -89,7 +89,7 @@
 "use strict";
 
 /* ---------------------------------------------------------------
-   ChoreTrail — vanilla JS build (no React, no build step).
+   Bao Buddy — vanilla JS build (no React, no build step).
    Each routine is a little path across a sky that shifts with the
    time of day. Every chore is a stepping stone with its own timer.
 ----------------------------------------------------------------- */
@@ -512,7 +512,7 @@ function bunFace(bodyColor, pleatColor, blushColor, mood) {
 }
 function mascotBaoMiles(size, mood) {
   return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 100 100">' +
-    bunFace("#FFD9B0", "#FFB877", "#FF9B7A", mood) + '</svg>';
+    bunFace("#C9EFC0", "#8FDDA0", "#FF9B7A", mood) + '</svg>';
 }
 function mascotBaoLina(size, mood) {
   return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 100 100">' +
@@ -813,7 +813,7 @@ function render() {
 
   // footer: parent mode lives here now, tucked out of the way of the kids' view
   html += '<div class="row-between" style="margin-top:20px;opacity:0.85">' +
-    '<div style="font-family:\'Nunito\',sans-serif;font-weight:700;font-size:11px;color:' + textOnSky + ';opacity:0.6">ChoreTrail</div>' +
+    '<div style="font-family:\'Nunito\',sans-serif;font-weight:700;font-size:11px;color:' + textOnSky + ';opacity:0.6">Bao Buddy</div>' +
     '<div class="row" style="gap:8px">' +
     (state.parentMode
       ? '<button class="lock-btn" data-action="toggle-period-preview" aria-label="Switch between morning and evening (parent check-in)">' + periodIconHtml + '</button>'
