@@ -110,9 +110,9 @@ var CHORE_LIBRARY = {
     ],
     evening: [
       { id: "e1", label: "Clean up toys",  minutes: 5,  emoji: "\uD83E\uDDF8" },
-      { id: "e2", label: "Brush teeth",    minutes: 2,  emoji: "\uD83E\uDEA5" },
-      { id: "e3", label: "Take bath",      minutes: 10, emoji: "\uD83D\uDEC1" },
-      { id: "e4", label: "Go potty",       minutes: 3,  emoji: "\uD83D\uDEBD" },
+      { id: "e2", label: "Go potty",       minutes: 3,  emoji: "\uD83D\uDEBD" },
+      { id: "e3", label: "Shower",         minutes: 10, emoji: "\uD83D\uDEBF" },
+      { id: "e4", label: "Brush teeth",    minutes: 2,  emoji: "\uD83E\uDEA5" },
       { id: "e5", label: "Put on pajamas", minutes: 3,  emoji: "\uD83C\uDF19" }
     ]
   },
@@ -125,10 +125,12 @@ var CHORE_LIBRARY = {
       { id: "m5", label: "Put on shoes",  minutes: 2,  emoji: "\uD83D\uDC5F" }
     ],
     evening: [
-      { id: "e1", label: "Tidy room",           minutes: 8,  emoji: "\uD83E\uDDF9" },
-      { id: "e2", label: "Shower",              minutes: 10, emoji: "\uD83D\uDEBF" },
-      { id: "e3", label: "Brush teeth",         minutes: 2,  emoji: "\uD83E\uDEA5" },
-      { id: "e4", label: "Read + lights out",   minutes: 10, emoji: "\uD83D\uDCD6" }
+      { id: "e0", label: "Homework",       minutes: 20, emoji: "\uD83D\uDCDA" },
+      { id: "e1", label: "Clean up toys",  minutes: 5,  emoji: "\uD83E\uDDF8" },
+      { id: "e2", label: "Go potty",       minutes: 3,  emoji: "\uD83D\uDEBD" },
+      { id: "e3", label: "Shower",         minutes: 10, emoji: "\uD83D\uDEBF" },
+      { id: "e4", label: "Brush teeth",    minutes: 2,  emoji: "\uD83E\uDEA5" },
+      { id: "e5", label: "Put on pajamas", minutes: 3,  emoji: "\uD83C\uDF19" }
     ]
   }
 };
@@ -291,7 +293,6 @@ function choresFor(kidId, period) {
   if (kidId === "lina" && period === "evening" && wIdx >= 0) {
     var rotating = ROTATING_CHORES[wIdx];
     return base.concat([
-      { id: "hw", label: "Homework", minutes: 20, emoji: "\uD83D\uDCDA", auto: true },
       { id: "dc" + wIdx, label: rotating.label, minutes: rotating.minutes, emoji: rotating.emoji, auto: true }
     ]);
   }
@@ -536,7 +537,7 @@ function bunFace(bodyColor, pleatColor, blushColor, mood) {
 }
 var DEFAULT_BUN_COLORS = {
   miles: { body: "#C9EFC0", pleat: "#8FDDA0", blush: "#FF9B7A" },
-  lina:  { body: "#E3E9FF", pleat: "#B9C6FF", blush: "#FFB8CE" }
+  lina:  { body: "#FFD9EC", pleat: "#FFB8D9", blush: "#FF8FBF" }
 };
 var BUN_PALETTE = [
   { body: "#C9EFC0", pleat: "#8FDDA0", blush: "#FF9B7A", name: "Green" },
@@ -612,10 +613,9 @@ function renderKidChores(kidId, textOnSky, isMorning, squishSwitcherKid, squishB
     '<div style="font-family:\'Nunito\',sans-serif;font-weight:800;font-size:13px;color:' + textOnSky + '">' + doneCount + '/' + chores.length + ' done</div>' +
     '</div>';
 
-  var COMPLETE_COLORS = {
-    miles: { bg: "#BDEFC9", shadow: "#8FDDA0" }, // light green
-    lina:  { bg: "#FFC9DE", shadow: "#F49DC2" }  // light pink
-  };
+  var bunColor = (state.bunColors && state.bunColors[kidId]) || DEFAULT_BUN_COLORS[kidId];
+  var COMPLETE_BG = bunColor.body;
+  var COMPLETE_SHADOW = bunColor.pleat;
 
   html += '<div style="display:flex;flex-direction:column;gap:12px;margin-top:16px">';
   chores.forEach(function (c, idx) {
@@ -625,9 +625,8 @@ function renderKidChores(kidId, textOnSky, isMorning, squishSwitcherKid, squishB
     var showTimer = !!state.timerUI[key] && !done;
     var accent = kid.accent;
 
-    var complete = COMPLETE_COLORS[kidId];
-    var doneBg = complete.bg;
-    var doneShadowColor = complete.shadow;
+    var doneBg = COMPLETE_BG;
+    var doneShadowColor = COMPLETE_SHADOW;
     var doneTextColor = "#3a2e2e";
     var doneSubTextColor = "#5a5252";
     var doneIconBg = "#ffffff70";
