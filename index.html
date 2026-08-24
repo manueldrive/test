@@ -41,6 +41,17 @@
   .done-btn { background: none; border: none; cursor: pointer; flex-shrink: 0; }
   .footer-card { margin-top: 16px; background: white; border-radius: 22px; padding: 16px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
   .lock-btn { background: #ffffff33; border: none; border-radius: 999px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .kid-columns { display: block; }
+  .kid-column { display: none; }
+  .kid-column.active { display: block; }
+  .wide-only { display: none; }
+  @media (min-width: 700px) {
+    #root { max-width: 980px; }
+    .kid-columns { display: flex; gap: 22px; align-items: flex-start; }
+    .kid-column { display: block !important; flex: 1; min-width: 0; }
+    .narrow-only { display: none !important; }
+    .wide-only { display: flex !important; }
+  }
   .confetti-wrap { position: absolute; inset: 0; pointer-events: none; overflow: hidden; border-radius: 20px; }
   .confetti-piece { position: absolute; top: -10%; width: 7px; height: 7px; }
   .timer-row { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
@@ -380,18 +391,12 @@ function mascotSVG(kind, size, mood) {
 }
 
 /* ---------------- render ---------------- */
-function render() {
-  var kidId = state.kidId;
+function renderKidPanel(kidId, squishSwitcherKid, squishBannerKid) {
   var kid = KIDS[kidId];
   var period = currentPeriod();
   state.lastRenderedPeriod = period;
   var isMorning = period === "morning";
   var chores = choresFor(kidId, period);
-
-  var squishSwitcherKid = state.squishSwitcher;
-  state.squishSwitcher = null;
-  var squishBannerNow = state.squishBanner;
-  state.squishBanner = false;
 
   var doneCount = 0;
   chores.forEach(function (c) {
@@ -411,10 +416,10 @@ function render() {
 
   var clockParts = formatClockParts(new Date());
   var clockGlow = isMorning ? "#FF9B4266" : "#7DD8C666";
-  var clockHtml = '<div id="clock-el" style="display:inline-flex;align-items:baseline;gap:6px;background:#00000020;padding:10px 18px;border-radius:18px;box-shadow:inset 0 2px 6px rgba(0,0,0,0.18)">' +
+  var clockHtml = '<div class="clock-el" data-clock-el style="display:inline-flex;align-items:baseline;gap:6px;background:#00000020;padding:10px 18px;border-radius:18px;box-shadow:inset 0 2px 6px rgba(0,0,0,0.18)">' +
     '<span style="font-size:16px;opacity:0.6">\u23F0</span>' +
-    '<span id="clock-time" style="font-family:\'Courier New\',monospace;font-weight:800;font-size:42px;color:' + textOnSky + ';letter-spacing:1px;text-shadow:0 0 14px ' + clockGlow + '">' + clockParts.hm + '</span>' +
-    '<span id="clock-ampm" style="font-family:\'Nunito\',sans-serif;font-weight:800;font-size:14px;color:' + textOnSky + ';opacity:0.75">' + clockParts.ampm + '</span>' +
+    '<span class="clock-time" data-clock-time style="font-family:\'Courier New\',monospace;font-weight:800;font-size:42px;color:' + textOnSky + ';letter-spacing:1px;text-shadow:0 0 14px ' + clockGlow + '">' + clockParts.hm + '</span>' +
+    '<span class="clock-ampm" data-clock-ampm style="font-family:\'Nunito\',sans-serif;font-weight:800;font-size:14px;color:' + textOnSky + ';opacity:0.75">' + clockParts.ampm + '</span>' +
     '</div>';
 
   html += '<div class="row-between">' +
@@ -427,10 +432,11 @@ function render() {
     '</div>' +
     '</div>';
 
-  html += '<div class="row" style="gap:12px;margin-top:14px">';
+  // narrow screens: interactive switcher to pick which kid's single column shows
+  html += '<div class="row narrow-only" style="gap:12px;margin-top:14px">';
   Object.keys(KIDS).forEach(function (id) {
     var k = KIDS[id];
-    var selected = kidId === id;
+    var selected = state.kidId === id;
     var justSquished = squishSwitcherKid === id;
     html += '<button class="kid-btn" data-action="select-kid" data-kid="' + id + '" style="padding:' + (selected ? "14px 10px 10px" : "12px 10px 10px") +
       ';background:' + (selected ? "white" : "#ffffff85") +
@@ -441,6 +447,12 @@ function render() {
       '</button>';
   });
   html += '</div>';
+
+  // wide screens: both kids' columns are already visible side by side, so just a small label instead of a picker
+  html += '<button data-action="squish-switcher" data-kid="' + kidId + '" class="wide-only row" style="border:none;background:none;padding:0;cursor:pointer;align-items:center;gap:10px;margin-top:14px">' +
+    '<div class="bob' + (squishSwitcherKid === kidId ? " squish-anim" : "") + '">' + mascotSVG(kid.mascot, 56, "happy") + '</div>' +
+    '<span style="font-family:\'Baloo 2\',sans-serif;font-weight:800;font-size:17px;color:' + textOnSky + '">' + kid.name + '</span>' +
+    '</button>';
 
   html += '<div class="row-between" style="margin-top:18px;align-items:baseline">' +
     '<div style="font-family:\'Baloo 2\',sans-serif;font-weight:700;font-size:19px;color:' + textOnSky + '">' + (isMorning ? "\u2600\uFE0F Morning routine" : "\uD83C\uDF19 Evening routine") + '</div>' +
@@ -510,8 +522,8 @@ function render() {
 
   if (allDone) {
     html += '<div style="margin-top:14px;background:#ffffff;border-radius:16px;padding:10px 14px;display:flex;align-items:center;gap:12px">' +
-      '<button data-action="squish-banner" style="border:none;background:none;padding:0;line-height:0" aria-label="Tap ' + kid.name + '">' +
-      '<div class="bob-fast mascot-tap' + (squishBannerNow ? " squish-anim" : "") + '">' + mascotSVG(kid.mascot, 52, "happy") + '</div>' +
+      '<button data-action="squish-banner" data-kid="' + kidId + '" style="border:none;background:none;padding:0;line-height:0" aria-label="Tap ' + kid.name + '">' +
+      '<div class="bob-fast mascot-tap' + (squishBannerKid === kidId ? " squish-anim" : "") + '">' + mascotSVG(kid.mascot, 52, "happy") + '</div>' +
       '</button>' +
       '<div style="font-family:\'Baloo 2\',sans-serif;font-weight:700;color:#3a2e2e;font-size:14px">All done, ' + kid.name + '! Great ' + (isMorning ? "morning" : "evening") + '!</div>' +
       '</div>';
@@ -601,6 +613,24 @@ function render() {
       '</div></div>';
   }
 
+  return html;
+}
+
+function render() {
+  var squishSwitcherKid = state.squishSwitcher;
+  state.squishSwitcher = null;
+  var squishBannerKid = state.squishBanner;
+  state.squishBanner = null;
+
+  var html = '<div class="kid-columns">';
+  Object.keys(KIDS).forEach(function (id) {
+    var active = state.kidId === id;
+    html += '<div class="kid-column' + (active ? " active" : "") + '">' +
+      renderKidPanel(id, squishSwitcherKid, squishBannerKid) +
+      '</div>';
+  });
+  html += '</div>';
+
   document.getElementById("root").innerHTML = html;
 }
 
@@ -651,8 +681,11 @@ document.getElementById("root").addEventListener("click", function (e) {
     state.accountOpenFor = null;
     state.squishSwitcher = el.dataset.kid;
     render();
+  } else if (action === "squish-switcher") {
+    state.squishSwitcher = el.dataset.kid;
+    render();
   } else if (action === "squish-banner") {
-    state.squishBanner = true;
+    state.squishBanner = el.dataset.kid;
     render();
   } else if (action === "toggle-parent") {
     state.parentMode = !state.parentMode;
@@ -724,14 +757,14 @@ document.getElementById("root").addEventListener("click", function (e) {
 
 /* ---------------- ticker: updates clock + running timers without a full re-render ---------------- */
 setInterval(function () {
-  // clock
-  var clockTimeEl = document.getElementById("clock-time");
-  var clockAmpmEl = document.getElementById("clock-ampm");
-  if (clockTimeEl && clockAmpmEl) {
-    var parts = formatClockParts(new Date());
-    if (clockTimeEl.textContent !== parts.hm) clockTimeEl.textContent = parts.hm;
-    if (clockAmpmEl.textContent !== parts.ampm) clockAmpmEl.textContent = parts.ampm;
-  }
+  // clock (there's one instance per visible kid column)
+  var parts = formatClockParts(new Date());
+  document.querySelectorAll("[data-clock-time]").forEach(function (el) {
+    if (el.textContent !== parts.hm) el.textContent = parts.hm;
+  });
+  document.querySelectorAll("[data-clock-ampm]").forEach(function (el) {
+    if (el.textContent !== parts.ampm) el.textContent = parts.ampm;
+  });
 
   // auto period switch (rare — only matters right around the morning/evening boundary)
   if (!state.periodOverride && naturalPeriod() !== state.lastRenderedPeriod) {
