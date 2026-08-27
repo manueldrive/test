@@ -797,8 +797,8 @@ function playFlapSound() {
     var osc = ctx.createOscillator();
     var gain = ctx.createGain();
     osc.type = "sine";
-    osc.frequency.setValueAtTime(340, ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(600, ctx.currentTime + 0.08);
+    osc.frequency.setValueAtTime(320, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(560, ctx.currentTime + 0.08);
     osc.connect(gain);
     gain.connect(ctx.destination);
     gain.gain.setValueAtTime(0.12, ctx.currentTime);
@@ -1082,7 +1082,7 @@ var MASCOT_STATES = {
         '<circle cx="36.8" cy="57.5" r="0.9" fill="#FFFFFF"/>' +
         '<circle cx="70.8" cy="57.5" r="0.9" fill="#FFFFFF"/>' +
         '<g stroke="VAR_BL" stroke-width="1.7" stroke-linecap="round" opacity="0.95">' +
-        '<line x1="25" y1="60" x2="27.5" y2="64"/><line x1="29.5" y1="60" x2="31.5" y2="64"/><line x1="33" y1="60" x2="35.5" y2="64"/>' +
+        '<line x1="25" y1="60" x2="27.5" y2="64"/><line x1="29" y1="60" x2="31.5" y2="64"/><line x1="33" y1="60" x2="35.5" y2="64"/>' +
         '<line x1="74" y1="60" x2="76.5" y2="64"/><line x1="78" y1="60" x2="80.5" y2="64"/><line x1="82" y1="60" x2="84.5" y2="64"/>' +
         '</g>' +
         '<path d="M49,60 Q55,68 61,60 Z" fill="#1C1818"/>' +
@@ -1165,7 +1165,7 @@ var MASCOT_STATES = {
         '<circle cx="36.8" cy="57.5" r="0.9" fill="#FFFFFF"/>' +
         '<circle cx="70.8" cy="57.5" r="0.9" fill="#FFFFFF"/>' +
         '<g stroke="VAR_BL" stroke-width="1.7" stroke-linecap="round" opacity="0.95">' +
-        '<line x1="25" y1="60" x2="27.5" y2="64"/><line x1="29.5" y1="60" x2="31.5" y2="64"/><line x1="33" y1="60" x2="35.5" y2="64"/>' +
+        '<line x1="25" y1="60" x2="27.5" y2="64"/><line x1="29" y1="60" x2="31.5" y2="64"/><line x1="33" y1="60" x2="35.5" y2="64"/>' +
         '<line x1="74" y1="60" x2="76.5" y2="64"/><line x1="78" y1="60" x2="80.5" y2="64"/><line x1="82" y1="60" x2="84.5" y2="64"/>' +
         '</g>' +
         '<path d="M49,60 Q55,68 61,60 Z" fill="#1C1818"/>' +
@@ -1499,10 +1499,10 @@ var flappyGame = {
   bao: { x: 55, y: 150, vy: 0, radius: 18, squishScaleX: 1, squishScaleY: 1, squishTime: 0 },
   pipes: [],
   pipeWidth: 38,
-  pipeGap: 130, // Widened gap for kid-friendly clearance
-  gravity: 0.22, // Slower, gentler fall
-  jumpStrength: -4.8, // Controlled, floaty flap
-  pipeSpeed: 1.4, // Slower chopstick glide
+  pipeGap: 110, // Original classic gap
+  gravity: 0.38, // Original responsive gravity
+  jumpStrength: -6.2, // Original responsive jump
+  pipeSpeed: 2.0, // Original snappy speed
   spawnCounter: 0,
 
   init: function(kidId) {
@@ -1531,8 +1531,8 @@ var flappyGame = {
   },
 
   renderBaoImage: function() {
-    // Generate full SVG with custom color and accessories for this specific kid
-    var svgStr = mascotSVG(this.kidId, 100, currentPeriod(), "p100");
+    var currentP = (state.parentMode && state.periodOverride) ? state.periodOverride : visualPeriod(new Date());
+    var svgStr = mascotSVG(this.kidId, 100, currentP, "p100");
     var blob = new Blob([svgStr], { type: "image/svg+xml;charset=utf-8" });
     var url = URL.createObjectURL(blob);
     var img = new Image();
@@ -1547,13 +1547,13 @@ var flappyGame = {
     if (this.state === "ready" || this.state === "playing") {
       this.state = "playing";
       this.bao.vy = this.jumpStrength;
-      this.bao.squishTime = 16;
+      this.bao.squishTime = 15;
       playFlapSound();
     } else if (this.state === "gameover") {
       this.reset();
       this.state = "playing";
       this.bao.vy = this.jumpStrength;
-      this.bao.squishTime = 16;
+      this.bao.squishTime = 15;
       playFlapSound();
     }
   },
@@ -1563,12 +1563,12 @@ var flappyGame = {
       this.bao.vy += this.gravity;
       this.bao.y += this.bao.vy;
 
-      // Kid-friendly squish animation on every tap
+      // Squish animation on tap
       if (this.bao.squishTime > 0) {
         this.bao.squishTime--;
-        var progress = (16 - this.bao.squishTime) / 16;
-        this.bao.squishScaleX = 1 + 0.32 * Math.sin(progress * Math.PI);
-        this.bao.squishScaleY = 1 - 0.25 * Math.sin(progress * Math.PI);
+        var progress = (15 - this.bao.squishTime) / 15;
+        this.bao.squishScaleX = 1 + 0.35 * Math.sin(progress * Math.PI);
+        this.bao.squishScaleY = 1 - 0.28 * Math.sin(progress * Math.PI);
       } else {
         this.bao.squishScaleX = 1;
         this.bao.squishScaleY = 1;
@@ -1585,10 +1585,10 @@ var flappyGame = {
 
       // Spawn chopstick pipes
       this.spawnCounter++;
-      if (this.spawnCounter >= 110) {
+      if (this.spawnCounter >= 85) {
         this.spawnCounter = 0;
-        var minTop = 35;
-        var maxTop = this.canvas.height - this.pipeGap - 55;
+        var minTop = 40;
+        var maxTop = this.canvas.height - this.pipeGap - 60;
         var topHeight = Math.floor(minTop + Math.random() * (maxTop - minTop));
         this.pipes.push({
           x: this.canvas.width + 10,
@@ -1603,10 +1603,9 @@ var flappyGame = {
         var p = this.pipes[i];
         p.x -= this.pipeSpeed;
 
-        // Collision check with forgiving hitbox
         var bx = this.bao.x;
         var by = this.bao.y;
-        var br = this.bao.radius - 3;
+        var br = this.bao.radius - 2;
 
         if (bx + br > p.x && bx - br < p.x + this.pipeWidth) {
           if (by - br < p.top || by + br > p.bottom) {
@@ -1614,7 +1613,6 @@ var flappyGame = {
           }
         }
 
-        // Score check
         if (!p.passed && p.x + this.pipeWidth < this.bao.x) {
           p.passed = true;
           this.score++;
@@ -1644,32 +1642,76 @@ var flappyGame = {
     var ctx = this.ctx;
     var W = this.canvas.width;
     var H = this.canvas.height;
+    var vp = (state.parentMode && state.periodOverride) ? state.periodOverride : visualPeriod(new Date());
 
-    // Background sky gradient
+    // Dynamic Time-Of-Day Sky Background in Game
     var skyGrad = ctx.createLinearGradient(0, 0, 0, H);
-    skyGrad.addColorStop(0, "#C7EBFF");
-    skyGrad.addColorStop(1, "#E8F7FF");
+    if (vp === "morning") {
+      skyGrad.addColorStop(0, "#7B9FE8");
+      skyGrad.addColorStop(0.35, "#B98FD1");
+      skyGrad.addColorStop(0.7, "#F0B896");
+      skyGrad.addColorStop(1, "#F5D9A8");
+    } else if (vp === "afternoon") {
+      skyGrad.addColorStop(0, "#2F8FEA");
+      skyGrad.addColorStop(0.45, "#6FB8F5");
+      skyGrad.addColorStop(1, "#D6ECFB");
+    } else {
+      skyGrad.addColorStop(0, "#0B1A3D");
+      skyGrad.addColorStop(0.5, "#1B2F63");
+      skyGrad.addColorStop(1, "#33468C");
+    }
     ctx.fillStyle = skyGrad;
     ctx.fillRect(0, 0, W, H);
 
-    // Clouds
-    ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
-    ctx.beginPath();
-    ctx.arc(60, 45, 18, 0, Math.PI * 2);
-    ctx.arc(80, 40, 24, 0, Math.PI * 2);
-    ctx.arc(104, 45, 18, 0, Math.PI * 2);
-    ctx.fill();
+    // Dynamic Atmosphere Decor
+    if (vp === "morning" || vp === "afternoon") {
+      // Sun Glow
+      if (vp === "morning") {
+        var sunG = ctx.createRadialGradient(W - 20, 20, 0, W - 20, 20, 70);
+        sunG.addColorStop(0, "rgba(255, 222, 122, 0.5)");
+        sunG.addColorStop(0.6, "rgba(255, 182, 138, 0.2)");
+        sunG.addColorStop(1, "transparent");
+        ctx.fillStyle = sunG;
+        ctx.fillRect(W - 90, 0, 90, 90);
+      }
+      // Floating Clouds
+      ctx.fillStyle = "rgba(255, 255, 255, 0.65)";
+      ctx.beginPath();
+      ctx.arc(60, 45, 18, 0, Math.PI * 2);
+      ctx.arc(80, 40, 24, 0, Math.PI * 2);
+      ctx.arc(104, 45, 18, 0, Math.PI * 2);
+      ctx.fill();
 
-    ctx.beginPath();
-    ctx.arc(220, 80, 16, 0, Math.PI * 2);
-    ctx.arc(238, 75, 22, 0, Math.PI * 2);
-    ctx.arc(260, 80, 16, 0, Math.PI * 2);
-    ctx.fill();
+      ctx.beginPath();
+      ctx.arc(220, 80, 16, 0, Math.PI * 2);
+      ctx.arc(238, 75, 22, 0, Math.PI * 2);
+      ctx.arc(260, 80, 16, 0, Math.PI * 2);
+      ctx.fill();
+    } else {
+      // Moon Glow & Stars
+      var moonG = ctx.createRadialGradient(W - 25, 25, 0, W - 25, 25, 75);
+      moonG.addColorStop(0, "rgba(234, 230, 255, 0.45)");
+      moonG.addColorStop(0.5, "rgba(185, 198, 255, 0.2)");
+      moonG.addColorStop(1, "transparent");
+      ctx.fillStyle = moonG;
+      ctx.fillRect(W - 100, 0, 100, 100);
 
-    // Ground
-    ctx.fillStyle = "#E3D5C5";
+      // Night Stars
+      ctx.fillStyle = "#FFFFFF";
+      STAR_FIELD.forEach(function(s, idx) {
+        if (idx % 2 === 0) {
+          ctx.beginPath();
+          ctx.arc((s.x / 100) * W, (s.y / 100) * (H - 40), s.size * 0.7, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      });
+    }
+
+    // Ground line matching landscape
+    var lp = LANDSCAPE_PALETTE[vp] || LANDSCAPE_PALETTE.evening;
+    ctx.fillStyle = lp.front;
     ctx.fillRect(0, H - 20, W, 20);
-    ctx.fillStyle = "#4A7C59";
+    ctx.fillStyle = lp.tree;
     ctx.fillRect(0, H - 24, W, 4);
 
     // Draw Chopsticks
@@ -1714,7 +1756,7 @@ var flappyGame = {
     // Draw Customized Kid Bao
     ctx.save();
     ctx.translate(this.bao.x, this.bao.y);
-    var tilt = Math.min(Math.PI / 4, Math.max(-Math.PI / 6, this.bao.vy * 0.08));
+    var tilt = Math.min(Math.PI / 4, Math.max(-Math.PI / 6, this.bao.vy * 0.06));
     ctx.rotate(tilt);
     ctx.scale(this.bao.squishScaleX, this.bao.squishScaleY);
 
@@ -1729,24 +1771,24 @@ var flappyGame = {
     ctx.restore();
 
     // Draw Score
-    ctx.fillStyle = "#3A2E2E";
-    ctx.font = "800 24px 'Baloo 2', Nunito, sans-serif";
+    ctx.fillStyle = vp === "evening" ? "#FFFFFF" : "#3A2E2E";
+    ctx.font = "800 26px 'Baloo 2', Nunito, sans-serif";
     ctx.textAlign = "center";
     ctx.fillText(this.score, W / 2, 40);
 
     // Ready Overlay
     if (this.state === "ready") {
-      ctx.fillStyle = "rgba(58, 46, 46, 0.85)";
+      ctx.fillStyle = vp === "evening" ? "rgba(255, 255, 255, 0.95)" : "rgba(58, 46, 46, 0.88)";
       ctx.font = "800 18px 'Baloo 2', Nunito, sans-serif";
-      ctx.fillText("Tap anywhere to Flap!", W / 2, H / 2 - 40);
-      ctx.fillStyle = "#736763";
+      ctx.fillText("Tap anywhere to Flap!", W / 2, H / 2 - 30);
+      ctx.fillStyle = vp === "evening" ? "rgba(255, 255, 255, 0.75)" : "#736763";
       ctx.font = "700 12px Nunito, sans-serif";
-      ctx.fillText("Dodge the chopsticks!", W / 2, H / 2 - 18);
+      ctx.fillText("Dodge the chopsticks!", W / 2, H / 2 - 10);
     }
 
     // Game Over Overlay
     if (this.state === "gameover") {
-      ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
+      ctx.fillStyle = "rgba(0, 0, 0, 0.45)";
       ctx.fillRect(0, 0, W, H);
 
       ctx.fillStyle = "#FFFFFF";
@@ -2002,10 +2044,9 @@ function renderKidChores(kidId, textOnSky, activePeriod, squishSwitcherKid, squi
       '<div style="background:white;border-radius:26px;padding:24px;width:100%;max-width:340px;text-align:center;position:relative;overflow:hidden">';
 
     if (state.gameActive) {
-      /* Flappy Bao Arcade Screen inside Modal */
+      /* Flappy Bao Arcade Screen inside Modal (Header Cleaned Up) */
       html += '<div class="row-between" style="margin-bottom:12px">' +
         '<button data-action="exit-flappy" style="border:none;background:#FAF6F0;border-radius:10px;padding:4px 10px;font-family:\'Nunito\',sans-serif;font-weight:800;font-size:12px;color:#3a2e2e;cursor:pointer">← Style Bao</button>' +
-        '<div style="font-family:\'Baloo 2\',sans-serif;font-weight:800;font-size:16px;color:#3a2e2e">Flappy ' + kid.name + ' 🥟</div>' +
         '<button class="lock-btn" data-action="close-play-modal" aria-label="Close">\u2715</button>' +
         '</div>' +
         '<canvas id="flappy-canvas" width="292" height="340" style="border-radius:18px;width:100%;cursor:pointer;box-shadow:inset 0 2px 8px rgba(0,0,0,0.1);touch-action:none" data-action="flap-bao"></canvas>' +
@@ -2019,8 +2060,7 @@ function renderKidChores(kidId, textOnSky, activePeriod, squishSwitcherKid, squi
         '<button data-action="start-flappy" data-kid="' + kidId + '" style="border:none;background:none;padding:0;cursor:pointer;margin:14px 0" aria-label="Play Flappy Bao!">' +
         '<div class="bob-fast mascot-tap' + (pokeBaoKid === kidId ? " squish-anim" : "") + '">' + mascotSVG(kidId, 140, activePeriod, "p100") + '</div>' +
         '</button>' +
-        '<div style="font-family:\'Baloo 2\',sans-serif;font-weight:800;color:#FF9B42;font-size:13.5px;margin-bottom:8px">🕹️ Tap Bao to Play Flappy Bao!</div>' +
-        '<div style="font-family:\'Nunito\',sans-serif;font-weight:700;color:#8a7f7f;font-size:12px;margin-bottom:12px">Or pick a new color & accessory:</div>' +
+        '<div style="font-family:\'Nunito\',sans-serif;font-weight:700;color:#8a7f7f;font-size:12px;margin-bottom:12px">Pick a new color & accessory:</div>' +
         '<div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap">' +
         (function () {
           var currentColor = state.bunColors[kidId] || DEFAULT_BUN_COLORS[kidId];
