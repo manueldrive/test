@@ -1,4 +1,10 @@
 /* Draw Jamboree — shared styles. One underwater look, dark by design. */
+/* Bundled fonts (SIL Open Font License, see fonts/), so text looks right offline and in the event reel. */
+@font-face{font-family:"Lilita One";font-style:normal;font-weight:400;font-display:swap;src:url(../fonts/lilita-one-latin-400-normal.woff2) format("woff2")}
+@font-face{font-family:"Nunito";font-style:normal;font-weight:700;font-display:swap;src:url(../fonts/nunito-latin-700-normal.woff2) format("woff2")}
+@font-face{font-family:"Nunito";font-style:normal;font-weight:800;font-display:swap;src:url(../fonts/nunito-latin-800-normal.woff2) format("woff2")}
+@font-face{font-family:"Nunito";font-style:normal;font-weight:900;font-display:swap;src:url(../fonts/nunito-latin-900-normal.woff2) format("woff2")}
+@font-face{font-family:"Nunito";font-style:normal;font-weight:600;font-display:swap;src:url(../fonts/nunito-latin-700-normal.woff2) format("woff2")}
 :root{
   --deep:#03202f; --water:#0a5675; --shallow:#1f8fa8; --foam:#eafcff; --panel:#06293b;
   --coral:#ff7b57; --coral-ink:#3a1206; --sand:#e2c48a; --kelp:#3aa877; --danger:#ff5d6c;
