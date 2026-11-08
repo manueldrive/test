@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#03202f">
-<title>Draw Jamboree</title>
+<title>Draw Together</title>
 <link rel="stylesheet" href="css/lagoon.css?v=202611081649">
 <style>
 html,body{height:100%;overflow:hidden}
@@ -135,7 +135,7 @@ body.idle .chrome{opacity:0;pointer-events:none}
 <div class="overlay" id="startOv" hidden>
   <div class="card">
     <span class="eyebrow">Event screen · Shark Lagoon</span>
-    <h1>Draw Jamboree</h1>
+    <h1>Draw Together</h1>
     <ol>
       <li>Put this screen on a projector or TV and set out the coloring sheets.</li>
       <li>Kids color a shark. A grown-up scans the QR code and snaps a photo.</li>
@@ -410,7 +410,7 @@ function buildReel(srcs){
 $('reelSave').onclick = function(){
   if (!reelUrl) return;
   var a = document.createElement('a'); a.href = reelUrl;
-  a.download = 'draw-jamboree-' + new Date().toISOString().slice(0,10) + '.gif';
+  a.download = 'draw-together-' + new Date().toISOString().slice(0,10) + '.gif';
   document.body.appendChild(a); a.click(); a.remove();
 };
 $('endBtn').onclick = function(){ $('endOv').hidden = false; };

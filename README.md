@@ -1,4 +1,4 @@
-# Draw Jamboree
+# Draw Together
 
 A shared big-screen drawing experience for kids' events. The first world is **Shark Lagoon**, an aquarium: kids color a shark on a printed sheet, a grown-up scans the QR code on the big screen and snaps a photo, and the shark swims into the tank for everyone to see.
 
@@ -28,7 +28,7 @@ Phones can send one shark every 20 seconds. Only the cropped drawing is uploaded
 
 Until this is set up the app runs in **demo mode**: everything works on the laptop, but phones can't reach the screen.
 
-1. Go to [console.firebase.google.com](https://console.firebase.google.com), click **Add project**, and name it `draw-jamboree` (the project ID can't be changed later, so keep it general rather than naming it after one world). Analytics can stay off.
+1. Go to [console.firebase.google.com](https://console.firebase.google.com), click **Add project**, and name it `draw-together` (the project ID can't be changed later, so keep it general rather than naming it after one world). Analytics can stay off.
 2. **Build → Realtime Database → Create database.** Pick the US location and start in **locked mode**.
 3. On the database's **Rules** tab, replace everything with the contents of `firebase-rules.json` and click **Publish**.
 4. **Build → Authentication → Get started → Sign-in method → Anonymous → Enable.**

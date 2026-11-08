@@ -1,4 +1,4 @@
-/* Draw Jamboree - event reel.
+/* Draw Together - event reel.
    Builds an animated GIF of every drawing from an event: a title card, one shark swimming across
    while its skin changes to each drawing, and a finale with the whole school together. Runs on
    the host laptop from drawings already in memory, so it works after the online data is deleted. */
@@ -80,7 +80,7 @@
       for (var i = 0; i < 14; i++) frames.push({ d: i < 13 ? 110 : 900, f: (function (i) { return function () {
         scene(g, W, H, t); scene.front(g, W, H, t);
         var a = ease(i / 5);
-        display(g, 'Draw Jamboree', W / 2, H * .5, 50, 'center', a, .86 + .14 * a);
+        display(g, 'Draw Together', W / 2, H * .5, 50, 'center', a, .86 + .14 * a);
         pill(g, world + '  \u2022  ' + date, W / 2, H * .66, 10, ease((i - 4) / 4));
       }; })(i) });
 

@@ -1,4 +1,4 @@
-/* Draw Jamboree — shared core
+/* Draw Together — shared core
    Shark drawing, coloring-sheet geometry, and sheet scanning (corner markers -> shark skin). */
 (function (global) {
   'use strict';
