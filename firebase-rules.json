@@ -1,0 +1,20 @@
+{
+  "rules": {
+    "events": {
+      "$event": {
+        ".read": true,
+        ".write": "auth != null && (data.exists() ? data.child('owner').val() === auth.uid : newData.child('owner').val() === auth.uid)",
+        "sharks": {
+          "$shark": {
+            ".write": "auth != null && !data.exists() && root.child('events').child($event).child('open').val() === true && newData.child('by').val() === auth.uid && newData.child('img').isString() && newData.child('img').val().length < 150000 && newData.child('img').val().beginsWith('data:image/jpeg') && (!root.child('events').child($event).child('last').child(auth.uid).exists() || now - root.child('events').child($event).child('last').child(auth.uid).val() > 18000)"
+          }
+        },
+        "last": {
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid && newData.val() === now"
+          }
+        }
+      }
+    }
+  }
+}
