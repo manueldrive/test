@@ -1,6 +1,6 @@
 # Draw Jamboree
 
-A shared big-screen drawing experience for kids' events. The first world is **Shark Lagoon**, an aquarium: Kids color a shark on a printed sheet, a grown-up scans the QR code on the big screen and snaps a photo, and the shark swims into the tank for everyone to see.
+A shared big-screen drawing experience for kids' events. The first world is **Shark Lagoon**, an aquarium: kids color a shark on a printed sheet, a grown-up scans the QR code on the big screen and snaps a photo, and the shark swims into the tank for everyone to see.
 
 ## The pages
 
