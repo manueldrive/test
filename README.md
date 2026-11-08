@@ -31,7 +31,6 @@ Until this is set up the app runs in **demo mode**: everything works on the lapt
 1. Go to [console.firebase.google.com](https://console.firebase.google.com), click **Add project**, and name it `draw-jamboree` (the project ID can't be changed later, so keep it general rather than naming it after one world). Analytics can stay off.
 2. **Build → Realtime Database → Create database.** Pick the US location and start in **locked mode**.
 3. On the database's **Rules** tab, replace everything with the contents of `firebase-rules.json` and click **Publish**.
-   - **Sharing the `bao-buddy` database with Bao Buddy, Lanterncorps, and Houses?** Use `firebase-rules-shared.json` instead. It keeps those apps' paths open as they are today and locks down only the shark events. Using `firebase-rules.json` there would cut those apps off. Export a backup first (**Data** tab → ⋮ → **Export JSON**). If you add another app to this database later, add its top-level path to the rules too.
 4. **Build → Authentication → Get started → Sign-in method → Anonymous → Enable.**
 5. In **Authentication → Settings → Authorized domains**, add `manueldrive.github.io` (or wherever the site is hosted).
 6. **Project settings** (gear icon) **→ Your apps → Web (`</>`)**, register an app, and copy the `firebaseConfig` object.
