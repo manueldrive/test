@@ -46,7 +46,10 @@
       },
       send: function (id, img) {
         var w = waitLeft(id); if (w) return Promise.reject({ code: 'wait', wait: w });
-        return uidP.then(function (uid) {
+        return api.screenAlive(id).then(function (alive) {
+          if (!alive) throw { code: 'noscreen' };
+          return uidP;
+        }).then(function (uid) {
           var key = db.ref().push().key, u = {};
           u['events/' + id + '/sharks/' + key] = { img: img, by: uid, t: TS };
           u['events/' + id + '/last/' + uid] = TS;
@@ -62,6 +65,14 @@
         });
       },
       remove: function (id, key) { return db.ref('events/' + id + '/sharks/' + key).remove(); },
+      // the big screen marks itself alive every 20s; phones only send to a screen that's really on
+      heartbeat: function (id) { return db.ref('events/' + id + '/alive').set(TS); },
+      screenAlive: function (id) {
+        return Promise.all([db.ref('events/' + id + '/alive').once('value'), db.ref('.info/serverTimeOffset').once('value')]).then(function (r) {
+          var t = r[0].val(), off = r[1].val() || 0;
+          return typeof t === 'number' && (Date.now() + off) - t < 75000;
+        });
+      },
       close: function (id) { return db.ref('events/' + id + '/open').set(false); },
       destroy: function (id) { return db.ref('events/' + id).remove(); }
     };
@@ -94,6 +105,8 @@
       },
       hostAdd: function () { return Promise.resolve(key()); },
       remove: function () { return Promise.resolve(); },
+      heartbeat: function () { return Promise.resolve(); },
+      screenAlive: function () { return Promise.resolve(true); },
       close: function (id) { setOpen(id, false); var c = chan(id); if (c) c.postMessage({ type: 'end' }); return Promise.resolve(); },
       destroy: function () { return Promise.resolve(); }
     };
