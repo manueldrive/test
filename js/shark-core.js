@@ -348,7 +348,7 @@
         var sum = I[y1 * W1 + x1] - I[y0 * W1 + x1] - I[y1 * W1 + x0] + I[y0 * W1 + x0];
         var mean = sum / ((x1 - x0) * (y1 - y0));
         var v = gray[y * w + x];
-        bin[y * w + x] = (v < mean * 0.72 && v < 170) ? 1 : 0;
+        bin[y * w + x] = (v < mean * 0.78 && v < 185) ? 1 : 0;
       }
     }
     // connected components
@@ -375,10 +375,11 @@
       var ok = true, L = cur;
       var at = function (xx, yy) { xx = Math.round(xx); yy = Math.round(yy); if (xx < 0 || yy < 0 || xx >= w || yy >= h) return -1; return label[yy * w + xx] === L ? 1 : 0; };
       var offs = [[0, 0], [.07, 0], [-.07, 0], [0, .07], [0, -.07]];
-      for (var o = 0; o < offs.length && ok; o++) if (at(cx + offs[o][0] * bw, cy + offs[o][1] * bh) !== 0) ok = false;
+      var lit = 0; for (var o = 0; o < offs.length; o++) if (at(cx + offs[o][0] * bw, cy + offs[o][1] * bh) === 0) lit++;
+      if (lit < 3 || at(cx, cy) !== 0) ok = false;
       var ring = [[.35, 0], [-.35, 0], [0, .35], [0, -.35], [.3, .3], [-.3, .3], [.3, -.3], [-.3, -.3]], hit = 0;
       for (o = 0; o < ring.length; o++) if (at(cx + ring[o][0] * bw, cy + ring[o][1] * bh) === 1) hit++;
-      if (!ok || hit < 7) continue;
+      if (!ok || hit < 6) continue;
       comps.push({ x: cx, y: cy, a: cnt });
     }
     return comps;
@@ -471,30 +472,45 @@
     var dA = bandDarkness(mA, sample, SHEET.title) - bandDarkness(mA, sample, SHEET.footer);
     var map = dA >= 0 ? mA : mB;
 
-    // paper color: brightest quarter of samples across the sheet
-    var px = [0, 0, 0], samples = [];
-    for (var y = 0; y < 34; y++) for (var x = 0; x < 44; x++) {
-      var p = map(40 + x * 1020 / 43, 40 + y * 770 / 33); sample(p[0], p[1], px);
-      samples.push([px[0], px[1], px[2], px[0] + px[1] + px[2]]);
+    // paper color, fitted as a smooth surface from the blank margins around the drawing,
+    // so shadows and uneven light across the sheet are evened out
+    var px = [0, 0, 0], pts = [];
+    function grab(x0, y0, x1, y1, nx, ny) {
+      for (var yy = 0; yy < ny; yy++) for (var xx = 0; xx < nx; xx++) {
+        var sx = x0 + (xx + .5) / nx * (x1 - x0), sy = y0 + (yy + .5) / ny * (y1 - y0), p = map(sx, sy);
+        sample(p[0], p[1], px); pts.push([sx / 1100, sy / 850, px[0], px[1], px[2]]);
+      }
     }
-    samples.sort(function (a, b) { return b[3] - a[3]; });
-    var top = samples.slice(0, Math.floor(samples.length / 4)), paper = [0, 0, 0];
-    top.forEach(function (s) { paper[0] += s[0]; paper[1] += s[1]; paper[2] += s[2]; });
-    paper = paper.map(function (v) { return Math.max(70, v / top.length); });
+    grab(150, 188, 950, 224, 24, 2); grab(150, 644, 950, 690, 24, 2);   // above and below the drawing
+    grab(30, 150, 140, 700, 3, 16); grab(960, 150, 1070, 700, 3, 16);   // left and right margins
+    grab(150, 772, 950, 830, 20, 2);                                     // bottom edge
+    var lum = pts.map(function (q) { return q[2] + q[3] + q[4]; }).sort(function (a, b) { return a - b; });
+    var med = lum[Math.floor(lum.length * .6)];
+    pts = pts.filter(function (q) { return q[2] + q[3] + q[4] > med * .8; });  // drop pen marks and printed text
+    var fit = [0, 1, 2].map(function (ch) {
+      var A = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]], bb = [0, 0, 0, 0];
+      pts.forEach(function (q) { var f4 = [1, q[0], q[1], q[0] * q[1]]; for (var i = 0; i < 4; i++) { bb[i] += f4[i] * q[2 + ch]; for (var j = 0; j < 4; j++) A[i][j] += f4[i] * f4[j]; } });
+      for (var d = 0; d < 4; d++) A[d][d] += 1e-3;
+      return solve(A, bb) || [med / 3, 0, 0, 0];
+    });
+    function paperAt(u, v, ch) { var f = fit[ch]; return Math.max(60, f[0] + f[1] * u + f[2] * v + f[3] * u * v); }
 
     var out = document.createElement('canvas'); out.width = TEX_W; out.height = TEX_H;
     var og = out.getContext('2d'), od = og.createImageData(TEX_W, TEX_H), d = od.data, R = SHEET.region, colored = 0;
     for (var v = 0; v < TEX_H; v++) for (var u = 0; u < TEX_W; u++) {
       var m = map(R.x + (u + .5) / TEX_W * R.w, R.y + (v + .5) / TEX_H * R.h);
       sample(m[0], m[1], px);
-      var r = Math.min(255, px[0] * 255 / paper[0]), g = Math.min(255, px[1] * 255 / paper[1]), b = Math.min(255, px[2] * 255 / paper[2]);
-      r = 255 - (255 - r) * 1.12; g = 255 - (255 - g) * 1.12; b = 255 - (255 - b) * 1.12;
-      if (r > 228 && g > 228 && b > 228) { r = g = b = 255; }
-      else { var mx = Math.max(r, g, b), mn = Math.min(r, g, b); if (mx - mn > 0.25 * mx || mx < 105) colored++; }
+      var su = (R.x + (u + .5) / TEX_W * R.w) / 1100, sv = (R.y + (v + .5) / TEX_H * R.h) / 850;
+      var r = Math.min(255, px[0] * 255 / paperAt(su, sv, 0)), g = Math.min(255, px[1] * 255 / paperAt(su, sv, 1)), b = Math.min(255, px[2] * 255 / paperAt(su, sv, 2));
+      r = 255 - (255 - r) * 1.25; g = 255 - (255 - g) * 1.25; b = 255 - (255 - b) * 1.25;
+      var mx = Math.max(r, g, b), mn = Math.min(r, g, b);
+      if (mx - mn > 22 || mx < 120) colored++;
+      var l = (r + g + b) / 3; r = l + (r - l) * 1.55; g = l + (g - l) * 1.55; b = l + (b - l) * 1.55; // crayon is pale: richer color on the big screen
+      if (r > 236 && g > 236 && b > 236) { r = g = b = 255; }
       var k = (v * TEX_W + u) * 4; d[k] = r; d[k + 1] = g; d[k + 2] = b; d[k + 3] = 255;
     }
     og.putImageData(od, 0, 0);
-    if (colored < TEX_W * TEX_H * 0.03) return { ok: false, reason: 'blank', canvas: out };
+    if (colored < TEX_W * TEX_H * 0.008) return { ok: false, reason: 'blank', canvas: out };
     return { ok: true, canvas: out, dataUrl: out.toDataURL('image/jpeg', 0.82) };
   }
 
