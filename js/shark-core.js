@@ -79,6 +79,112 @@
     c.fillStyle = '#fff'; c.beginPath(); c.arc(79.5, -8.6, 1.4, 0, 7); c.fill();
   }
 
+  /* ---------- 3D-feeling shark ----------
+     The flat shark is drawn once into a cached skin, then redrawn each frame as thin
+     vertical strips. Each strip is placed with a simple perspective rotation around the
+     shark's vertical axis, so a turn swings the head toward or away from the viewer.
+     A traveling wave runs down the strips for swimming, shading follows the turn,
+     and near edge-on a head-on view (in the kid's colors) fades in. */
+  function Shark3D(img, opts) {
+    opts = opts || {};
+    this.img = img; this.S = opts.scale || 2.4; this.skin = null; this.frame = null;
+    this.avg = [150, 175, 190]; this.side = Math.random() < .5 ? -1 : 1;
+    var self = this;
+    if (img && img.complete && img.naturalWidth) this.build();
+    else if (img) img.addEventListener('load', function () { self.build(); }, { once: true });
+  }
+  Shark3D.prototype.build = function () {
+    var S = this.S, sk = document.createElement('canvas');
+    sk.width = Math.ceil(BOX.w * S) + 4; sk.height = Math.ceil(BOX.h * S) + 4;
+    var g = sk.getContext('2d'); g.setTransform(S, 0, 0, S, -BOX.x * S + 2, -BOX.y * S + 2);
+    drawShark(g, this.img, 0);
+    this.skin = sk;
+    // average color of the kid's drawing for the head-on view
+    var t = document.createElement('canvas'); t.width = 16; t.height = 8;
+    var tg = t.getContext('2d'); tg.drawImage(this.img, 0, 0, 16, 8);
+    var d = tg.getImageData(0, 0, 16, 8).data, r = 0, gg = 0, b = 0, n = 0;
+    for (var i = 0; i < d.length; i += 4) { var L = d[i] + d[i + 1] + d[i + 2]; if (L < 735 && L > 150) { r += d[i]; gg += d[i + 1]; b += d[i + 2]; n++; } }
+    if (n) this.avg = [r / n * .85 + 150 * .15, gg / n * .85 + 175 * .15, b / n * .85 + 190 * .15];
+    var f = document.createElement('canvas');
+    f.width = Math.ceil(BOX.w * 1.4 * S); f.height = Math.ceil(BOX.h * 1.7 * S);
+    this.frame = f; this.fg = f.getContext('2d');
+  };
+  function smooth(a, b, x) { var t = Math.max(0, Math.min(1, (x - a) / (b - a))); return t * t * (3 - 2 * t); }
+  // turn: -1 (facing left) .. 1 (facing right); phase: swim cycle; tint: 0..1 distance haze
+  Shark3D.prototype.draw = function (ctx, turn, phase, tint, wob) {
+    if (!this.skin) { ctx.save(); ctx.scale(turn < 0 ? -1 : 1, 1); drawShark(ctx, this.img, Math.sin(phase) * 8); ctx.restore(); return; }
+    var S = this.S, f = this.frame, fg = this.fg, FW = f.width, FH = f.height, skin = this.skin;
+    var th = Math.acos(Math.max(-1, Math.min(1, turn))) * this.side + (wob || 0);
+    var cs = Math.cos(th), sn = Math.sin(th), c = Math.max(.035, Math.abs(cs)), mirror = cs < 0;
+    var front = smooth(.34, .07, Math.abs(cs));
+    var F = 430, N = 32, skH = skin.height, colW = (skin.width - 4) / N;
+    fg.setTransform(1, 0, 0, 1, 0, 0); fg.clearRect(0, 0, FW, FH);
+    fg.setTransform(S, 0, 0, S, FW / 2, FH / 2);
+    fg.globalCompositeOperation = 'source-over';
+    fg.globalAlpha = 1 - front * .92;
+    var hx = 0, tx = 0;
+    for (var i = 0; i < N; i++) {
+      var u0 = i / N, u1 = (i + 1) / N, um = (u0 + u1) / 2;
+      var x0 = BOX.x + u0 * BOX.w, x1 = BOX.x + u1 * BOX.w;
+      var p0 = F / (F - x0 * sn), p1 = F / (F - x1 * sn), pm = (p0 + p1) / 2;
+      var X0 = x0 * c * p0, X1 = x1 * c * p1;
+      if (i === 0) tx = X0; if (i === N - 1) hx = X1;
+      var tailness = Math.pow(1 - um, 2.2);
+      var wave = Math.sin(phase - um * 4.6) * 7.5 * tailness + Math.sin(phase - 1.2) * .8;
+      fg.drawImage(skin, 2 + u0 * (skin.width - 4), 0, colW + .8, skH,
+        X0 - .15, (BOX.y - 2 / S) * pm + wave * pm, (X1 - X0) + .45, (BOX.h + 4 / S) * pm);
+    }
+    // shading: the side swinging away gets darker, plus haze for far-away sharks
+    fg.globalAlpha = 1; fg.globalCompositeOperation = 'source-atop';
+    var dark = (1 - Math.abs(cs)) * .5;
+    if (dark > .01) {
+      var gr = fg.createLinearGradient(tx, 0, hx, 0), near = sn > 0;
+      gr.addColorStop(0, 'rgba(3,22,36,' + (dark * (near ? 1 : .25)) + ')');
+      gr.addColorStop(1, 'rgba(3,22,36,' + (dark * (near ? .25 : 1)) + ')');
+      fg.fillStyle = gr; fg.fillRect(-FW, -FH, FW * 2, FH * 2);
+    }
+    if (tint > .01) { fg.fillStyle = 'rgba(12,84,112,' + tint + ')'; fg.fillRect(-FW, -FH, FW * 2, FH * 2); }
+    fg.globalCompositeOperation = 'source-over';
+    if (front > .01) { fg.globalAlpha = front; this.drawFront(fg, phase, tint); fg.globalAlpha = 1; }
+    ctx.save(); if (mirror) ctx.scale(-1, 1);
+    ctx.drawImage(f, -FW / 2 / S, -FH / 2 / S, FW / S, FH / S);
+    ctx.restore();
+  };
+  // the shark seen nose-on: oval body, dorsal fin up, pectoral fins out, tail peeking behind
+  Shark3D.prototype.drawFront = function (g, phase, tint) {
+    var a = this.avg, col = function (k, al) { return 'rgba(' + Math.round(a[0] * k) + ',' + Math.round(a[1] * k) + ',' + Math.round(a[2] * k) + ',' + (al == null ? 1 : al) + ')'; };
+    var sw = Math.sin(phase) * 9, edge = 'rgba(10,35,55,.5)';
+    g.save(); g.scale(1.45, 1.45); g.lineWidth = 1.3; g.strokeStyle = edge;
+    // tail fin far behind (small, sweeping)
+    g.fillStyle = col(.72); g.beginPath(); g.moveTo(sw * .5, -6); g.quadraticCurveTo(sw * .8 - 3, -30, sw - 2, -44); g.quadraticCurveTo(sw * .8 + 4, -24, sw * .5 + 3, -4);
+    g.quadraticCurveTo(sw * .8 + 3, 12, sw + 1, 26); g.quadraticCurveTo(sw * .7 - 3, 12, sw * .5, -6); g.fill(); g.stroke();
+    // pectoral fins
+    g.fillStyle = col(.8);
+    g.beginPath(); g.moveTo(-14, 8); g.quadraticCurveTo(-34, 20, -46, 34); g.quadraticCurveTo(-28, 26, -10, 18); g.closePath(); g.fill(); g.stroke();
+    g.beginPath(); g.moveTo(14, 8); g.quadraticCurveTo(34, 20, 46, 34); g.quadraticCurveTo(28, 26, 10, 18); g.closePath(); g.fill(); g.stroke();
+    // dorsal fin
+    g.fillStyle = col(.78); g.beginPath(); g.moveTo(-6, -22); g.quadraticCurveTo(-2, -42, 1, -58); g.quadraticCurveTo(4, -40, 6, -22); g.closePath(); g.fill(); g.stroke();
+    // body
+    // body painted with the kid's actual drawing (the head end of it)
+    g.save(); g.beginPath(); g.ellipse(0, -1, 19, 27, 0, 0, 7); g.clip();
+    g.fillStyle = '#c4d6df'; g.fillRect(-20, -29, 40, 56);
+    var im = this.img, iw = im.naturalWidth || im.width, ih = im.naturalHeight || im.height;
+    if (iw) { g.globalCompositeOperation = 'multiply'; g.drawImage(im, iw * .6, ih * .3, iw * .26, ih * .5, -20, -29, 40, 56); g.globalCompositeOperation = 'source-over'; }
+    var bg = g.createRadialGradient(-6, -10, 3, 0, -1, 30);
+    bg.addColorStop(0, 'rgba(255,255,255,.22)'); bg.addColorStop(.6, 'rgba(3,22,36,0)'); bg.addColorStop(1, 'rgba(3,22,36,.45)');
+    g.fillStyle = bg; g.fillRect(-20, -29, 40, 56);
+    g.restore();
+    g.beginPath(); g.ellipse(0, -1, 19, 27, 0, 0, 7); g.stroke();
+    // white belly
+    g.fillStyle = 'rgba(245,250,250,.85)'; g.beginPath(); g.ellipse(0, 12, 12, 12, 0, 0, Math.PI); g.fill();
+    // eyes, mouth
+    g.fillStyle = '#0b1a24'; g.beginPath(); g.ellipse(-13, -7, 3.2, 3.8, 0, 0, 7); g.fill(); g.beginPath(); g.ellipse(13, -7, 3.2, 3.8, 0, 0, 7); g.fill();
+    g.fillStyle = '#fff'; g.beginPath(); g.arc(-12.2, -8.4, 1.1, 0, 7); g.fill(); g.beginPath(); g.arc(13.8, -8.4, 1.1, 0, 7); g.fill();
+    g.strokeStyle = 'rgba(10,35,55,.6)'; g.beginPath(); g.moveTo(-8, 9); g.quadraticCurveTo(0, 13, 8, 9); g.stroke();
+    if (tint > .01) { g.globalCompositeOperation = 'source-atop'; g.fillStyle = 'rgba(12,84,112,' + tint + ')'; g.fillRect(-60, -70, 120, 130); g.globalCompositeOperation = 'source-over'; }
+    g.restore();
+  };
+
   /* ---------- Water scene ---------- */
   function makeScene() {
     var kelp = [];
@@ -313,7 +419,7 @@
 
   global.SharkCore = {
     BOX: BOX, TEX_W: TEX_W, TEX_H: TEX_H, SHEET: SHEET,
-    sharkPath: sharkPath, drawShark: drawShark, sheetOutlinePath: sheetOutlinePath,
+    sharkPath: sharkPath, drawShark: drawShark, Shark3D: Shark3D, sheetOutlinePath: sheetOutlinePath,
     makeScene: makeScene, scanSheet: scanSheet,
     reasonText: function (r) {
       return r === 'blank' ? "That shark looks blank. Color it in, then take the photo again."
