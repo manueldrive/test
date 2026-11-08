@@ -37,7 +37,7 @@
       // plan the frames as small draw functions so encoding can run in chunks
       for (var i = 0; i < 10; i++) frames.push({ d: 140, f: (function (i) { return function () {
         scene(g, W, H, t); scene.front(g, W, H, t);
-        title(g, W, 'Draw Jamboree', H * .36, 46, Math.min(1, i / 3)); small(g, W, world + ' · ' + date, H * .56, 16);
+        title(g, W, 'Draw Jamboree', H * .36, 46, Math.min(1, i / 3)); small(g, W, world + ' \u00b7 ' + date, H * .56, 16);
       }; })(i) });
       show.forEach(function (img, n) {
         for (var k = 0; k < 5; k++) frames.push({ d: 110, f: (function (k) { return function () {
