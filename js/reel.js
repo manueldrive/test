@@ -5,8 +5,9 @@
 (function (global) {
   'use strict';
   var C = global.SharkCore;
-  var NAVY = '#0b3a64', INK = 'rgba(7,40,72,.86)', WHITE = '#ffffff', SAND = '#ffd58a';
-  var DISPLAY = '"Lilita One", "Arial Rounded MT Bold", sans-serif', LABEL = 'Nunito, system-ui, sans-serif';
+  // soft & bubbly: cream and butter yellow with a chunky navy outline and drop
+  var INK = '#13294b', CREAM = '#fff6e0', BUTTER = '#ffc93c';
+  var DISPLAY = '"DynaPuff", "Lilita One", "Arial Rounded MT Bold", sans-serif', LABEL = 'Nunito, system-ui, sans-serif';
 
   function loadAll(srcs) {
     return Promise.all(srcs.map(function (src) {
@@ -15,7 +16,7 @@
   }
   function fontsReady() {
     if (!document.fonts || !document.fonts.load) return Promise.resolve();
-    var want = ['56px "Lilita One"', '900 12px Nunito', '800 12px Nunito'];
+    var want = ['700 56px "DynaPuff"', '900 12px Nunito', '800 12px Nunito'];
     return Promise.race([
       Promise.all(want.map(function (f) { return document.fonts.load(f); })),
       new Promise(function (r) { setTimeout(r, 2500); })
@@ -42,23 +43,28 @@
     g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r);
     g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath();
   }
-  // a dark rounded pill with a letter-spaced label, centered on cx
-  function pill(g, txt, cx, cy, size, alpha) {
+  // a rounded pill with a letter-spaced label, centered on cx: cream (with a navy drop) or butter yellow
+  function pill(g, txt, cx, cy, size, alpha, bg) {
+    if (alpha != null && alpha <= 0) return;
     g.save(); g.globalAlpha = alpha == null ? 1 : alpha;
     g.font = '900 ' + size + 'px ' + LABEL; g.textBaseline = 'middle';
-    var track = size * .16, tw = spacedWidth(g, txt, track), padX = size * 1.1, h = size * 2.3, w = tw + padX * 2;
-    g.fillStyle = INK; round(g, cx - w / 2, cy - h / 2, w, h, h / 2); g.fill();
-    g.fillStyle = WHITE; spaced(g, txt, cx, cy + 1, track, 'center');
+    var track = size * .16, tw = spacedWidth(g, txt, track), padX = size * 1.2, h = size * 2.4, w = tw + padX * 2;
+    if (bg !== BUTTER) { g.fillStyle = INK; round(g, cx - w / 2, cy - h / 2 + 3, w, h, h / 2); g.fill(); }
+    g.fillStyle = bg || CREAM; round(g, cx - w / 2, cy - h / 2, w, h, h / 2); g.fill();
+    g.fillStyle = INK; spaced(g, txt, cx, cy + 1, track, 'center');
     g.restore();
   }
-  // big chunky display word: white fill on a thick navy outline with a soft drop
-  function display(g, txt, x, y, size, align, alpha, scale) {
+  // puffy display word: fill color on a thick navy outline, with a solid navy drop underneath
+  function display(g, txt, x, y, size, align, alpha, scale, fill) {
+    if (alpha != null && alpha <= 0) return;
     g.save(); g.globalAlpha = alpha == null ? 1 : alpha;
     g.translate(x, y); if (scale) g.scale(scale, scale);
-    g.font = size + 'px ' + DISPLAY; g.textAlign = align || 'center'; g.textBaseline = 'alphabetic'; g.lineJoin = 'round';
-    g.fillStyle = 'rgba(4,28,52,.35)'; g.fillText(txt, 0, size * .09);
-    g.lineWidth = size * .2; g.strokeStyle = NAVY; g.strokeText(txt, 0, 0);
-    g.fillStyle = WHITE; g.fillText(txt, 0, 0);
+    g.font = '700 ' + size + 'px ' + DISPLAY; g.textAlign = align || 'center'; g.textBaseline = 'alphabetic'; g.lineJoin = 'round';
+    g.lineWidth = size * .17; g.strokeStyle = INK; g.fillStyle = INK;
+    var drop = Math.max(2, size * .06);
+    g.strokeText(txt, 0, drop); g.fillText(txt, 0, drop);
+    g.strokeText(txt, 0, 0);
+    g.fillStyle = fill || CREAM; g.fillText(txt, 0, 0);
     g.restore();
   }
   function topShade(g, W, H, a) {
@@ -80,8 +86,8 @@
       for (var i = 0; i < 14; i++) frames.push({ d: i < 13 ? 110 : 900, f: (function (i) { return function () {
         scene(g, W, H, t); scene.front(g, W, H, t);
         var a = ease(i / 5);
-        display(g, 'Draw Together', W / 2, H * .5, 50, 'center', a, .86 + .14 * a);
-        pill(g, world + '  \u2022  ' + date, W / 2, H * .66, 10, ease((i - 4) / 4));
+        display(g, 'Draw Together', W / 2, H * .5, 48, 'center', a, .86 + .14 * a);
+        pill(g, world + '  \u2022  ' + date, W / 2, H * .66, 10, ease((i - 4) / 4), BUTTER);
       }; })(i) });
 
       /* 2. one shark swims across while its skin changes to each drawing */
@@ -110,30 +116,27 @@
       }
 
       /* 3. finale: the whole school, with the count */
-      var school = pick(imgs, 28).map(function (img, n) { return { img: img, x: (n * 97 % W), y: H * (.4 + ((n * 37) % 100) / 100 * .42), s: .32 + (n % 4) * .05, v: 3 + (n % 3) }; });
+      var school = pick(imgs, 28).map(function (img, n) { return { img: img, x: (n * 97 % W), y: H * (.58 + ((n * 37) % 100) / 100 * .26), s: .32 + (n % 4) * .05, v: 3 + (n % 3) }; });
       for (i = 0; i < 20; i++) frames.push({ d: i < 19 ? 130 : 1400, f: (function (i) { return function () {
         scene(g, W, H, t);
         school.forEach(function (sh) { g.save(); g.translate((sh.x + i * sh.v * 2.2) % (W + 80) - 40, sh.y); g.scale(sh.s, sh.s); C.drawShark(g, sh.img, Math.sin(i * 1.4 + sh.x) * 8); g.restore(); });
         scene.front(g, W, H, t);
-        topShade(g, W, H, .45 * ease(i / 4));
-        var a = ease(i / 4);
-        g.save(); g.font = '58px ' + DISPLAY; var nw = g.measureText(String(all)).width;
-        g.font = '24px ' + DISPLAY; var lw = g.measureText(all === 1 ? 'shark swam today!' : 'sharks swam today!').width; g.restore();
-        var gap = 10, x0 = W / 2 - (nw + gap + lw) / 2;
-        display(g, String(all), x0, H * .25, 58, 'left', a);
-        display(g, all === 1 ? 'shark swam today!' : 'sharks swam today!', x0 + nw + gap, H * .21, 24, 'left', a);
-        pill(g, 'THANKS FOR SWIMMING WITH US', W / 2, H * .9, 9, ease((i - 5) / 4));
+        var a = ease(i / 4), word = all === 1 ? 'shark swam today!' : 'sharks swam today!';
+        display(g, String(all), W / 2, H * .36, 72, 'center', a, .8 + .2 * a, BUTTER);
+        display(g, word, W / 2, H * .5, 22, 'center', ease((i - 2) / 4));
+        pill(g, 'THANKS FOR DRAWING TOGETHER', W / 2, H * .9, 9, ease((i - 5) / 4));
       }; })(i) });
 
       function counter(g, n, total) {
-        // bottom-left badge: big number, small "of N"
+        // top-right badge: big number, small "OF N", cream with a navy drop
         g.save(); g.textBaseline = 'alphabetic';
-        g.font = '24px ' + DISPLAY; var nw = g.measureText(String(n)).width;
-        g.font = '900 10px ' + LABEL; var ow = spacedWidth(g, 'OF ' + total, 1.4);
-        var w = 14 + nw + 7 + ow + 14, h = 34, x = 12, y = H - h - 10;
-        g.fillStyle = INK; round(g, x, y, w, h, 12); g.fill();
-        g.fillStyle = SAND; g.font = '24px ' + DISPLAY; g.textAlign = 'left'; g.fillText(String(n), x + 14, y + 26);
-        g.fillStyle = WHITE; g.font = '900 10px ' + LABEL; spaced(g, 'OF ' + total, x + 14 + nw + 7, y + 22, 1.4, 'left');
+        g.font = '700 20px ' + DISPLAY; var nw = g.measureText(String(n)).width;
+        g.font = '900 9px ' + LABEL; var ow = spacedWidth(g, 'OF ' + total, 1.3);
+        var w = 13 + nw + 6 + ow + 13, h = 30, x = W - w - 12, y = 12;
+        g.fillStyle = INK; round(g, x, y + 3, w, h, 12); g.fill();
+        g.fillStyle = CREAM; round(g, x, y, w, h, 12); g.fill();
+        g.fillStyle = INK; g.font = '700 20px ' + DISPLAY; g.textAlign = 'left'; g.fillText(String(n), x + 13, y + 22);
+        g.font = '900 9px ' + LABEL; spaced(g, 'OF ' + total, x + 13 + nw + 6, y + 19, 1.3, 'left');
         g.restore();
       }
 

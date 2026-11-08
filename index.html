@@ -5,26 +5,35 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#03202f">
 <title>Draw Together</title>
-<link rel="stylesheet" href="css/lagoon.css?v=202611081649">
+<link rel="stylesheet" href="css/lagoon.css?v=202611081655">
 <style>
 html,body{height:100%;overflow:hidden}
 #tank{position:fixed;inset:0;width:100%;height:100%;display:block}
 .chrome{transition:opacity .5s}
 body.idle .chrome{opacity:0;pointer-events:none}
 
-/* QR card: always visible, sized to be scannable from across a room */
-.qrcard{position:fixed;left:calc(18px + env(safe-area-inset-left,0px));bottom:calc(18px + env(safe-area-inset-bottom,0px));
-  display:flex;align-items:center;gap:16px;background:var(--foam);color:var(--deep);border-radius:20px;padding:14px 20px 14px 14px;
-  box-shadow:0 12px 40px rgba(0,0,0,.35);max-width:calc(100% - 36px);z-index:5}
-.qrcard canvas{width:clamp(110px,17vh,220px);height:clamp(110px,17vh,220px);image-rendering:pixelated;display:block;flex:none}
-.qrcard h2{font-size:clamp(20px,3.2vh,34px);line-height:1.05}
-.qrcard p{font-weight:800;font-size:clamp(13px,1.8vh,18px);opacity:.75;margin-top:6px}
-.qrcard .code{display:inline-block;margin-top:10px;font-size:clamp(11px,1.4vh,14px);letter-spacing:.14em;text-transform:uppercase;font-weight:800;
-  background:rgba(3,32,47,.08);padding:5px 9px;border-radius:999px}
+/* Soft & bubbly: cream cards with a chunky navy drop, butter-yellow chips, puffy outlined wordmark.
+   Sizes follow screen height so it reads the same on a laptop, TV or projector. */
+.brand{position:fixed;top:calc(2.2vh + env(safe-area-inset-top,0px));left:calc(2.2vw + env(safe-area-inset-left,0px));z-index:5;
+  display:flex;align-items:center;gap:1.4vh;flex-wrap:wrap}
+.brand b{font:700 clamp(24px,5.4vh,64px)/1 var(--display);color:var(--cream);-webkit-text-stroke:clamp(4px,.85vh,10px) var(--ink);paint-order:stroke fill;
+  text-shadow:0 .45vh 0 var(--ink)}
+.brand span,.chip{font:900 clamp(10px,1.7vh,19px)/1 var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--ink);background:var(--butter);
+  padding:.8vh 1.4vh;border-radius:999px}
+.chip.warn{background:var(--cream)}
+.count{position:fixed;top:calc(2.4vh + env(safe-area-inset-top,0px));right:calc(2.2vw + env(safe-area-inset-right,0px));z-index:5;
+  font:700 clamp(18px,3.6vh,40px)/1 var(--display);color:var(--ink);background:var(--cream);padding:1vh 2.2vh 1.2vh;border-radius:2.8vh;
+  box-shadow:0 .6vh 0 var(--ink)}
+.count small{font:900 clamp(10px,1.6vh,17px) var(--body);letter-spacing:.1em;text-transform:uppercase;margin-left:.7vh}
 
-.top{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));left:calc(18px + env(safe-area-inset-left,0px));display:flex;gap:8px;flex-wrap:wrap;z-index:5}
-.pill{font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;background:var(--glass);border:1px solid var(--line);padding:6px 11px;border-radius:999px}
-.pill.warn{background:var(--sand);color:var(--deep);border-color:var(--sand)}
+/* QR card: always visible, sized to be scannable from across a room */
+.qrcard{position:fixed;left:calc(2.2vw + env(safe-area-inset-left,0px));bottom:calc(3vh + env(safe-area-inset-bottom,0px));z-index:5;
+  display:flex;align-items:center;gap:2.6vh;background:var(--cream);color:var(--ink);border-radius:3.6vh;padding:2vh 3.2vh 2vh 2vh;
+  box-shadow:0 .9vh 0 var(--ink);max-width:calc(100% - 4.4vw)}
+.qrcard canvas{width:clamp(110px,24vh,280px);height:clamp(110px,24vh,280px);image-rendering:pixelated;display:block;flex:none;border-radius:1.6vh}
+.qrcard h2{font:700 clamp(20px,5vh,56px)/1 var(--display);margin:0 0 1.6vh;color:var(--ink)}
+.qrcard .steps{display:flex;gap:1vh;flex-wrap:wrap}
+.qrcard .code{display:inline-block;margin-top:1.6vh;font:900 clamp(9px,1.35vh,14px) var(--body);letter-spacing:.16em;text-transform:uppercase;opacity:.55}
 
 .hostbtn{position:fixed;right:calc(18px + env(safe-area-inset-right,0px));bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:6}
 
@@ -65,29 +74,29 @@ body.idle .chrome{opacity:0;pointer-events:none}
 .bar i{display:block;height:100%;width:0;background:var(--sand);transition:width .2s}
 .demo{background:rgba(226,196,138,.12);border:1px solid rgba(226,196,138,.4);border-radius:14px;padding:12px 14px;font-size:14px;line-height:1.45}
 </style>
-<script src="config.js?v=202611081649"></script>
+<script src="config.js?v=202611081655"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-<script src="vendor/qrcode.js?v=202611081649"></script>
-<script src="js/shark-core.js?v=202611081649"></script>
-<script src="js/net.js?v=202611081649"></script>
-<script src="vendor/gifenc.js?v=202611081649"></script>
-<script src="js/reel.js?v=202611081649"></script>
+<script src="vendor/qrcode.js?v=202611081655"></script>
+<script src="js/shark-core.js?v=202611081655"></script>
+<script src="js/net.js?v=202611081655"></script>
+<script src="vendor/gifenc.js?v=202611081655"></script>
+<script src="js/reel.js?v=202611081655"></script>
 </head>
 <body>
 <canvas id="tank" aria-label="Aquarium with swimming sharks"></canvas>
 
-<div class="top chrome">
-  <span class="pill" id="count">0 sharks</span>
-  <span class="pill warn" id="demoPill" hidden>Demo mode</span>
+<div class="brand">
+  <b>Draw Together</b><span>Shark Lagoon</span><span class="chip warn" id="demoPill" hidden>Demo mode</span>
 </div>
+<div class="count" id="count">0<small>sharks</small></div>
 
 <div class="qrcard" id="qrcard" hidden>
   <canvas id="qr" width="400" height="400" aria-label="QR code to send a shark"></canvas>
   <div>
-    <h2>Scan to send<br>your shark</h2>
-    <p>Color a sheet, then snap a photo</p>
+    <h2>Add your shark!</h2>
+    <div class="steps"><span class="chip">1 &middot; Color</span><span class="chip">2 &middot; Snap</span><span class="chip">3 &middot; Swim</span></div>
     <span class="code" id="code"></span>
   </div>
 </div>
@@ -192,7 +201,7 @@ function bs(){ return Math.max(.38, Math.min(1.25, Math.min(W/1050, H/620))); }
 var eventId = null, unwatch = null, quietUntil = 0, beatT = null, allRecs = {};
 var fish = [], queue = [], bubbles = [], T = 0, rotateT = 0, parade = null, removeMode = false;
 function total(){ return fish.filter(function(f){ return !f.gone; }).length + queue.length; }
-function updateCount(){ var n = total(); $('count').textContent = n + (n === 1 ? ' shark' : ' sharks'); }
+function updateCount(){ var n = total(); $('count').innerHTML = n + '<small>' + (n === 1 ? 'shark' : 'sharks') + '</small>'; }
 
 function makeFish(rec, mode){
   var img = new Image(); img.src = rec.img;
@@ -343,7 +352,7 @@ function drawQR(text){
   var q = qrcode(0, 'M'); q.addData(text); q.make();
   var n = q.getModuleCount(), cv = $('qr'), g = cv.getContext('2d'), pad = 2, cell = Math.floor(cv.width/(n + pad*2));
   var off = Math.floor((cv.width - cell*(n + pad*2))/2);
-  g.fillStyle = '#eafcff'; g.fillRect(0,0,cv.width,cv.height); g.fillStyle = '#03202f';
+  g.fillStyle = '#ffffff'; g.fillRect(0,0,cv.width,cv.height); g.fillStyle = '#13294b';
   for (var r=0;r<n;r++) for (var c=0;c<n;c++) if (q.isDark(r,c)) g.fillRect(off + (c+pad)*cell, off + (r+pad)*cell, cell, cell);
 }
 function scanUrl(id){ var u = new URL('scan.html', location.href); u.search = '?e=' + id; u.hash = ''; return u.href; }
