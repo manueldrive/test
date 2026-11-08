@@ -1,4 +1,4 @@
-/* Crayon Shark Lagoon — shared core
+/* Draw Jamboree — shared core
    Shark drawing, coloring-sheet geometry, and sheet scanning (corner markers -> shark skin). */
 (function (global) {
   'use strict';

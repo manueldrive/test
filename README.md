@@ -1,6 +1,6 @@
-# Crayon Shark Lagoon
+# Draw Jamboree
 
-A shared aquarium for kids' events. Kids color a shark on a printed sheet, a grown-up scans the QR code on the big screen and snaps a photo, and the shark swims into the tank for everyone to see.
+A shared big-screen drawing experience for kids' events. The first world is **Shark Lagoon**, an aquarium: Kids color a shark on a printed sheet, a grown-up scans the QR code on the big screen and snaps a photo, and the shark swims into the tank for everyone to see.
 
 ## The pages
 
@@ -28,7 +28,7 @@ Phones can send one shark every 20 seconds. Only the cropped drawing is uploaded
 
 Until this is set up the app runs in **demo mode**: everything works on the laptop, but phones can't reach the screen.
 
-1. Go to [console.firebase.google.com](https://console.firebase.google.com), click **Add project**, and name it (for example `shark-lagoon`). Analytics can stay off.
+1. Go to [console.firebase.google.com](https://console.firebase.google.com), click **Add project**, and name it `draw-jamboree` (the project ID can't be changed later, so keep it general rather than naming it after one world). Analytics can stay off.
 2. **Build → Realtime Database → Create database.** Pick the US location and start in **locked mode**.
 3. On the database's **Rules** tab, replace everything with the contents of `firebase-rules.json` and click **Publish**.
    - **Sharing the `bao-buddy` database with Bao Buddy, Lanterncorps, and Houses?** Use `firebase-rules-shared.json` instead. It keeps those apps' paths open as they are today and locks down only the shark events. Using `firebase-rules.json` there would cut those apps off. Export a backup first (**Data** tab → ⋮ → **Export JSON**). If you add another app to this database later, add its top-level path to the rules too.
@@ -52,4 +52,4 @@ Turn on GitHub Pages (**Settings → Pages → Deploy from branch → `main` / r
 ## Ideas for later
 
 - **Paid safety check add-on:** an AI check of each drawing before it swims in, for public and teen events.
-- More creatures and sheets (whale, octopus, turtle), and themed packs for VBS or holidays.
+- More worlds, each with its own sheet and scene (dino valley, space station, bug garden), plus themed packs for VBS or holidays.

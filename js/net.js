@@ -1,4 +1,4 @@
-/* Crayon Shark Lagoon — event connection.
+/* Draw Jamboree — event connection.
    Live mode: Firebase Realtime Database + anonymous sign-in (set up in config.js).
    Demo mode: when Firebase isn't set up, the screen and scan page talk only inside one browser. */
 (function (global) {

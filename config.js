@@ -1,4 +1,4 @@
-/* Crayon Shark Lagoon settings.
+/* Draw Jamboree settings.
    Until `firebase` is filled in, the app runs in demo mode: everything works,
    but phones can't reach the big screen (the scan page only works in the same browser).
    See README.md -> "Turn on phone scanning" for the 10-minute setup. */
