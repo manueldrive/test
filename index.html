@@ -5,529 +5,460 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#03202f">
 <title>Crayon Shark Lagoon</title>
-<meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@600;800&display=swap">
-<style>*{box-sizing:border-box}[hidden]{display:none!important}body{margin:0}img{max-width:100%}</style>
-</head>
-<body>
+<link rel="stylesheet" href="css/lagoon.css">
 <style>
-/* Layout: the tank fills the whole screen; controls float over the water like an aquarium info rail. */
-:root{
-  --deep:#03202f; --water:#0a5675; --shallow:#1f8fa8; --foam:#eafcff;
-  --coral:#ff7b57; --coral-ink:#3a1206; --kelp:#3aa877; --sand:#e2c48a;
-  --glass:rgba(3,32,47,.72); --line:rgba(234,252,255,.18);
-  --display:"Lilita One","Arial Rounded MT Bold","Trebuchet MS",sans-serif;
-  --body:"Nunito",ui-rounded,system-ui,sans-serif;
-  color-scheme:dark;
-}
-html,body{height:100%}
-body{background:var(--deep);color:var(--foam);font-family:var(--body);overflow:hidden;
-  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-#stage{position:fixed;inset:0;background:var(--deep)}
-#tank{width:100%;height:100%;display:block;touch-action:manipulation}
+html,body{height:100%;overflow:hidden}
+#tank{position:fixed;inset:0;width:100%;height:100%;display:block}
 .chrome{transition:opacity .5s}
 body.idle .chrome{opacity:0;pointer-events:none}
 
-.brand{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));left:max(16px,env(safe-area-inset-left,0px));
-  display:flex;align-items:center;gap:10px}
-.brand h1{margin:0;font-family:var(--display);font-weight:400;font-size:clamp(20px,4vw,30px);letter-spacing:.01em;
-  text-shadow:0 2px 0 rgba(0,0,0,.35)}
-.count{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;background:var(--glass);
-  border:1px solid var(--line);padding:4px 9px;border-radius:999px}
-.fs{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));right:max(16px,env(safe-area-inset-right,0px))}
+/* QR card: always visible, sized to be scannable from across a room */
+.qrcard{position:fixed;left:calc(18px + env(safe-area-inset-left,0px));bottom:calc(18px + env(safe-area-inset-bottom,0px));
+  display:flex;align-items:center;gap:16px;background:var(--foam);color:var(--deep);border-radius:20px;padding:14px 20px 14px 14px;
+  box-shadow:0 12px 40px rgba(0,0,0,.35);max-width:calc(100% - 36px);z-index:5}
+.qrcard canvas{width:clamp(110px,17vh,220px);height:clamp(110px,17vh,220px);image-rendering:pixelated;display:block;flex:none}
+.qrcard h2{font-size:clamp(20px,3.2vh,34px);line-height:1.05}
+.qrcard p{font-weight:800;font-size:clamp(13px,1.8vh,18px);opacity:.75;margin-top:6px}
+.qrcard .code{display:inline-block;margin-top:10px;font-size:clamp(11px,1.4vh,14px);letter-spacing:.14em;text-transform:uppercase;font-weight:800;
+  background:rgba(3,32,47,.08);padding:5px 9px;border-radius:999px}
 
-.how{position:fixed;left:max(16px,env(safe-area-inset-left,0px));top:calc(64px + env(safe-area-inset-top,0px));
-  width:min(300px,calc(100% - 32px));background:var(--glass);border:1px solid var(--line);border-radius:14px;
-  padding:12px 14px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
-.how ol{margin:6px 0 0;padding-left:20px;display:grid;gap:4px;font-size:14px;line-height:1.35}
-.how h2{margin:0;font-family:var(--display);font-weight:400;font-size:17px;display:flex;justify-content:space-between;align-items:center}
-.how .x{background:none;border:0;color:var(--foam);opacity:.7;font-size:20px;cursor:pointer;padding:0 4px}
+.top{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));left:calc(18px + env(safe-area-inset-left,0px));display:flex;gap:8px;flex-wrap:wrap;z-index:5}
+.pill{font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;background:var(--glass);border:1px solid var(--line);padding:6px 11px;border-radius:999px}
+.pill.warn{background:var(--sand);color:var(--deep);border-color:var(--sand)}
 
-.dock{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:center;gap:10px;flex-wrap:wrap;
-  padding:12px max(16px,env(safe-area-inset-right,0px)) calc(14px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));
-  pointer-events:none}
-.dock>*{pointer-events:auto}
-.btn{font:800 15px/1 var(--body);border-radius:999px;border:2px solid var(--line);background:var(--glass);color:var(--foam);
-  padding:13px 18px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
-.btn:hover{border-color:rgba(234,252,255,.45)}
-.btn:focus-visible,.icon:focus-visible,input:focus-visible+.btn{outline:3px solid var(--sand);outline-offset:2px}
-.btn.primary{background:var(--coral);border-color:var(--coral);color:var(--coral-ink)}
-.btn svg{width:20px;height:20px;flex:none}
-.icon{width:44px;height:44px;border-radius:50%;padding:0;justify-content:center}
-.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.hostbtn{position:fixed;right:calc(18px + env(safe-area-inset-right,0px));bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:6}
 
-.sheet{position:fixed;inset:0;display:flex;align-items:flex-end;justify-content:center;background:rgba(2,16,24,.55);z-index:20;
-  padding:0 max(0px,env(safe-area-inset-right,0px)) 0 max(0px,env(safe-area-inset-left,0px))}
-.panel{width:min(640px,100%);max-height:92%;overflow:auto;background:#06293b;border:1px solid var(--line);border-bottom:0;
-  border-radius:22px 22px 0 0;padding:18px max(16px,env(safe-area-inset-left,0px)) calc(18px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-right,0px));
-  display:grid;gap:14px;box-shadow:0 -20px 60px rgba(0,0,0,.4)}
-@media (min-width:700px){.sheet{align-items:center}.panel{border-radius:22px;border-bottom:1px solid var(--line)}}
-.panel h2{margin:0;font-family:var(--display);font-weight:400;font-size:24px;text-wrap:balance}
-.panel p{margin:0;font-size:14px;line-height:1.45;opacity:.85}
-.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.row.end{justify-content:flex-end}
-.preview{width:100%;aspect-ratio:2/1;max-width:100%;border-radius:14px;background:linear-gradient(var(--shallow),var(--water));display:block}
-.field{display:grid;gap:6px;font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
-.field input{font:700 17px var(--body);padding:12px 14px;border-radius:12px;border:2px solid var(--line);background:#03202f;color:var(--foam);text-transform:none;letter-spacing:0}
-.chip{font:800 13px var(--body);padding:9px 13px;border-radius:999px;border:2px solid var(--line);background:transparent;color:var(--foam);cursor:pointer}
-.chip[aria-pressed="true"]{background:var(--foam);color:var(--deep);border-color:var(--foam)}
+.side{position:fixed;top:0;right:0;bottom:0;width:min(360px,100%);background:var(--panel);border-left:1px solid var(--line);z-index:30;
+  padding:calc(20px + env(safe-area-inset-top,0px)) calc(18px + env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) 18px;
+  display:flex;flex-direction:column;gap:12px;overflow:auto;box-shadow:-20px 0 60px rgba(0,0,0,.4)}
+.side header{display:flex;justify-content:space-between;align-items:center}
+.side h2{font-size:26px}
+.side .grp{display:grid;gap:8px}
+.side .btn{justify-content:flex-start;width:100%}
+.side .note{font-size:13px;color:var(--muted)}
+.x{background:none;border:0;color:var(--foam);font-size:28px;line-height:1;cursor:pointer;padding:4px 8px;border-radius:8px}
 
-.pad-wrap{position:relative;width:100%;aspect-ratio:880/452;max-width:100%;border-radius:14px;overflow:hidden;background:#fff;touch-action:none}
-.pad-wrap canvas{position:absolute;inset:0;width:100%;height:100%}
-.swatches{display:flex;gap:8px;flex-wrap:wrap}
-.sw{width:34px;height:34px;border-radius:50%;border:3px solid transparent;cursor:pointer;box-shadow:inset 0 0 0 2px rgba(0,0,0,.15)}
-.sw[aria-pressed="true"]{border-color:var(--foam);transform:scale(1.12)}
+.banner{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);z-index:20;
+  display:flex;gap:12px;align-items:center;background:var(--danger);color:#2a0308;font-weight:800;padding:8px 8px 8px 18px;border-radius:999px;max-width:calc(100% - 32px)}
+.banner .btn{padding:9px 14px;font-size:14px;background:#2a0308;color:var(--foam);border-color:#2a0308}
 
-.list{display:grid;gap:8px;margin:0;padding:0;list-style:none}
-.list li{display:flex;align-items:center;gap:12px;padding:8px;border:1px solid var(--line);border-radius:12px}
-.list canvas{width:96px;height:48px;border-radius:8px;background:var(--water);flex:none}
-.list .nm{flex:1;min-width:0;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tag{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;opacity:.6;margin-left:6px}
-.rm{font:800 13px var(--body);background:none;border:2px solid var(--line);color:var(--foam);border-radius:999px;padding:7px 12px;cursor:pointer}
-.rm.armed{background:var(--coral);border-color:var(--coral);color:var(--coral-ink)}
+.station{position:fixed;right:calc(18px + env(safe-area-inset-right,0px));bottom:calc(88px + env(safe-area-inset-bottom,0px));z-index:20;
+  width:min(380px,calc(100% - 36px));background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:12px;display:grid;gap:10px;
+  box-shadow:0 20px 60px rgba(0,0,0,.45)}
+.station header{display:flex;justify-content:space-between;align-items:center}
+.station h3{font-size:19px}
+.station video{width:100%;aspect-ratio:4/3;max-width:100%;object-fit:cover;border-radius:12px;background:#000;display:block}
+.station .status{font-size:14px;color:var(--muted);min-height:1.4em}
 
-.toast{position:fixed;left:50%;bottom:calc(86px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);
-  background:var(--foam);color:var(--deep);font-weight:800;padding:10px 16px;border-radius:999px;z-index:30;max-width:calc(100% - 32px);text-align:center}
-@media (prefers-reduced-motion:reduce){.chrome{transition:none}}
+.overlay{position:fixed;inset:0;z-index:40;display:grid;place-items:center;background:rgba(2,16,24,.62);
+  padding:20px max(16px,env(safe-area-inset-right,0px)) 20px max(16px,env(safe-area-inset-left,0px))}
+.card{width:min(560px,100%);background:var(--panel);border:1px solid var(--line);border-radius:24px;padding:28px;display:grid;gap:16px;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+.card h1{font-size:clamp(34px,6vw,52px);line-height:1}
+.card h2{font-size:28px}
+.card p{color:var(--muted)}
+.card .row{display:flex;gap:10px;flex-wrap:wrap}
+.card ol{margin:0;padding-left:22px;display:grid;gap:6px;line-height:1.4}
+.demo{background:rgba(226,196,138,.12);border:1px solid rgba(226,196,138,.4);border-radius:14px;padding:12px 14px;font-size:14px;line-height:1.45}
 </style>
+<script src="config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="vendor/qrcode.js"></script>
+<script src="js/shark-core.js"></script>
+<script src="js/net.js"></script>
+</head>
+<body>
+<canvas id="tank" aria-label="Aquarium with swimming sharks"></canvas>
 
-<div id="stage">
-  <canvas id="tank" aria-label="Aquarium with swimming sharks. Tap a shark to see whose it is."></canvas>
+<div class="top chrome">
+  <span class="pill" id="count">0 sharks</span>
+  <span class="pill warn" id="demoPill" hidden>Demo mode</span>
 </div>
 
-<div class="brand chrome"><h1>Crayon Shark Lagoon</h1><span class="count" id="count"></span></div>
-<button class="btn icon fs chrome" id="fsBtn" aria-label="Full screen">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+<div class="qrcard" id="qrcard" hidden>
+  <canvas id="qr" width="400" height="400" aria-label="QR code to send a shark"></canvas>
+  <div>
+    <h2>Scan to send<br>your shark</h2>
+    <p>Color a sheet, then snap a photo</p>
+    <span class="code" id="code"></span>
+  </div>
+</div>
+
+<button class="btn hostbtn chrome" id="hostBtn" aria-label="Host controls" hidden>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>
+  Host
 </button>
 
-<aside class="how chrome" id="how">
-  <h2>How it works <button class="x" id="howX" aria-label="Hide instructions">×</button></h2>
-  <ol>
-    <li>Color a shark skin on paper. Turn the page sideways and fill it up.</li>
-    <li>Tap <b>Scan a drawing</b> and take a photo of it.</li>
-    <li>Give it a name and release it. Tap any shark to make it zoom.</li>
-  </ol>
+<aside class="side" id="side" hidden aria-label="Host controls">
+  <header><h2>Host controls</h2><button class="x" id="sideX" aria-label="Close">×</button></header>
+  <div class="grp">
+    <span class="eyebrow">Screen</span>
+    <button class="btn" id="fsBtn">Full screen</button>
+  </div>
+  <div class="grp">
+    <span class="eyebrow">Add sharks here</span>
+    <button class="btn" id="stationBtn">Scan station (camera)</button>
+    <input type="file" id="file" accept="image/*" class="vh">
+    <label class="btn" for="file" role="button" tabindex="0" id="uploadBtn">Upload a photo of a sheet</label>
+    <p class="note">Use these when phones can't connect, or for kids without a parent's phone.</p>
+  </div>
+  <div class="grp">
+    <span class="eyebrow">Keep it friendly</span>
+    <button class="btn" id="removeBtn">Remove a shark</button>
+  </div>
+  <div class="grp">
+    <span class="eyebrow">Supplies</span>
+    <a class="btn" href="sheet.html" target="_blank" rel="noopener">Print coloring sheets</a>
+  </div>
+  <div class="grp" style="margin-top:auto">
+    <button class="btn danger" id="endBtn">End event</button>
+  </div>
 </aside>
 
-<nav class="dock chrome">
-  <input type="file" id="file" accept="image/*" class="vh">
-  <label for="file" class="btn primary" role="button" tabindex="0" id="scanBtn">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
-    Scan a drawing
-  </label>
-  <button class="btn" id="drawBtn">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l4-1 11-11-3-3L5 16z"/><path d="M14 6l3 3"/></svg>
-    Draw on screen
-  </button>
-  <button class="btn" id="tankBtn">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M3 7h18M3 12h18M3 17h18"/></svg>
-    My sharks
-  </button>
-</nav>
+<div class="banner" id="removeBanner" hidden>Tap a shark to remove it <button class="btn" id="removeDone">Done</button></div>
 
-<!-- Scan / release sheet -->
-<div class="sheet" id="scanSheet" hidden>
-  <div class="panel" role="dialog" aria-modal="true" aria-labelledby="scanTitle">
-    <h2 id="scanTitle">Here's your shark</h2>
-    <canvas class="preview" id="preview" width="640" height="320"></canvas>
-    <div class="row" id="photoTools">
-      <button class="chip" id="rotBtn">Rotate</button>
-      <button class="chip" id="cropAuto" aria-pressed="true">Trim paper</button>
-      <button class="chip" id="cropWhole" aria-pressed="false">Use whole photo</button>
-    </div>
-    <label class="field">Shark's name
-      <input id="nameIn" maxlength="18" placeholder="e.g. Captain Chomp" autocomplete="off">
-    </label>
-    <div class="row end">
-      <button class="btn" id="scanCancel">Cancel</button>
-      <button class="btn primary" id="releaseBtn">Release into the tank</button>
-    </div>
-  </div>
-</div>
+<section class="station" id="station" hidden aria-label="Scan station">
+  <header><h3>Scan station</h3><button class="x" id="stationX" aria-label="Close scan station">×</button></header>
+  <video id="video" playsinline muted></video>
+  <button class="btn primary block" id="snapBtn">Scan this sheet</button>
+  <p class="status" id="stationStatus">Hold the sheet flat under the camera with all 4 corner squares showing.</p>
+</section>
 
-<!-- Draw sheet -->
-<div class="sheet" id="drawSheet" hidden>
-  <div class="panel" role="dialog" aria-modal="true" aria-labelledby="drawTitle">
-    <h2 id="drawTitle">Color your shark</h2>
-    <div class="pad-wrap" id="padWrap">
-      <canvas id="guide" width="880" height="452"></canvas>
-      <canvas id="pad" width="880" height="452"></canvas>
-    </div>
-    <div class="swatches" id="swatches"></div>
+<div class="overlay" id="startOv" hidden>
+  <div class="card">
+    <span class="eyebrow">Event screen</span>
+    <h1>Crayon Shark Lagoon</h1>
+    <ol>
+      <li>Put this screen on a projector or TV and set out the coloring sheets.</li>
+      <li>Kids color a shark. A grown-up scans the QR code and snaps a photo.</li>
+      <li>The shark swims into the tank.</li>
+    </ol>
+    <div class="demo" id="demoNote" hidden><b>Demo mode.</b> Phone scanning isn't set up yet, so the QR code only works in another tab of this browser. You can still add sharks with the scan station or a photo upload. Setup steps are in the README.</div>
     <div class="row">
-      <button class="chip" data-size="10">Thin</button>
-      <button class="chip" data-size="22" aria-pressed="true">Medium</button>
-      <button class="chip" data-size="44">Fat</button>
-      <button class="chip" id="eraser" aria-pressed="false">Eraser</button>
-      <button class="chip" id="clearPad">Clear</button>
+      <button class="btn primary big" id="startBtn">Start an event</button>
+      <a class="btn" href="sheet.html" target="_blank" rel="noopener">Print coloring sheets</a>
     </div>
-    <div class="row end">
-      <button class="btn" id="drawCancel">Cancel</button>
-      <button class="btn primary" id="drawDone">Next</button>
-    </div>
+    <p class="err" id="startErr" hidden></p>
   </div>
 </div>
 
-<!-- Manage sheet -->
-<div class="sheet" id="tankSheet" hidden>
-  <div class="panel" role="dialog" aria-modal="true" aria-labelledby="tankTitle">
-    <h2 id="tankTitle">Sharks in the tank</h2>
-    <ul class="list" id="list"></ul>
-    <div class="row end"><button class="btn" id="tankClose">Done</button></div>
+<div class="overlay" id="endOv" hidden>
+  <div class="card" role="dialog" aria-modal="true" aria-labelledby="endTitle">
+    <h2 id="endTitle">End the event?</h2>
+    <p>Every shark swims one last lap across the screen. Then the QR code stops working and all drawings are deleted.</p>
+    <div class="row"><button class="btn" id="endNo">Keep swimming</button><button class="btn danger" id="endYes">End event</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="doneOv" hidden>
+  <div class="card">
+    <h1>Thanks for swimming with us!</h1>
+    <p>The event is over and its drawings are deleted.</p>
+    <div class="row"><button class="btn primary big" id="againBtn">Start a new event</button></div>
   </div>
 </div>
 
 <div class="toast" id="toast" hidden></div>
 
 <script>
-(()=>{
-const $=id=>document.getElementById(id);
-const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
-const MAX=16, KEY='crayon-sharks-v1';
-const TEX_W=440, TEX_H=226;           // texture size, same aspect as the shark's box
-const BOX={x:-112,y:-64,w:218,h:112}; // shark local bounding box that the drawing covers
+(function(){
+'use strict';
+var C = SharkCore, Net = SharkNet, $ = function(id){ return document.getElementById(id); };
+var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+var MAX_VISIBLE = 24, ROTATE_EVERY = 22, EVENT_KEY = 'shark-event';
 
-/* ---------- Shark drawing ---------- */
-function sharkPath(c,s){
-  c.beginPath();
-  c.moveTo(104,2);
-  c.bezierCurveTo(100,-14,70,-26,30,-28);
-  c.bezierCurveTo(0,-29,-40,-22,-68,-9+s*.4);
-  c.quadraticCurveTo(-85,-25+s*.8,-110,-52+s);
-  c.quadraticCurveTo(-100,-20+s,-90,-2+s*.9);
-  c.quadraticCurveTo(-98,14+s,-104,32+s);
-  c.quadraticCurveTo(-84,18+s*.8,-68,8+s*.4);
-  c.bezierCurveTo(-35,22,10,27,50,22);
-  c.bezierCurveTo(80,18,100,12,104,2);
-  c.closePath();
-  c.moveTo(22,-27);c.quadraticCurveTo(8,-45,-4,-62);c.quadraticCurveTo(-6,-40,-18,-25);c.closePath();
-  c.moveTo(22,20);c.quadraticCurveTo(26,30,10,46);c.quadraticCurveTo(28,32,40,18);c.closePath();
-  c.moveTo(-48,-15);c.lineTo(-56,-25);c.lineTo(-58,-12);c.closePath();
-}
-function drawShark(c,tex,sway){
-  const g=c.createLinearGradient(0,-60,0,40);
-  g.addColorStop(0,'#86a9bd');g.addColorStop(.55,'#b9d0dc');g.addColorStop(.75,'#f3f7f6');g.addColorStop(1,'#ffffff');
-  c.save();
-  sharkPath(c,sway);
-  c.fillStyle=g;c.fill();
-  c.clip();
-  if(tex&&tex.complete&&tex.naturalWidth){
-    c.globalCompositeOperation='multiply';
-    c.drawImage(tex,BOX.x,BOX.y,BOX.w,BOX.h);
-    c.globalCompositeOperation='source-over';
+/* ---------- canvas ---------- */
+var tank = $('tank'), ctx = tank.getContext('2d'), W = 0, H = 0, DPR = 1;
+function resize(){ DPR = Math.min(2, devicePixelRatio || 1); W = innerWidth; H = innerHeight; tank.width = Math.round(W*DPR); tank.height = Math.round(H*DPR); }
+addEventListener('resize', resize); resize();
+var scene = C.makeScene();
+function bs(){ return Math.max(.38, Math.min(1.25, Math.min(W/1050, H/620))); }
+
+/* ---------- state ---------- */
+var eventId = null, unwatch = null, quietUntil = 0;
+var fish = [], queue = [], bubbles = [], T = 0, rotateT = 0, parade = null, removeMode = false;
+function total(){ return fish.filter(function(f){ return !f.gone; }).length + queue.length; }
+function updateCount(){ var n = total(); $('count').textContent = n + (n === 1 ? ' shark' : ' sharks'); }
+
+function makeFish(rec, mode){
+  var img = new Image(); img.src = rec.img;
+  var s = 0.78 + Math.random()*0.38, dir = Math.random() < .5 ? -1 : 1;
+  var f = { key: rec.key, img: img, rec: rec, size: s, dir: dir, turn: dir, x: W*(.12 + Math.random()*.76),
+    baseY: H*(.18 + Math.random()*.55), targetY: H*(.18 + Math.random()*.55), y: 0,
+    speed: (36 + Math.random()*28) * (reduce ? .5 : 1), phase: Math.random()*6, seed: Math.random()*99,
+    dash: 0, glow: 0, pop: 1, born: T, leaving: 0, gone: false };
+  if (mode === 'enter' || mode === 'swimin'){
+    f.dir = f.turn = 1; f.x = -170; f.baseY = f.targetY = H*(.3 + Math.random()*.3);
+    if (mode === 'enter'){ f.glow = 7; f.pop = 1.7; f.dash = 1.4; }
   }
-  const sh=c.createLinearGradient(0,-62,0,46);
-  sh.addColorStop(0,'rgba(5,30,50,.28)');sh.addColorStop(.45,'rgba(5,30,50,0)');sh.addColorStop(1,'rgba(5,30,50,.12)');
-  c.fillStyle=sh;c.fillRect(BOX.x,BOX.y,BOX.w,BOX.h);
-  c.restore();
-  sharkPath(c,sway);
-  c.lineWidth=2;c.strokeStyle='rgba(10,35,55,.55)';c.stroke();
-  c.strokeStyle='rgba(10,35,55,.5)';c.lineWidth=1.6;c.lineCap='round';
-  for(let i=0;i<3;i++){c.beginPath();c.moveTo(56-i*6,-12);c.quadraticCurveTo(52-i*6,-3,56-i*6,7);c.stroke();}
-  c.beginPath();c.moveTo(96,9);c.quadraticCurveTo(84,16,72,13);c.stroke();
-  c.fillStyle='#0b1a24';c.beginPath();c.ellipse(78,-7,4.2,4.6,0,0,7);c.fill();
-  c.fillStyle='#fff';c.beginPath();c.arc(79.5,-8.6,1.4,0,7);c.fill();
+  f.y = f.baseY;
+  return f;
+}
+function visible(){ return fish.filter(function(f){ return !f.gone && !f.leaving; }); }
+
+function addShark(rec){
+  if (fish.some(function(f){ return f.key === rec.key; }) || queue.some(function(q){ return q.key === rec.key; })) return;
+  var quiet = performance.now() < quietUntil;
+  if (parade){ return; }
+  if (quiet && visible().length >= MAX_VISIBLE){ queue.push(rec); updateCount(); return; }
+  if (!quiet && visible().length >= MAX_VISIBLE) sendOff(oldest());
+  var f = makeFish(rec, quiet ? 'place' : 'enter');
+  fish.push(f);
+  if (!quiet) bubble(40, f.baseY, 26);
+  updateCount();
+}
+function oldest(){ var all = visible(), v = all.filter(function(f){ return f.glow <= 0; }); if (!v.length) v = all; v.sort(function(a,b){ return a.born - b.born; }); return v[0]; }
+function sendOff(f){ if (!f) return; f.leaving = f.dir = (f.x > W/2 ? 1 : -1); f.dash = 1; }
+function removeShark(key, animate){
+  queue = queue.filter(function(q){ return q.key !== key; });
+  fish.forEach(function(f){ if (f.key === key && !f.gone){ if (animate !== false) bubble(f.x, f.y, 30); f.gone = true; } });
+  fish = fish.filter(function(f){ return !f.gone; });
+  updateCount();
 }
 
-/* ---------- Sample skins (crayon style) ---------- */
-function rng(seed){return()=>((seed=Math.imul(seed^seed>>>15,seed|1)^(seed+Math.imul(seed^seed>>>7,seed|61)))>>>0)/4294967296;}
-function crayon(g,pts,color,w,r){
-  g.strokeStyle=color;g.lineCap='round';g.lineJoin='round';
-  for(let p=0;p<3;p++){
-    g.globalAlpha=.55;g.lineWidth=w*(.7+r()*.4);g.beginPath();
-    pts.forEach(([x,y],i)=>{const jx=x+(r()-.5)*w*.4,jy=y+(r()-.5)*w*.4;i?g.lineTo(jx,jy):g.moveTo(jx,jy);});
-    g.stroke();
-  }
-  g.globalAlpha=1;
-}
-function sample(kind){
-  const c=document.createElement('canvas');c.width=TEX_W;c.height=TEX_H;const g=c.getContext('2d');
-  g.fillStyle='#fff';g.fillRect(0,0,TEX_W,TEX_H);
-  const r=rng(kind.length*977+13);
-  if(kind==='stripes'){
-    const cols=['#ff8a2b','#2b6fff','#ffcf2b','#ff8a2b','#2b6fff'];
-    for(let b=0;b<5;b++){const pts=[];for(let x=-10;x<=TEX_W+20;x+=26)pts.push([x,40+b*38+((x/26)%2?14:-14)]);crayon(g,pts,cols[b],14,r);}
-  }else if(kind==='dots'){
-    for(let y=10;y<TEX_H;y+=12){crayon(g,[[0,y],[TEX_W,y+6]],'#ff9ec7',14,r);}
-    for(let i=0;i<22;i++){const x=r()*TEX_W,y=r()*TEX_H,rad=8+r()*12,pts=[];for(let a=0;a<7.2;a+=.6)pts.push([x+Math.cos(a)*rad,y+Math.sin(a)*rad]);crayon(g,pts,['#ffd92b','#8a3bff','#26c281'][i%3],9,r);}
-  }else{
-    const cols=['#e8322f','#ff8a2b','#ffd92b','#3ac25a','#2b8cff','#8a3bff'];
-    cols.forEach((col,b)=>{for(let k=0;k<3;k++){const y=20+b*36+k*9;crayon(g,[[0,y],[TEX_W*.5,y+(r()-.5)*10],[TEX_W,y]],col,12,r);}});
-    for(let s=0;s<5;s++){const cx=60+s*80,cy=60+(s%2)*90,pts=[];for(let i=0;i<=10;i++){const a=i*Math.PI/5-Math.PI/2,rr=i%2?7:17;pts.push([cx+Math.cos(a)*rr,cy+Math.sin(a)*rr]);}crayon(g,pts,'#ffffff',6,r);}
-  }
-  return c.toDataURL('image/jpeg',.88);
-}
-const SAMPLES=[{name:'Stripey',sample:'stripes'},{name:'Bubblegum',sample:'dots'},{name:'Rainbow Fin',sample:'rainbow'}];
-
-/* ---------- Tank state ---------- */
-const tank=$('tank'),ctx=tank.getContext('2d');
-let W=0,H=0,DPR=1,sharks=[],bubbles=[],T=0,uid=0;
-function resize(){DPR=Math.min(2,devicePixelRatio||1);W=tank.clientWidth;H=tank.clientHeight;tank.width=Math.round(W*DPR);tank.height=Math.round(H*DPR);}
-addEventListener('resize',resize);resize();
-const baseScale=()=>Math.max(.42,Math.min(1.3,Math.min(W/950,H/560)));
-
-function makeShark(rec,enter){
-  const img=new Image();img.src=rec.src||sample(rec.sample);
-  const size=.75+Math.random()*.4;
-  const dir=enter?1:(Math.random()<.5?-1:1);
-  return {id:++uid,name:rec.name,sample:rec.sample||null,src:rec.src||null,img,size,dir,turn:dir,
-    x:enter?-160:W*(.15+Math.random()*.7),y:H*.5,baseY:H*(.2+Math.random()*.55),targetY:H*(.2+Math.random()*.55),
-    speed:(38+Math.random()*30)*(reduce?.5:1),phase:Math.random()*6,seed:Math.random()*99,dash:0,showName:enter?5:0};
-}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(sharks.map(s=>s.sample?{name:s.name,sample:s.sample}:{name:s.name,src:s.src})));}catch(e){}}
-function load(){let d=null;try{d=JSON.parse(localStorage.getItem(KEY));}catch(e){}return Array.isArray(d)?d:SAMPLES;}
-sharks=load().map(r=>makeShark(r,false));
-function updateCount(){$('count').textContent=sharks.length+(sharks.length===1?' shark':' sharks');}
-updateCount();
-
-/* ---------- Scene ---------- */
-const kelp=Array.from({length:9},(_,i)=>({x:(i+.3+Math.random()*.4)/9,h:.18+Math.random()*.22,ph:Math.random()*6}));
-function scene(t){
-  const g=ctx.createLinearGradient(0,0,0,H);
-  g.addColorStop(0,'#1f8fa8');g.addColorStop(.35,'#0a5675');g.addColorStop(1,'#03202f');
-  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
-  // light rays
-  ctx.save();ctx.globalCompositeOperation='lighter';
-  for(let i=0;i<5;i++){
-    const x=W*(i/4)+Math.sin(t*.15+i)*W*.06,w=W*.08+i%2*W*.05,a=.05+.03*Math.sin(t*.4+i*2);
-    const rg=ctx.createLinearGradient(0,0,0,H*.85);rg.addColorStop(0,`rgba(200,245,255,${a})`);rg.addColorStop(1,'rgba(200,245,255,0)');
-    ctx.fillStyle=rg;ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x+w,0);ctx.lineTo(x+w*.4-W*.12,H*.85);ctx.lineTo(x-w*.6-W*.12,H*.85);ctx.fill();
-  }
-  ctx.restore();
-  // kelp
-  const sandY=H*.9;
-  kelp.forEach(k=>{
-    const x0=k.x*W,h=k.h*H;ctx.strokeStyle='#2b8a62';ctx.lineWidth=Math.max(6,W*.009);ctx.lineCap='round';
-    ctx.beginPath();ctx.moveTo(x0,sandY+10);
-    for(let s=1;s<=6;s++){const yy=sandY-h*s/6,xx=x0+Math.sin(t*.8+k.ph+s*.6)*s*3.5;ctx.lineTo(xx,yy);}
-    ctx.stroke();
-  });
-  // sand
-  ctx.fillStyle='#c9a96f';ctx.beginPath();ctx.moveTo(0,H);
-  for(let x=0;x<=W;x+=W/12)ctx.lineTo(x,sandY+Math.sin(x*.012)*8);
-  ctx.lineTo(W,H);ctx.fill();
-  ctx.fillStyle='#e2c48a';ctx.beginPath();ctx.moveTo(0,H);
-  for(let x=0;x<=W;x+=W/12)ctx.lineTo(x,sandY+14+Math.sin(x*.009+2)*7);
-  ctx.lineTo(W,H);ctx.fill();
-}
-function bubble(x,y,n){for(let i=0;i<n;i++)bubbles.push({x:x+(Math.random()-.5)*20,y:y+(Math.random()-.5)*20,r:2+Math.random()*5,v:30+Math.random()*50,ph:Math.random()*6});}
+/* ---------- motion ---------- */
+function bubble(x, y, n){ for (var i=0;i<n;i++) bubbles.push({x:x+(Math.random()-.5)*30, y:y+(Math.random()-.5)*30, r:2+Math.random()*6, v:30+Math.random()*60, ph:Math.random()*6}); }
 
 function step(dt){
-  const bs=baseScale();
-  sharks.forEach(s=>{
-    const sc=bs*s.size,m=110*sc;
-    s.phase+=dt*(4+s.dash*10);
-    s.dash=Math.max(0,s.dash-dt*.8);
-    s.showName=Math.max(0,s.showName-dt);
-    const v=s.speed*bs*(1+s.dash*3);
-    s.x+=v*dt*s.turn;
-    if(s.x>W-m*.6&&s.dir>0)s.dir=-1;
-    if(s.x<m*.6&&s.dir<0)s.dir=1;
-    if(Math.random()<dt*.02)s.dir*=-1;
-    s.turn+=(s.dir-s.turn)*Math.min(1,dt*2.2);
-    if(Math.random()<dt*.15)s.targetY=H*(.18+Math.random()*.6);
-    s.baseY+=(s.targetY-s.baseY)*dt*.25;
-    s.y=s.baseY+Math.sin(T*.6+s.seed)*14*bs;
-    if(Math.random()<dt*.25)bubble(s.x+s.turn*95*sc,s.y-5*sc,1);
+  var b = bs();
+  fish.forEach(function(f){
+    var sc = b*f.size, m = 110*sc;
+    f.phase += dt*(4 + f.dash*10);
+    f.dash = Math.max(0, f.dash - dt*.5);
+    f.glow = Math.max(0, f.glow - dt);
+    f.pop += (1 - f.pop) * Math.min(1, dt*.8);
+    var v = f.speed*b*(1 + f.dash*3) * (parade ? 2.2 : f.leaving ? 3 : 1);
+    if (f.leaving || parade){ f.dir = f.leaving || 1; }
+    else {
+      if (f.x > W - m*.6 && f.dir > 0) f.dir = -1;
+      if (f.x < m*.6 && f.dir < 0 && f.x > 0) f.dir = 1;
+      if (f.x < m*.6 && f.dir < 0 && f.x <= 0) f.dir = 1;
+      if (Math.random() < dt*.02) f.dir *= -1;
+      if (Math.random() < dt*.15) f.targetY = H*(.16 + Math.random()*.6);
+    }
+    f.turn += (f.dir - f.turn) * Math.min(1, dt*2.2);
+    f.x += v*dt*f.turn;
+    f.baseY += (f.targetY - f.baseY) * dt * .25;
+    f.y = f.baseY + Math.sin(T*.6 + f.seed)*14*b;
+    if (Math.random() < dt*.25) bubble(f.x + f.turn*95*sc, f.y - 5*sc, 1);
+    if ((f.leaving || parade) && (f.x > W + 200 || f.x < -200)){
+      f.gone = true;
+      if (f.leaving && !parade) queue.push(f.rec);
+    }
   });
-  bubbles.forEach(b=>{b.y-=b.v*dt;b.x+=Math.sin(T*3+b.ph)*.4;});
-  bubbles=bubbles.filter(b=>b.y>-10);
+  fish = fish.filter(function(f){ return !f.gone; });
+  bubbles.forEach(function(p){ p.y -= p.v*dt; p.x += Math.sin(T*3 + p.ph)*.4; });
+  bubbles = bubbles.filter(function(p){ return p.y > -10; });
+
+  if (parade) paradeStep(dt);
+  else {
+    rotateT += dt;
+    var room = MAX_VISIBLE - visible().length;
+    if (room < 0){ sendOff(oldest()); }
+    else if (queue.length && room > 0 && rotateT > 1.5){ rotateT = 0; fish.push(makeFish(queue.shift(), 'swimin')); }
+    else if (queue.length && rotateT > ROTATE_EVERY){ rotateT = 0; sendOff(oldest()); }
+  }
 }
+
 function render(){
   ctx.setTransform(DPR,0,0,DPR,0,0);
-  scene(T);
-  const bs=baseScale();
-  [...sharks].sort((a,b)=>a.size-b.size).forEach(s=>{
-    const sc=bs*s.size;
-    ctx.save();ctx.translate(s.x,s.y);
-    ctx.rotate(Math.sin(T*.6+s.seed)*.05*s.turn);
-    ctx.scale(s.turn*sc,sc);
-    ctx.globalAlpha=s.size<.85?.85:1;
-    drawShark(ctx,s.img,Math.sin(s.phase)*8);
+  scene(ctx, W, H, T);
+  var b = bs();
+  fish.slice().sort(function(a,c){ return a.size - c.size; }).forEach(function(f){
+    var sc = b*f.size*f.pop;
+    ctx.save(); ctx.translate(f.x, f.y);
+    if (f.glow > 0){
+      var a = Math.min(1, f.glow/2) * (.55 + .25*Math.sin(T*6));
+      var g = ctx.createRadialGradient(0,0,10*sc,0,0,150*sc);
+      g.addColorStop(0, 'rgba(255,240,180,' + a + ')'); g.addColorStop(1, 'rgba(255,240,180,0)');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.ellipse(0,0,160*sc,110*sc,0,0,7); ctx.fill();
+    }
+    if (removeMode){ ctx.strokeStyle = 'rgba(255,93,108,.9)'; ctx.lineWidth = 3; ctx.setLineDash([8,6]); ctx.beginPath(); ctx.ellipse(0,0,120*sc,62*sc,0,0,7); ctx.stroke(); ctx.setLineDash([]); }
+    ctx.rotate(Math.sin(T*.6 + f.seed)*.05*f.turn);
+    ctx.scale(f.turn*sc, sc);
+    C.drawShark(ctx, f.img, Math.sin(f.phase)*8);
     ctx.restore();
   });
-  ctx.fillStyle='rgba(234,252,255,.55)';ctx.strokeStyle='rgba(234,252,255,.8)';ctx.lineWidth=1;
-  bubbles.forEach(b=>{ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,7);ctx.globalAlpha=.35;ctx.fill();ctx.globalAlpha=.8;ctx.stroke();});
-  ctx.globalAlpha=1;
-  sharks.forEach(s=>{
-    if(s.showName<=0)return;const sc=bs*s.size;
-    ctx.globalAlpha=Math.min(1,s.showName);
-    ctx.font='800 '+Math.round(14+6*bs)+'px Nunito, system-ui, sans-serif';
-    const tw=ctx.measureText(s.name).width,px=12,h=28*Math.max(.8,bs),x=s.x-tw/2-px,y=s.y+58*sc;
-    ctx.fillStyle='rgba(3,32,47,.82)';ctx.beginPath();ctx.roundRect?ctx.roundRect(x,y,tw+px*2,h,h/2):ctx.rect(x,y,tw+px*2,h);ctx.fill();
-    ctx.fillStyle='#eafcff';ctx.textBaseline='middle';ctx.fillText(s.name,x+px,y+h/2+1);
-    ctx.globalAlpha=1;
-  });
+  ctx.fillStyle = 'rgba(234,252,255,.55)'; ctx.strokeStyle = 'rgba(234,252,255,.8)'; ctx.lineWidth = 1;
+  bubbles.forEach(function(p){ ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,7); ctx.globalAlpha=.35; ctx.fill(); ctx.globalAlpha=.8; ctx.stroke(); });
+  ctx.globalAlpha = 1;
+  if (parade){
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.font = Math.round(Math.min(W*.07, 84)) + 'px "Lilita One", "Arial Rounded MT Bold", sans-serif';
+    ctx.fillStyle = 'rgba(3,32,47,.35)'; ctx.fillText('Thanks for swimming with us!', W/2 + 3, H*.16 + 4);
+    ctx.fillStyle = '#eafcff'; ctx.fillText('Thanks for swimming with us!', W/2, H*.16);
+    ctx.textAlign = 'start';
+  }
 }
 
-/* ---------- Preview (in sheet) ---------- */
-const pv=$('preview'),pctx=pv.getContext('2d');let previewImg=null;
-function renderPreview(){
-  pctx.setTransform(1,0,0,1,0,0);pctx.clearRect(0,0,640,320);
-  pctx.translate(330,165);pctx.scale(2.6,2.6);
-  drawShark(pctx,previewImg,Math.sin(T*4)*8);
-}
-
-let last=performance.now();
-function loop(now){
-  const dt=Math.min(.05,(now-last)/1000);last=now;T+=dt;
-  step(dt);render();
-  if(!$('scanSheet').hidden)renderPreview();
-  requestAnimationFrame(loop);
-}
+var last = performance.now();
+function loop(now){ var dt = Math.min(.05, (now-last)/1000); last = now; T += dt; step(dt); render(); requestAnimationFrame(loop); }
 requestAnimationFrame(loop);
 
-/* tap a shark */
-tank.addEventListener('pointerdown',e=>{
-  wake();
-  const r=tank.getBoundingClientRect(),px=e.clientX-r.left,py=e.clientY-r.top,bs=baseScale();
-  for(const s of [...sharks].sort((a,b)=>b.size-a.size)){
-    const sc=bs*s.size,dx=(px-s.x)/(110*sc*Math.max(.3,Math.abs(s.turn))),dy=(py-s.y)/(50*sc);
-    if(dx*dx+dy*dy<1){s.dash=1;s.showName=3;bubble(s.x,s.y,10);break;}
+/* ---------- goodbye parade ---------- */
+function startParade(done){
+  var line = queue.slice(0, 60); queue = [];
+  fish.forEach(function(f){ f.leaving = 1; });
+  var lanes = 5, i = 0;
+  parade = { left: line, t: 0, done: done, spawned: 0, lane: function(){ return H*(.28 + (i++ % lanes)*.12); } };
+  if (!fish.length && !line.length) setTimeout(finishParade, 1200);
+}
+function paradeStep(dt){
+  parade.t += dt;
+  if (parade.left.length && parade.t > .55){
+    parade.t = 0;
+    var f = makeFish(parade.left.shift(), 'swimin'); f.baseY = f.targetY = parade.lane(); f.leaving = 1;
+    fish.push(f);
   }
-});
-
-/* ---------- Toast ---------- */
-let toastT;function toast(msg){const t=$('toast');t.textContent=msg;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,3200);}
-
-/* ---------- Photo scanning ---------- */
-let work=null,crop=null,rot=0,useWhole=false,source='photo';
-function loadImage(src){return new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=src;});}
-async function processPhoto(file){
-  const url=URL.createObjectURL(file);
-  let img;try{img=await loadImage(url);}catch(e){toast("That file isn't a photo I can read. Try a JPG or PNG.");return;}
-  const k=Math.min(1,900/Math.max(img.width,img.height));
-  const c=document.createElement('canvas');c.width=Math.max(1,Math.round(img.width*k));c.height=Math.max(1,Math.round(img.height*k));
-  const g=c.getContext('2d');g.drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(url);
-  const d=g.getImageData(0,0,c.width,c.height),p=d.data,w=c.width,h=c.height;
-  // estimate paper color from the brighter border pixels
-  const bw=Math.max(2,Math.round(Math.min(w,h)*.04)),samp=[];
-  for(let y=0;y<h;y+=2)for(let x=0;x<w;x+=2){if(x<bw||y<bw||x>w-bw||y>h-bw){const i=(y*w+x)*4;samp.push([p[i],p[i+1],p[i+2]]);}}
-  samp.sort((a,b)=>(b[0]+b[1]+b[2])-(a[0]+a[1]+a[2]));
-  const top=samp.slice(0,Math.max(1,Math.floor(samp.length*.5)));
-  const paper=[0,1,2].map(ch=>Math.max(60,top.reduce((s,v)=>s+v[ch],0)/top.length));
-  // normalize so paper becomes white, then find the drawn area
-  let x0=w,y0=h,x1=0,y1=0;const mg=Math.round(Math.min(w,h)*.03);
-  for(let y=0;y<h;y++)for(let x=0;x<w;x++){
-    const i=(y*w+x)*4;
-    const r=Math.min(255,p[i]*255/paper[0]),gg=Math.min(255,p[i+1]*255/paper[1]),b=Math.min(255,p[i+2]*255/paper[2]);
-    p[i]=r;p[i+1]=gg;p[i+2]=b;
-    const mx=Math.max(r,gg,b),mn=Math.min(r,gg,b),lum=.3*r+.59*gg+.11*b,sat=mx?(mx-mn)/mx:0;
-    if(x>mg&&y>mg&&x<w-mg&&y<h-mg&&(lum<185||sat>.28)){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y;}
-  }
-  g.putImageData(d,0,0);
-  work=c;
-  const pad=Math.round(Math.min(w,h)*.02);
-  crop=(x1-x0>w*.08&&y1-y0>h*.08)?{x:Math.max(0,x0-pad),y:Math.max(0,y0-pad),w:Math.min(w,x1+pad)-Math.max(0,x0-pad),h:Math.min(h,y1+pad)-Math.max(0,y0-pad)}:{x:0,y:0,w,h};
-  rot=(crop.h>crop.w*1.15)?1:0; useWhole=false; source='photo';
-  setCropUI();openScan();
+  if (!parade.left.length && !fish.length) finishParade();
 }
-function buildTexture(){
-  const r=useWhole?{x:0,y:0,w:work.width,h:work.height}:crop;
-  const t=document.createElement('canvas'),q=rot%2;t.width=q?r.h:r.w;t.height=q?r.w:r.h;
-  const tg=t.getContext('2d');tg.translate(t.width/2,t.height/2);tg.rotate(rot*Math.PI/2);
-  tg.drawImage(work,r.x,r.y,r.w,r.h,-r.w/2,-r.h/2,r.w,r.h);
-  const o=document.createElement('canvas');o.width=TEX_W;o.height=TEX_H;const og=o.getContext('2d');
-  og.fillStyle='#fff';og.fillRect(0,0,TEX_W,TEX_H);
-  // allow a little stretch so the drawing covers more of the shark, then fit the rest
-  const A=TEX_W/TEX_H,a=t.width/t.height;let sw=t.width,sh=t.height;
-  if(a<A)sw*=Math.min(A/a,1.4);else sh*=Math.min(a/A,1.4);
-  const k=Math.min(TEX_W/sw,TEX_H/sh),dw=sw*k,dh=sh*k;
-  og.drawImage(t,(TEX_W-dw)/2,(TEX_H-dh)/2,dw,dh);
-  return o.toDataURL('image/jpeg',.85);
-}
-let pendingSrc=null;
-function refreshPreview(){pendingSrc=buildTexture();const i=new Image();i.src=pendingSrc;previewImg=i;}
-function setCropUI(){$('cropAuto').setAttribute('aria-pressed',String(!useWhole));$('cropWhole').setAttribute('aria-pressed',String(useWhole));}
-function openScan(){
-  $('photoTools').hidden=source!=='photo';
-  if(source==='photo')refreshPreview();
-  $('nameIn').value='';$('scanSheet').hidden=false;
-  setTimeout(()=>$('nameIn').focus({preventScroll:true}),50);
-}
-$('file').addEventListener('change',e=>{const f=e.target.files[0];e.target.value='';if(f)processPhoto(f);});
-$('scanBtn').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('file').click();}});
-$('rotBtn').onclick=()=>{rot=(rot+1)%4;refreshPreview();};
-$('cropAuto').onclick=()=>{useWhole=false;setCropUI();refreshPreview();};
-$('cropWhole').onclick=()=>{useWhole=true;setCropUI();refreshPreview();};
-$('scanCancel').onclick=()=>{$('scanSheet').hidden=true;};
-$('releaseBtn').onclick=()=>{
-  if(sharks.length>=MAX){toast('The tank holds '+MAX+' sharks. Remove one in My sharks to add more.');return;}
-  const name=$('nameIn').value.trim()||'Mystery Shark';
-  const s=makeShark({name,src:pendingSrc},true);s.baseY=s.targetY=H*.45;s.y=H*.45;
-  sharks.push(s);bubble(20,H*.45,24);save();updateCount();
-  $('scanSheet').hidden=true;$('how').hidden=true;
-  toast(name+' is in the tank!');
-};
-$('nameIn').addEventListener('keydown',e=>{if(e.key==='Enter')$('releaseBtn').click();});
+function finishParade(){ if (!parade) return; var d = parade.done; parade = null; d && d(); }
 
-/* ---------- Draw on screen ---------- */
-const COLORS=['#e8322f','#ff8a2b','#ffd92b','#3ac25a','#1fb5c9','#2b6fff','#8a3bff','#ff6fb5','#7a4a22','#1b1b1b'];
-let color=COLORS[1],size=22,erasing=false;
-const pad=$('pad'),pg=pad.getContext('2d');
-(function guide(){const g=$('guide').getContext('2d'),k=880/BOX.w;g.translate(-BOX.x*k,-BOX.y*k);g.scale(k,k);
-  sharkPath(g,0);g.setLineDash([4,4]);g.lineWidth=1.2;g.strokeStyle='rgba(20,60,90,.35)';g.stroke();})();
-const sw=$('swatches');
-COLORS.forEach(c=>{const b=document.createElement('button');b.className='sw';b.style.background=c;b.setAttribute('aria-label','Color '+c);
-  b.setAttribute('aria-pressed',String(c===color));b.onclick=()=>{color=c;erasing=false;$('eraser').setAttribute('aria-pressed','false');
-  sw.querySelectorAll('.sw').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));};sw.appendChild(b);});
-document.querySelectorAll('[data-size]').forEach(b=>b.onclick=()=>{size=+b.dataset.size;document.querySelectorAll('[data-size]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));});
-$('eraser').onclick=()=>{erasing=!erasing;$('eraser').setAttribute('aria-pressed',String(erasing));};
-$('clearPad').onclick=()=>pg.clearRect(0,0,880,452);
-let drawing=false,lx=0,ly=0;
-function pt(e){const r=pad.getBoundingClientRect();return[(e.clientX-r.left)*880/r.width,(e.clientY-r.top)*452/r.height];}
-pad.addEventListener('pointerdown',e=>{drawing=true;pad.setPointerCapture(e.pointerId);[lx,ly]=pt(e);line(lx,ly,lx+.1,ly);});
-pad.addEventListener('pointermove',e=>{if(!drawing)return;const[x,y]=pt(e);line(lx,ly,x,y);lx=x;ly=y;});
-['pointerup','pointercancel'].forEach(t=>pad.addEventListener(t,()=>drawing=false));
-function line(a,b,c,d){pg.globalCompositeOperation=erasing?'destination-out':'source-over';pg.strokeStyle=color;pg.lineWidth=size;pg.lineCap='round';
-  pg.beginPath();pg.moveTo(a,b);pg.lineTo(c,d);pg.stroke();pg.globalCompositeOperation='source-over';}
-$('drawBtn').onclick=()=>{$('drawSheet').hidden=false;};
-$('drawCancel').onclick=()=>{$('drawSheet').hidden=true;};
-$('drawDone').onclick=()=>{
-  const o=document.createElement('canvas');o.width=TEX_W;o.height=TEX_H;const og=o.getContext('2d');
-  og.fillStyle='#fff';og.fillRect(0,0,TEX_W,TEX_H);og.drawImage(pad,0,0,TEX_W,TEX_H);
-  pendingSrc=o.toDataURL('image/jpeg',.85);const i=new Image();i.src=pendingSrc;previewImg=i;
-  source='draw';$('drawSheet').hidden=true;pg.clearRect(0,0,880,452);openScan();
-};
+/* ---------- event lifecycle ---------- */
+function drawQR(text){
+  var q = qrcode(0, 'M'); q.addData(text); q.make();
+  var n = q.getModuleCount(), cv = $('qr'), g = cv.getContext('2d'), pad = 2, cell = Math.floor(cv.width/(n + pad*2));
+  var off = Math.floor((cv.width - cell*(n + pad*2))/2);
+  g.fillStyle = '#eafcff'; g.fillRect(0,0,cv.width,cv.height); g.fillStyle = '#03202f';
+  for (var r=0;r<n;r++) for (var c=0;c<n;c++) if (q.isDark(r,c)) g.fillRect(off + (c+pad)*cell, off + (r+pad)*cell, cell, cell);
+}
+function scanUrl(id){ var u = new URL('scan.html', location.href); u.search = '?e=' + id; u.hash = ''; return u.href; }
 
-/* ---------- Manage ---------- */
-function renderList(){
-  const ul=$('list');ul.innerHTML='';
-  if(!sharks.length){const li=document.createElement('li');li.textContent='The tank is empty. Scan a drawing to add the first shark.';ul.appendChild(li);}
-  sharks.forEach(s=>{
-    const li=document.createElement('li');
-    const c=document.createElement('canvas');c.width=192;c.height=96;const g=c.getContext('2d');g.translate(98,50);g.scale(.8,.8);
-    const paint=()=>drawShark(g,s.img,0);s.img.complete?paint():s.img.addEventListener('load',paint,{once:true});
-    const nm=document.createElement('span');nm.className='nm';nm.textContent=s.name;
-    if(s.sample){const t=document.createElement('span');t.className='tag';t.textContent='Sample';nm.appendChild(t);}
-    const rm=document.createElement('button');rm.className='rm';rm.textContent='Remove';
-    rm.onclick=()=>{if(!rm.classList.contains('armed')){rm.classList.add('armed');rm.textContent='Tap to confirm';setTimeout(()=>{rm.classList.remove('armed');rm.textContent='Remove';},3000);return;}
-      sharks=sharks.filter(x=>x!==s);save();updateCount();renderList();};
-    li.append(c,nm,rm);ul.appendChild(li);
+function openEvent(id){
+  eventId = id;
+  try { localStorage.setItem(EVENT_KEY, id); } catch(e){}
+  drawQR(scanUrl(id));
+  $('code').textContent = 'Event ' + id.replace(/^demo/, 'demo-');
+  $('qrcard').hidden = false; $('hostBtn').hidden = false; $('startOv').hidden = true; $('doneOv').hidden = true;
+  fish = []; queue = []; updateCount();
+  quietUntil = performance.now() + 2500;
+  if (unwatch) unwatch();
+  unwatch = Net.watch(id, {
+    add: addShark,
+    remove: function(k){ removeShark(k); },
+    end: function(){ if (!parade && eventId === id) endLocal(false); }
   });
 }
-$('tankBtn').onclick=()=>{renderList();$('tankSheet').hidden=false;};
-$('tankClose').onclick=()=>{$('tankSheet').hidden=true;};
-document.querySelectorAll('.sheet').forEach(s=>s.addEventListener('click',e=>{if(e.target===s)s.hidden=true;}));
-document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.sheet').forEach(s=>s.hidden=true);});
-$('howX').onclick=()=>{$('how').hidden=true;};
-
-/* ---------- Full screen + idle hiding ---------- */
-let idleT,lock=null;
-function wake(){document.body.classList.remove('idle');clearTimeout(idleT);
-  if(document.fullscreenElement||document.webkitFullscreenElement)idleT=setTimeout(()=>document.body.classList.add('idle'),4000);}
-['pointermove','keydown'].forEach(t=>addEventListener(t,wake));
-$('fsBtn').onclick=async()=>{
-  const el=document.documentElement;
-  try{
-    if(document.fullscreenElement||document.webkitFullscreenElement){await (document.exitFullscreen||document.webkitExitFullscreen).call(document);}
-    else{await (el.requestFullscreen||el.webkitRequestFullscreen).call(el);try{lock=await navigator.wakeLock?.request('screen');}catch(e){}}
-  }catch(e){toast('Full screen is not available here. Try opening the page in a browser.');}
-  wake();
+function showStart(){
+  $('qrcard').hidden = true; $('hostBtn').hidden = true; $('startOv').hidden = false;
+  $('demoNote').hidden = Net.live; $('demoPill').hidden = Net.live;
+}
+$('startBtn').onclick = function(){
+  var b = this; b.disabled = true; b.textContent = 'Starting…';
+  Net.createEvent().then(openEvent, function(){
+    $('startErr').hidden = false;
+    $('startErr').textContent = "Couldn't start the event. Check the internet connection and the Firebase setup in config.js, then try again.";
+  }).then(function(){ b.disabled = false; b.textContent = 'Start an event'; });
 };
+$('againBtn').onclick = function(){ $('doneOv').hidden = true; $('startBtn').click(); };
+
+function endLocal(fromHost){
+  if (unwatch){ unwatch(); unwatch = null; }
+  var id = eventId; eventId = null;
+  try { localStorage.removeItem(EVENT_KEY); } catch(e){}
+  $('qrcard').hidden = true; $('hostBtn').hidden = true; closeSide(); setRemove(false); closeStation();
+  startParade(function(){
+    if (fromHost) Net.destroy(id).catch(function(){});
+    fish = []; queue = []; updateCount();
+    $('doneOv').hidden = false;
+  });
+}
+$('endBtn').onclick = function(){ $('endOv').hidden = false; };
+$('endNo').onclick = function(){ $('endOv').hidden = true; };
+$('endYes').onclick = function(){
+  $('endOv').hidden = true;
+  var id = eventId;
+  Net.close(id).catch(function(){}).then(function(){ endLocal(true); });
+};
+
+/* resume after a refresh */
+(function boot(){
+  $('demoPill').hidden = Net.live;
+  var saved = null; try { saved = localStorage.getItem(EVENT_KEY); } catch(e){}
+  if (!saved){ showStart(); return; }
+  Promise.all([Net.isOpen(saved), Net.isOwner(saved)]).then(function(r){
+    if (r[0] && r[1]) openEvent(saved); else { try { localStorage.removeItem(EVENT_KEY); } catch(e){} showStart(); }
+  }, showStart);
+})();
+
+/* ---------- host controls ---------- */
+function openSide(){ $('side').hidden = false; }
+function closeSide(){ $('side').hidden = true; }
+$('hostBtn').onclick = openSide; $('sideX').onclick = closeSide;
+function setRemove(on){ removeMode = on; $('removeBanner').hidden = !on; }
+$('removeBtn').onclick = function(){ closeSide(); setRemove(true); };
+$('removeDone').onclick = function(){ setRemove(false); };
+
+tank.addEventListener('pointerdown', function(e){
+  wake();
+  var px = e.clientX, py = e.clientY, b = bs();
+  var hit = null;
+  fish.slice().sort(function(a,c){ return c.size - a.size; }).some(function(f){
+    var sc = b*f.size, dx = (px - f.x)/(115*sc), dy = (py - f.y)/(58*sc);
+    if (dx*dx + dy*dy < 1){ hit = f; return true; }
+  });
+  if (!hit) return;
+  if (removeMode){
+    var k = hit.key; removeShark(k);
+    if (eventId) Net.remove(eventId, k).catch(function(){ toast("That shark was removed here, but the online copy couldn't be deleted."); });
+    toast('Shark removed');
+  } else { hit.dash = 1; bubble(hit.x, hit.y, 10); }
+});
+
+/* scan station + upload (host adds) */
+function hostAddCanvasResult(res){
+  if (!res.ok){ return res; }
+  if (!eventId) return { ok:false, reason:'noevent' };
+  Net.hostAdd(eventId, res.dataUrl).then(function(key){
+    if (!Net.live) addShark({ key: key, img: res.dataUrl });
+  }, function(){ toast("Couldn't add that shark. Check the connection and try again."); });
+  return res;
+}
+var stream = null;
+function closeStation(){ $('station').hidden = true; if (stream){ stream.getTracks().forEach(function(t){ t.stop(); }); stream = null; } }
+$('stationX').onclick = closeStation;
+$('stationBtn').onclick = function(){
+  closeSide();
+  $('station').hidden = false; $('stationStatus').textContent = 'Starting the camera…';
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ $('stationStatus').textContent = 'This browser has no camera access. Use "Upload a photo" instead.'; return; }
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } }, audio: false })
+    .then(function(s){ stream = s; var v = $('video'); v.srcObject = s; v.play(); $('stationStatus').textContent = 'Hold the sheet flat under the camera with all 4 corner squares showing.'; })
+    .catch(function(){ $('stationStatus').textContent = 'The camera is blocked or missing. Allow camera access, or use "Upload a photo" instead.'; });
+};
+$('snapBtn').onclick = function(){
+  var v = $('video'); if (!v.videoWidth){ return; }
+  var r = hostAddCanvasResult(C.scanSheet(v));
+  $('stationStatus').textContent = r.ok ? 'Shark sent! Ready for the next sheet.' : (r.reason === 'noevent' ? 'Start an event first.' : C.reasonText(r.reason));
+};
+$('file').addEventListener('change', function(e){
+  var f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  var url = URL.createObjectURL(f), img = new Image();
+  img.onload = function(){ var r = hostAddCanvasResult(C.scanSheet(img)); URL.revokeObjectURL(url); toast(r.ok ? 'Shark sent into the tank!' : C.reasonText(r.reason)); };
+  img.onerror = function(){ toast("That file isn't a photo the browser can read. Try a JPG or PNG."); };
+  img.src = url;
+});
+$('uploadBtn').addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); $('file').click(); } });
+
+/* full screen, idle hiding, wake lock */
+var idleT, lock = null;
+function wake(){ document.body.classList.remove('idle'); clearTimeout(idleT); idleT = setTimeout(function(){ if ($('side').hidden && !removeMode) document.body.classList.add('idle'); }, 5000); }
+['pointermove','keydown','pointerdown'].forEach(function(t){ addEventListener(t, wake); }); wake();
+$('fsBtn').onclick = function(){
+  var el = document.documentElement;
+  var p = document.fullscreenElement ? document.exitFullscreen() : (el.requestFullscreen ? el.requestFullscreen() : Promise.reject());
+  Promise.resolve(p).catch(function(){ toast('Full screen is not available in this browser.'); });
+  closeSide();
+};
+function keepAwake(){ if (navigator.wakeLock && document.visibilityState === 'visible') navigator.wakeLock.request('screen').then(function(l){ lock = l; }).catch(function(){}); }
+document.addEventListener('visibilitychange', keepAwake); keepAwake();
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape'){ closeSide(); setRemove(false); $('endOv').hidden = true; } });
+
+var toastT; function toast(m){ var t = $('toast'); t.textContent = m; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(function(){ t.hidden = true; }, 3400); }
+window.__lagoon = { addShark: addShark, state: function(){ return { fish: fish.length, visible: visible().length, queue: queue.length, eventId: eventId }; } };
 })();
 </script>
-
 </body>
 </html>

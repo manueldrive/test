@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#03202f">
+<title>Send Your Shark</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@600;800&display=swap">
+<link rel="stylesheet" href="css/lagoon.css">
+<style>
+body{min-height:100vh;min-height:100dvh;background:linear-gradient(180deg,#1f8fa8 0%,#0a5675 38%,#03202f 100%) fixed var(--deep)}
+main{max-width:480px;margin:0 auto;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;gap:18px;
+  padding-block:calc(22px + env(safe-area-inset-top,0px)) calc(22px + env(safe-area-inset-bottom,0px));
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.brand{display:flex;align-items:center;gap:10px}
+.brand span{font-family:var(--display);font-size:18px}
+.step{display:flex;flex-direction:column;gap:16px}
+.step h1{font-size:clamp(34px,10vw,44px);line-height:1}
+.step p{color:var(--muted);font-size:17px}
+.howto{background:var(--glass);border:1px solid var(--line);border-radius:18px;padding:16px;display:grid;grid-template-columns:96px 1fr;gap:14px;align-items:center}
+.howto svg{width:96px;height:auto;display:block}
+.howto ul{margin:0;padding-left:18px;display:grid;gap:6px;font-size:15px;line-height:1.35}
+.stage{width:100%;max-width:100%;aspect-ratio:16/10;border-radius:20px;display:block;background:var(--water)}
+.err{background:rgba(255,93,108,.14);border:1px solid rgba(255,93,108,.5);border-radius:14px;padding:12px 14px;font-weight:700;line-height:1.4}
+.stack{display:grid;gap:10px}
+.foot{margin-top:auto;text-align:center;font-size:14px;color:var(--muted)}
+.foot a{font-weight:800}
+.saved{width:100%;max-width:100%;border-radius:16px;display:block}
+.spin{width:44px;height:44px;border-radius:50%;border:4px solid var(--line);border-top-color:var(--sand);animation:sp 1s linear infinite;margin:10px auto}
+@keyframes sp{to{transform:rotate(1turn)}}
+</style>
+<script src="config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="js/shark-core.js"></script>
+<script src="js/net.js"></script>
+</head>
+<body>
+<main>
+  <div class="brand"><span>Crayon Shark Lagoon</span></div>
+
+  <section class="step" id="sLoading"><div class="spin" aria-label="Loading"></div></section>
+
+  <section class="step" id="sStart" hidden>
+    <h1>Send your shark to the tank</h1>
+    <div class="howto">
+      <svg viewBox="0 0 110 85" aria-hidden="true">
+        <rect x="1" y="1" width="108" height="83" rx="4" fill="#fff"/>
+        <g fill="#03202f"><rect x="4" y="4" width="10" height="10"/><rect x="96" y="4" width="10" height="10"/><rect x="96" y="71" width="10" height="10"/><rect x="4" y="71" width="10" height="10"/></g>
+        <g fill="#fff"><rect x="7.4" y="7.4" width="3.4" height="3.4"/><rect x="99.4" y="7.4" width="3.4" height="3.4"/><rect x="99.4" y="74.4" width="3.4" height="3.4"/><rect x="7.4" y="74.4" width="3.4" height="3.4"/></g>
+        <path d="M86 44c-1-5-10-9-22-9-14 0-26 4-34 8l-10-10 4 11-5 11 11-7c10 4 24 6 36 5 12-1 19-4 20-9z" fill="#ff8a2b" opacity=".9"/>
+      </svg>
+      <ul>
+        <li>Lay the sheet flat in good light.</li>
+        <li>Fit the whole page in the photo.</li>
+        <li>All 4 black corner squares must show.</li>
+      </ul>
+    </div>
+    <input type="file" id="file" accept="image/*" capture="environment" class="vh">
+    <label for="file" class="btn primary big block" role="button" tabindex="0" id="snap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+      Take a photo of the sheet
+    </label>
+    <p class="err" id="err" hidden></p>
+  </section>
+
+  <section class="step" id="sPreview" hidden>
+    <h1>Here's your shark!</h1>
+    <canvas class="stage" id="preview" width="800" height="500" aria-label="Your shark"></canvas>
+    <div class="stack">
+      <button class="btn primary big block" id="send">Send it to the tank</button>
+      <button class="btn block" id="retake">Retake photo</button>
+    </div>
+    <p class="err" id="sendErr" hidden></p>
+  </section>
+
+  <section class="step" id="sSent" hidden>
+    <h1>Your shark is swimming in!</h1>
+    <p>Look at the big screen. It's the one glowing.</p>
+    <canvas class="stage" id="swim" width="800" height="500" aria-label="Your shark swimming"></canvas>
+    <div class="stack">
+      <button class="btn primary block" id="save">Save my shark</button>
+      <button class="btn block" id="another">Send another shark</button>
+    </div>
+    <img class="saved" id="savedImg" alt="Your shark picture. Press and hold to save it." hidden>
+    <p id="saveHelp" hidden>Press and hold the picture to save it to your photos.</p>
+  </section>
+
+  <section class="step" id="sClosed" hidden>
+    <h1>This tank is closed</h1>
+    <p>The event has ended, or this QR code is for a different event. Scan the code on the big screen to join the one that's happening now.</p>
+  </section>
+
+  <p class="foot" id="foot" hidden></p>
+</main>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(function(){
+'use strict';
+var C = SharkCore, Net = SharkNet, $ = function(id){ return document.getElementById(id); };
+var cfg = window.SHARK_CONFIG || {};
+var id = new URLSearchParams(location.search).get('e');
+var skin = null, skinImg = null, skinUrl = null, waitT = null;
+
+function show(s){ ['sLoading','sStart','sPreview','sSent','sClosed'].forEach(function(k){ $(k).hidden = k !== s; }); scrollTo(0,0); }
+function toast(m){ var t = $('toast'); t.textContent = m; t.hidden = false; clearTimeout(t._t); t._t = setTimeout(function(){ t.hidden = true; }, 3200); }
+
+if (cfg.bookingUrl){
+  var a = document.createElement('a'); a.href = cfg.bookingUrl; a.target = '_blank'; a.rel = 'noopener';
+  a.textContent = cfg.bookingText || 'Book this for your party'; $('foot').appendChild(a);
+}
+
+if (!id) show('sClosed');
+else Net.isOpen(id).then(function(o){ show(o ? 'sStart' : 'sClosed'); }, function(){ show('sStart'); });
+
+/* little swimming preview */
+var scenes = { preview: C.makeScene(), swim: C.makeScene() }, T = 0, x = 0;
+function frame(){
+  T += 1/60;
+  ['preview','swim'].forEach(function(k){
+    var cv = $(k); if (cv.offsetParent === null) return;
+    var g = cv.getContext('2d'); g.setTransform(1,0,0,1,0,0); scenes[k](g, 800, 500, T);
+    g.save();
+    if (k === 'swim'){ x = (x + 3) % 1300; g.translate(x - 250, 230 + Math.sin(T)*16); }
+    else g.translate(400, 235 + Math.sin(T)*10);
+    g.scale(2.4, 2.4); C.drawShark(g, skinImg, Math.sin(T*5)*8); g.restore();
+  });
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+/* photo -> skin */
+$('file').addEventListener('change', function(e){
+  var f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  $('err').hidden = true;
+  var url = URL.createObjectURL(f), img = new Image();
+  img.onload = function(){
+    var r = C.scanSheet(img); URL.revokeObjectURL(url);
+    if (!r.ok){ $('err').textContent = C.reasonText(r.reason); $('err').hidden = false; return; }
+    skin = r.dataUrl; skinImg = new Image(); skinImg.src = skin; $('sendErr').hidden = true; show('sPreview');
+  };
+  img.onerror = function(){ $('err').textContent = C.reasonText('noimage'); $('err').hidden = false; };
+  img.src = url;
+});
+$('snap').addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); $('file').click(); } });
+$('retake').onclick = function(){ show('sStart'); $('file').click(); };
+
+$('send').onclick = function(){
+  var b = this; b.disabled = true; b.textContent = 'Sending…'; $('sendErr').hidden = true;
+  Net.send(id, skin).then(function(){
+    x = 0; $('savedImg').hidden = true; $('saveHelp').hidden = true; skinUrl = null;
+    show('sSent'); $('foot').hidden = !cfg.bookingUrl; tickAnother();
+  }, function(e){
+    if (e && e.code === 'closed') show('sClosed');
+    else if (e && e.code === 'wait') { $('sendErr').textContent = 'Too many sharks at once! Try again in ' + Math.ceil(e.wait/1000) + ' seconds.'; $('sendErr').hidden = false; }
+    else { $('sendErr').textContent = "Couldn't reach the tank. Check your internet and try again."; $('sendErr').hidden = false; }
+  }).then(function(){ b.disabled = false; b.textContent = 'Send it to the tank'; });
+};
+
+function tickAnother(){
+  clearInterval(waitT);
+  var b = $('another');
+  function u(){ var w = Net.waitLeft(id); b.disabled = w > 0; b.textContent = w > 0 ? 'Send another in ' + Math.ceil(w/1000) + 's' : 'Send another shark'; if (!w) clearInterval(waitT); }
+  u(); waitT = setInterval(u, 500);
+}
+$('another').onclick = function(){ skin = null; skinImg = null; show('sStart'); };
+
+/* keepsake picture */
+function keepsake(){
+  var cv = document.createElement('canvas'); cv.width = 1080; cv.height = 1080; var g = cv.getContext('2d');
+  C.makeScene()(g, 1080, 1080, 2.2);
+  g.save(); g.translate(540, 560); g.scale(3.9, 3.9); C.drawShark(g, skinImg, 3); g.restore();
+  g.textAlign = 'center'; g.fillStyle = '#eafcff';
+  g.font = '76px "Lilita One", "Arial Rounded MT Bold", sans-serif'; g.fillText('My shark swam in!', 540, 170);
+  g.font = '800 34px Nunito, system-ui, sans-serif'; g.globalAlpha = .8; g.fillText('Crayon Shark Lagoon', 540, 230);
+  return cv;
+}
+$('save').onclick = function(){
+  var cv = keepsake();
+  cv.toBlob(function(blob){
+    var file = blob && window.File ? new File([blob], 'my-shark.png', { type: 'image/png' }) : null;
+    if (file && navigator.canShare && navigator.canShare({ files: [file] })){
+      navigator.share({ files: [file], title: 'My shark' }).catch(function(){});
+      return;
+    }
+    var url = cv.toDataURL('image/png');
+    var a = document.createElement('a'); a.href = url; a.download = 'my-shark.png'; document.body.appendChild(a); a.click(); a.remove();
+    $('savedImg').src = url; $('savedImg').hidden = false; $('saveHelp').hidden = false;
+  }, 'image/png');
+};
+})();
+</script>
+</body>
+</html>
