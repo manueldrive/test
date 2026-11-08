@@ -5,35 +5,39 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#03202f">
 <title>Draw Together</title>
-<link rel="stylesheet" href="css/lagoon.css?v=202611081655">
+<link rel="stylesheet" href="css/lagoon.css?v=202611081705">
 <style>
 html,body{height:100%;overflow:hidden}
 #tank{position:fixed;inset:0;width:100%;height:100%;display:block}
 .chrome{transition:opacity .5s}
 body.idle .chrome{opacity:0;pointer-events:none}
 
-/* Soft & bubbly: cream cards with a chunky navy drop, butter-yellow chips, puffy outlined wordmark.
+/* Soft & bubbly, compact: small corner pieces so the tank keeps the screen.
    Sizes follow screen height so it reads the same on a laptop, TV or projector. */
-.brand{position:fixed;top:calc(2.2vh + env(safe-area-inset-top,0px));left:calc(2.2vw + env(safe-area-inset-left,0px));z-index:5;
-  display:flex;align-items:center;gap:1.4vh;flex-wrap:wrap}
-.brand b{font:700 clamp(24px,5.4vh,64px)/1 var(--display);color:var(--cream);-webkit-text-stroke:clamp(4px,.85vh,10px) var(--ink);paint-order:stroke fill;
-  text-shadow:0 .45vh 0 var(--ink)}
-.brand span,.chip{font:900 clamp(10px,1.7vh,19px)/1 var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--ink);background:var(--butter);
-  padding:.8vh 1.4vh;border-radius:999px}
+.brand{position:fixed;top:calc(2vh + env(safe-area-inset-top,0px));left:calc(1.8vw + env(safe-area-inset-left,0px));z-index:5;
+  display:flex;align-items:center;gap:1vh;flex-wrap:wrap}
+.brand b{font:700 clamp(18px,3.5vh,42px)/1 var(--display);color:var(--cream);-webkit-text-stroke:clamp(3px,.6vh,7px) var(--ink);paint-order:stroke fill;
+  text-shadow:0 .32vh 0 var(--ink)}
+.brand span,.chip{font:900 clamp(9px,1.25vh,14px)/1 var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--ink);background:var(--butter);
+  padding:.6vh 1.1vh;border-radius:999px}
 .chip.warn{background:var(--cream)}
-.count{position:fixed;top:calc(2.4vh + env(safe-area-inset-top,0px));right:calc(2.2vw + env(safe-area-inset-right,0px));z-index:5;
-  font:700 clamp(18px,3.6vh,40px)/1 var(--display);color:var(--ink);background:var(--cream);padding:1vh 2.2vh 1.2vh;border-radius:2.8vh;
-  box-shadow:0 .6vh 0 var(--ink)}
-.count small{font:900 clamp(10px,1.6vh,17px) var(--body);letter-spacing:.1em;text-transform:uppercase;margin-left:.7vh}
+.count{position:fixed;top:calc(2vh + env(safe-area-inset-top,0px));right:calc(1.8vw + env(safe-area-inset-right,0px));z-index:5;
+  font:700 clamp(14px,2.5vh,30px)/1 var(--display);color:var(--ink);background:var(--cream);padding:.7vh 1.5vh .8vh;border-radius:2vh;
+  box-shadow:0 .45vh 0 var(--ink)}
+.count small{font:900 clamp(8px,1.15vh,13px) var(--body);letter-spacing:.1em;text-transform:uppercase;margin-left:.5vh}
 
-/* QR card: always visible, sized to be scannable from across a room */
-.qrcard{position:fixed;left:calc(2.2vw + env(safe-area-inset-left,0px));bottom:calc(3vh + env(safe-area-inset-bottom,0px));z-index:5;
-  display:flex;align-items:center;gap:2.6vh;background:var(--cream);color:var(--ink);border-radius:3.6vh;padding:2vh 3.2vh 2vh 2vh;
-  box-shadow:0 .9vh 0 var(--ink);max-width:calc(100% - 4.4vw)}
-.qrcard canvas{width:clamp(110px,24vh,280px);height:clamp(110px,24vh,280px);image-rendering:pixelated;display:block;flex:none;border-radius:1.6vh}
-.qrcard h2{font:700 clamp(20px,5vh,56px)/1 var(--display);margin:0 0 1.6vh;color:var(--ink)}
-.qrcard .steps{display:flex;gap:1vh;flex-wrap:wrap}
-.qrcard .code{display:inline-block;margin-top:1.6vh;font:900 clamp(9px,1.35vh,14px) var(--body);letter-spacing:.16em;text-transform:uppercase;opacity:.55}
+/* QR card: compact by default; Host > Bigger QR code for big rooms */
+.qrcard{position:fixed;left:calc(1.8vw + env(safe-area-inset-left,0px));bottom:calc(2.4vh + env(safe-area-inset-bottom,0px));z-index:5;
+  display:flex;align-items:center;gap:1.5vh;background:var(--cream);color:var(--ink);border-radius:2.4vh;padding:1.2vh 2vh 1.2vh 1.2vh;
+  box-shadow:0 .6vh 0 var(--ink);max-width:calc(100% - 3.6vw)}
+.qrcard canvas{width:clamp(96px,16vh,200px);height:clamp(96px,16vh,200px);image-rendering:pixelated;display:block;flex:none;border-radius:1vh}
+.qrcard h2{font:700 clamp(15px,3.1vh,36px)/1 var(--display);margin:0 0 .9vh;color:var(--ink)}
+.qrcard .steps{font:900 clamp(9px,1.25vh,14px)/1 var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--ink);opacity:.7}
+.qrcard .code{display:block;margin-top:.9vh;font:900 clamp(8px,1.05vh,12px) var(--body);letter-spacing:.16em;text-transform:uppercase;opacity:.45}
+body.bigqr .qrcard{gap:2.4vh;padding:1.8vh 3vh 1.8vh 1.8vh;border-radius:3.4vh}
+body.bigqr .qrcard canvas{width:clamp(120px,26vh,300px);height:clamp(120px,26vh,300px)}
+body.bigqr .qrcard h2{font-size:clamp(20px,4.8vh,54px)}
+body.bigqr .qrcard .steps{font-size:clamp(10px,1.8vh,19px)}
 
 .hostbtn{position:fixed;right:calc(18px + env(safe-area-inset-right,0px));bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:6}
 
@@ -74,15 +78,15 @@ body.idle .chrome{opacity:0;pointer-events:none}
 .bar i{display:block;height:100%;width:0;background:var(--sand);transition:width .2s}
 .demo{background:rgba(226,196,138,.12);border:1px solid rgba(226,196,138,.4);border-radius:14px;padding:12px 14px;font-size:14px;line-height:1.45}
 </style>
-<script src="config.js?v=202611081655"></script>
+<script src="config.js?v=202611081705"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-<script src="vendor/qrcode.js?v=202611081655"></script>
-<script src="js/shark-core.js?v=202611081655"></script>
-<script src="js/net.js?v=202611081655"></script>
-<script src="vendor/gifenc.js?v=202611081655"></script>
-<script src="js/reel.js?v=202611081655"></script>
+<script src="vendor/qrcode.js?v=202611081705"></script>
+<script src="js/shark-core.js?v=202611081705"></script>
+<script src="js/net.js?v=202611081705"></script>
+<script src="vendor/gifenc.js?v=202611081705"></script>
+<script src="js/reel.js?v=202611081705"></script>
 </head>
 <body>
 <canvas id="tank" aria-label="Aquarium with swimming sharks"></canvas>
@@ -96,7 +100,7 @@ body.idle .chrome{opacity:0;pointer-events:none}
   <canvas id="qr" width="400" height="400" aria-label="QR code to send a shark"></canvas>
   <div>
     <h2>Add your shark!</h2>
-    <div class="steps"><span class="chip">1 &middot; Color</span><span class="chip">2 &middot; Snap</span><span class="chip">3 &middot; Swim</span></div>
+    <div class="steps">Color &middot; Snap &middot; Swim</div>
     <span class="code" id="code"></span>
   </div>
 </div>
@@ -111,6 +115,7 @@ body.idle .chrome{opacity:0;pointer-events:none}
   <div class="grp">
     <span class="eyebrow">Screen</span>
     <button class="btn" id="fsBtn">Full screen</button>
+    <button class="btn" id="bigQrBtn" aria-pressed="false">Bigger QR code</button>
   </div>
   <div class="grp">
     <span class="eyebrow">Add sharks here</span>
@@ -502,6 +507,10 @@ $('uploadBtn').addEventListener('keydown', function(e){ if (e.key === 'Enter' ||
 var idleT, lock = null;
 function wake(){ document.body.classList.remove('idle'); clearTimeout(idleT); idleT = setTimeout(function(){ if ($('side').hidden && !removeMode) document.body.classList.add('idle'); }, 5000); }
 ['pointermove','keydown','pointerdown'].forEach(function(t){ addEventListener(t, wake); }); wake();
+/* bigger QR code for big rooms (remembered on this laptop) */
+function setBigQr(on){ document.body.classList.toggle('bigqr', on); $('bigQrBtn').setAttribute('aria-pressed', String(on)); $('bigQrBtn').textContent = on ? 'Smaller QR code' : 'Bigger QR code'; try { localStorage.setItem('shark-bigqr', on ? '1' : ''); } catch(e){} }
+try { if (localStorage.getItem('shark-bigqr')) setBigQr(true); } catch(e){}
+$('bigQrBtn').onclick = function(){ setBigQr(!document.body.classList.contains('bigqr')); };
 $('fsBtn').onclick = function(){
   var el = document.documentElement;
   var p = document.fullscreenElement ? document.exitFullscreen() : (el.requestFullscreen ? el.requestFullscreen() : Promise.reject());
