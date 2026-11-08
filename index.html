@@ -7,7 +7,7 @@
 <title>Draw Jamboree</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@600;800&display=swap">
-<link rel="stylesheet" href="css/lagoon.css">
+<link rel="stylesheet" href="css/lagoon.css?v=202611081442">
 <style>
 html,body{height:100%;overflow:hidden}
 #tank{position:fixed;inset:0;width:100%;height:100%;display:block}
@@ -62,13 +62,13 @@ body.idle .chrome{opacity:0;pointer-events:none}
 .card ol{margin:0;padding-left:22px;display:grid;gap:6px;line-height:1.4}
 .demo{background:rgba(226,196,138,.12);border:1px solid rgba(226,196,138,.4);border-radius:14px;padding:12px 14px;font-size:14px;line-height:1.45}
 </style>
-<script src="config.js"></script>
+<script src="config.js?v=202611081442"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-<script src="vendor/qrcode.js"></script>
-<script src="js/shark-core.js"></script>
-<script src="js/net.js"></script>
+<script src="vendor/qrcode.js?v=202611081442"></script>
+<script src="js/shark-core.js?v=202611081442"></script>
+<script src="js/net.js?v=202611081442"></script>
 </head>
 <body>
 <canvas id="tank" aria-label="Aquarium with swimming sharks"></canvas>
@@ -186,7 +186,7 @@ function updateCount(){ var n = total(); $('count').textContent = n + (n === 1 ?
 function makeFish(rec, mode){
   var img = new Image(); img.src = rec.img;
   var s = 0.78 + Math.random()*0.38, dir = Math.random() < .5 ? -1 : 1;
-  var f = { key: rec.key, img: img, s3d: new C.Shark3D(img, { scale: Math.min(3, 1.4*DPR) }), rec: rec, size: s, dir: dir, turn: dir, x: W*(.12 + Math.random()*.76),
+  var f = { key: rec.key, img: img, s3d: C.Shark3D ? new C.Shark3D(img, { scale: Math.min(3, 1.4*DPR) }) : null, rec: rec, size: s, dir: dir, turn: dir, x: W*(.12 + Math.random()*.76),
     baseY: H*(.18 + Math.random()*.55), targetY: H*(.18 + Math.random()*.55), y: 0,
     speed: (36 + Math.random()*28) * (reduce ? .5 : 1), phase: Math.random()*6, seed: Math.random()*99,
     dash: 0, glow: 0, pop: 1, born: T, leaving: 0, gone: false };
@@ -280,7 +280,10 @@ function render(){
     ctx.rotate(Math.sin(T*.6 + f.seed)*.05*f.turn);
     ctx.scale(sc, sc);
     var haze = Math.max(0, Math.min(.26, (1 - f.size)*.9));
-    f.s3d.draw(ctx, f.turn, f.phase, haze, .14*Math.sin(T*.45 + f.seed));
+    try {
+      if (f.s3d) f.s3d.draw(ctx, f.turn, f.phase, haze, .14*Math.sin(T*.45 + f.seed));
+      else { ctx.scale(f.turn < 0 ? -1 : 1, 1); C.drawShark(ctx, f.img, Math.sin(f.phase)*8); }
+    } catch (e) { f.s3d = null; }
     ctx.restore();
   });
   ctx.fillStyle = 'rgba(234,252,255,.55)'; ctx.strokeStyle = 'rgba(234,252,255,.8)'; ctx.lineWidth = 1;
@@ -296,7 +299,7 @@ function render(){
 }
 
 var last = performance.now();
-function loop(now){ var dt = Math.min(.05, (now-last)/1000); last = now; T += dt; step(dt); render(); requestAnimationFrame(loop); }
+function loop(now){ var dt = Math.min(.05, (now-last)/1000); last = now; T += dt; try { step(dt); render(); } catch (e) { if (window.console) console.error(e); } requestAnimationFrame(loop); }
 requestAnimationFrame(loop);
 
 /* ---------- goodbye parade ---------- */
