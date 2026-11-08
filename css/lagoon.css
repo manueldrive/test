@@ -1,5 +1,6 @@
 /* Draw Together — shared styles. One underwater look, dark by design. */
 /* Bundled fonts (SIL Open Font License, see fonts/), so text looks right offline and in the event reel. */
+@font-face{font-family:"DynaPuff";font-style:normal;font-weight:700;font-display:swap;src:url(../fonts/dynapuff-latin-700-normal.woff2) format("woff2")}
 @font-face{font-family:"Lilita One";font-style:normal;font-weight:400;font-display:swap;src:url(../fonts/lilita-one-latin-400-normal.woff2) format("woff2")}
 @font-face{font-family:"Nunito";font-style:normal;font-weight:700;font-display:swap;src:url(../fonts/nunito-latin-700-normal.woff2) format("woff2")}
 @font-face{font-family:"Nunito";font-style:normal;font-weight:800;font-display:swap;src:url(../fonts/nunito-latin-800-normal.woff2) format("woff2")}
@@ -9,7 +10,8 @@
   --deep:#03202f; --water:#0a5675; --shallow:#1f8fa8; --foam:#eafcff; --panel:#06293b;
   --coral:#ff7b57; --coral-ink:#3a1206; --sand:#e2c48a; --kelp:#3aa877; --danger:#ff5d6c;
   --glass:rgba(3,32,47,.74); --line:rgba(234,252,255,.18); --muted:rgba(234,252,255,.72);
-  --display:"Lilita One","Arial Rounded MT Bold","Trebuchet MS",sans-serif;
+  --display:"DynaPuff","Lilita One","Arial Rounded MT Bold","Trebuchet MS",sans-serif;
+  --cream:#fff6e0; --butter:#ffc93c; --ink:#13294b;
   --body:"Nunito",ui-rounded,system-ui,-apple-system,sans-serif;
   color-scheme:dark;
 }
@@ -17,7 +19,7 @@
 [hidden]{display:none!important}
 html,body{margin:0}
 body{background:var(--deep);color:var(--foam);font-family:var(--body);font-size:16px;-webkit-tap-highlight-color:transparent}
-h1,h2,h3{font-family:var(--display);font-weight:400;margin:0;text-wrap:balance;letter-spacing:.01em}
+h1,h2,h3{font-family:var(--display);font-weight:700;margin:0;text-wrap:balance;letter-spacing:.01em}
 p{margin:0;line-height:1.45}
 a{color:var(--sand)}
 .btn{font:800 16px/1 var(--body);border-radius:999px;border:2px solid var(--line);background:var(--glass);color:var(--foam);
