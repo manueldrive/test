@@ -7,7 +7,7 @@
 <title>Send Your Shark</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@600;800&display=swap">
-<link rel="stylesheet" href="css/lagoon.css?v=202611081506">
+<link rel="stylesheet" href="css/lagoon.css?v=202611081517">
 <style>
 body{min-height:100vh;min-height:100dvh;background:linear-gradient(180deg,#1f8fa8 0%,#0a5675 38%,#03202f 100%) fixed var(--deep)}
 main{max-width:480px;margin:0 auto;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;gap:18px;
@@ -37,12 +37,12 @@ main{max-width:480px;margin:0 auto;min-height:100vh;min-height:100dvh;display:fl
 .spin{width:44px;height:44px;border-radius:50%;border:4px solid var(--line);border-top-color:var(--sand);animation:sp 1s linear infinite;margin:10px auto}
 @keyframes sp{to{transform:rotate(1turn)}}
 </style>
-<script src="config.js?v=202611081506"></script>
+<script src="config.js?v=202611081517"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-<script src="js/shark-core.js?v=202611081506"></script>
-<script src="js/net.js?v=202611081506"></script>
+<script src="js/shark-core.js?v=202611081517"></script>
+<script src="js/net.js?v=202611081517"></script>
 </head>
 <body>
 <main>
@@ -178,14 +178,27 @@ $('file').addEventListener('change', function(e){
 $('snap').addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); $('file').click(); } });
 
 /* camera inside the page (more reliable than the phone's camera screen) */
-function camFail(){
-  $('err').textContent = "The camera couldn't open here. Tap \u201cChoose a photo instead\u201d and pick Take Photo or a picture you already took. If you opened this from a QR scanner app, open the link in Safari or Chrome instead.";
-  $('err').hidden = false; show('sStart');
+function camFail(e){
+  var name = e && e.name, ios = /iPhone|iPad|iPod/.test(navigator.userAgent), app = /CriOS/.test(navigator.userAgent) ? 'Chrome' : /FxiOS/.test(navigator.userAgent) ? 'Firefox' : /EdgiOS/.test(navigator.userAgent) ? 'Edge' : 'Safari';
+  var msg;
+  if (name === 'NotAllowedError' || name === 'SecurityError' || name === 'PermissionDeniedError') {
+    msg = ios
+      ? 'Camera access is turned off for ' + app + '. Open the iPhone Settings app, tap ' + app + ', and turn on Camera. Then reload this page. Or tap \u201cChoose a photo instead.\u201d'
+      : 'Camera access is blocked for this page. Allow the camera in your browser settings and reload, or tap \u201cChoose a photo instead.\u201d';
+  } else if (name === 'NotReadableError' || name === 'TrackStartError' || name === 'AbortError') {
+    msg = 'Another app is using the camera. Close it, then try again. Or tap \u201cChoose a photo instead.\u201d';
+  } else if (name === 'NotFoundError' || name === 'OverconstrainedError') {
+    msg = 'No camera was found. Tap \u201cChoose a photo instead.\u201d';
+  } else {
+    msg = "The camera couldn't open here. Tap \u201cChoose a photo instead,\u201d or open this link in Safari.";
+  }
+  $('err').textContent = msg; $('err').hidden = false; show('sStart');
 }
 function openCam(){
   $('err').hidden = true; $('camErr').hidden = true;
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ camFail(); return; }
   navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1440 } }, audio: false })
+    .catch(function(e){ if (e && e.name === 'OverconstrainedError') return navigator.mediaDevices.getUserMedia({ video: true, audio: false }); throw e; })
     .then(function(s){
       stream = s; var v = $('video'); v.muted = true; v.setAttribute('playsinline', ''); v.srcObject = s;
       show('sCam');
