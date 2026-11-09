@@ -271,7 +271,10 @@ document.getElementById('file').addEventListener('change', function(e){
     var url = URL.createObjectURL(f), im = new Image();
     im.onload = function(){ var r = C.scanSheet(im); URL.revokeObjectURL(url);
       if (!r.ok){ toast(C.reasonText(r.reason)); return; }
-      var s = new Image(); s.onload = function(){ addCreature(chosen, chosen === 'shark' ? s : cropToFill(s)); }; s.src = r.dataUrl; };
+      // the sheet's code says which creature it is; old shark sheets have no code, so they use the picked button
+      var kind = r.kind && r.kind !== 'shark' ? r.kind : chosen, ownSheet = kind === 'shark' || (DEFS[kind].code && r.kind === kind);
+      if (r.kind && r.kind !== 'shark') toast('Found a ' + DEFS[kind].label.toLowerCase() + ' sheet!');
+      var s = new Image(); s.onload = function(){ addCreature(kind, ownSheet ? s : cropToFill(s)); }; s.src = r.dataUrl; };
     im.src = url;
   });
   e.target.value = '';
