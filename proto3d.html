@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Draw Together 3D Prototype</title>
+<link rel="stylesheet" href="css/lagoon.css">
+<style>
+html,body{height:100%;overflow:hidden}
+canvas.layer{position:fixed;inset:0;width:100%;height:100%;display:block}
+.bar{position:fixed;left:calc(1.8vw + env(safe-area-inset-left,0px));bottom:calc(2.4vh + env(safe-area-inset-bottom,0px));z-index:5;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.tag{position:fixed;top:calc(2vh + env(safe-area-inset-top,0px));left:calc(1.8vw + env(safe-area-inset-left,0px));z-index:5;
+  font:700 clamp(18px,3.5vh,42px)/1 var(--display);color:var(--cream);-webkit-text-stroke:clamp(3px,.6vh,7px) var(--ink);paint-order:stroke fill;text-shadow:0 .32vh 0 var(--ink)}
+.tag span{font:900 clamp(9px,1.25vh,14px)/1 var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--ink);background:var(--butter);padding:.6vh 1.1vh;border-radius:999px;
+  -webkit-text-stroke:0;text-shadow:none;vertical-align:middle;margin-left:1vh}
+</style>
+<script src="vendor/three.min.js"></script>
+<script src="js/shark-core.js"></script>
+<script src="js/shark3d.js"></script>
+</head>
+<body>
+<canvas class="layer" id="back"></canvas>
+<canvas class="layer" id="gl"></canvas>
+<canvas class="layer" id="front"></canvas>
+<div class="tag">Draw Together<span>3D prototype</span></div>
+<div class="bar">
+  <input type="file" id="file" accept="image/*" multiple class="vh">
+  <label class="btn" for="file" role="button" tabindex="0">Add sheet photos</label>
+</div>
+<div class="toast" id="toast" hidden></div>
+<script>
+(function(){
+'use strict';
+var C = SharkCore, K = Shark3DKit;
+var back = document.getElementById('back'), front = document.getElementById('front'), glc = document.getElementById('gl');
+var bg = back.getContext('2d'), fg = front.getContext('2d'), scene2d = C.makeScene();
+var W = 0, H = 0, DPR = 1;
+
+var renderer = new THREE.WebGLRenderer({ canvas: glc, antialias: true, alpha: true, preserveDrawingBuffer: true });
+renderer.setClearColor(0x000000, 0);
+if ('outputColorSpace' in renderer) renderer.outputColorSpace = THREE.SRGBColorSpace; else renderer.outputEncoding = THREE.sRGBEncoding;
+var scene = new THREE.Scene();
+scene.fog = new THREE.Fog(0x6cbde2, 950, 2300);           // far sharks fade into the water
+var camera = new THREE.PerspectiveCamera(38, 16 / 9, 10, 4000);
+camera.position.set(0, 20, 820); camera.lookAt(0, -10, 0);
+scene.add(new THREE.HemisphereLight(0xe6f8ff, 0x1d5f8c, 1.05));
+var sun = new THREE.DirectionalLight(0xfff6e6, 1.25); sun.position.set(250, 700, 600); scene.add(sun);
+var rim = new THREE.DirectionalLight(0x9fe0ff, .45); rim.position.set(-400, 200, -500); scene.add(rim);
+
+function resize(){
+  DPR = Math.min(2, devicePixelRatio || 1); W = innerWidth; H = innerHeight;
+  [back, front].forEach(function(c){ c.width = Math.round(W*DPR); c.height = Math.round(H*DPR); });
+  renderer.setPixelRatio(DPR); renderer.setSize(W, H, false);
+  camera.aspect = W / H; camera.updateProjectionMatrix();
+}
+addEventListener('resize', resize); resize();
+
+/* ---- swimming: steer toward wandering targets inside the tank, so turns are wide arcs ---- */
+var BOUNDS = { x: 430, y: 130, zMin: -380, zMax: 30 }, sharks = [];
+function rand(a, b){ return a + Math.random() * (b - a); }
+function newTarget(s){ s.tx = rand(-BOUNDS.x, BOUNDS.x); s.ty = rand(-BOUNDS.y, BOUNDS.y * .8); s.tz = rand(BOUNDS.zMin, BOUNDS.zMax); }
+function addShark(img){
+  var s = new K.Shark3D(img);
+  s.x = rand(-500, 500); s.y = rand(-120, 120); s.z = rand(BOUNDS.zMin, BOUNDS.zMax);
+  s.heading = Math.random() < .5 ? 0 : Math.PI; s.pitch = 0; s.bank = 0; s.speed = rand(70, 95); s.size = rand(.85, 1.15);
+  s.group.scale.setScalar(s.size);
+  newTarget(s); scene.add(s.group); sharks.push(s);
+  return s;
+}
+function step(dt){
+  sharks.forEach(function(s){
+    var dx = s.tx - s.x, dz = s.tz - s.z, dy = s.ty - s.y;
+    if (dx*dx + dz*dz < 120*120) newTarget(s);
+    var want = Math.atan2(-dz, dx), diff = want - s.heading;
+    while (diff > Math.PI) diff -= 2*Math.PI; while (diff < -Math.PI) diff += 2*Math.PI;
+    var turn = Math.max(-.55, Math.min(.55, diff * 1.1));    // radians per second: gentle, wide turns
+    s.heading += turn * dt;
+    s.bank += ((-turn * .9) - s.bank) * Math.min(1, dt * 2);
+    s.pitch += (Math.max(-.25, Math.min(.25, dy / 400)) - s.pitch) * Math.min(1, dt * 1.5);
+    var v = s.speed * (1 + Math.abs(turn) * .4);
+    s.x += Math.cos(s.heading) * v * dt; s.z -= Math.sin(s.heading) * v * dt; s.y += Math.sin(s.pitch) * v * dt;
+    s.group.position.set(s.x, s.y, s.z);
+    s.group.rotation.set(s.bank, s.heading, s.pitch, 'YXZ');
+    s.swim(dt, Math.abs(turn));
+  });
+}
+
+var T = 0;
+function draw(){
+  bg.setTransform(DPR,0,0,DPR,0,0); scene2d(bg, W, H, T);
+  renderer.render(scene, camera);
+  fg.setTransform(DPR,0,0,DPR,0,0); fg.clearRect(0,0,W,H); scene2d.front(fg, W, H, T);
+}
+var last = performance.now(), auto = true;
+function loop(now){ if (auto){ var dt = Math.min(.05, (now - last)/1000); T += dt; step(dt); draw(); } last = now; requestAnimationFrame(loop); }
+requestAnimationFrame(loop);
+
+/* ---- demo skins so the tank isn't empty, plus photo upload ---- */
+function demoSkin(cols, seed){
+  var c = document.createElement('canvas'); c.width = C.TEX_W; c.height = C.TEX_H; var g = c.getContext('2d');
+  g.fillStyle = '#fff'; g.fillRect(0,0,c.width,c.height); var r = seed;
+  function rnd(){ r = (r * 16807) % 2147483647; return r / 2147483647; }
+  for (var i = 0; i < 90; i++){ g.strokeStyle = cols[i % cols.length]; g.globalAlpha = .45; g.lineWidth = 5 + rnd()*5; g.beginPath();
+    var y = (i % 30) / 30 * c.height + rnd()*8; g.moveTo(-10, y); for (var x = 0; x < c.width + 20; x += 22) g.lineTo(x, y + (rnd()-.5)*16); g.stroke(); }
+  var im = new Image(); im.src = c.toDataURL(); return im;
+}
+var demo = [['#ff5a2b','#ffd92b'],['#2b6fff','#3ac25a'],['#c23bff','#ff6fb5'],['#ff8a2b','#2b6fff','#ffd92b'],['#3ac25a','#1fb5c9']];
+if (!/nodemo/.test(location.search)) demo.forEach(function(c, i){ addShark(demoSkin(c, 11 + i*37)); });
+document.getElementById('file').addEventListener('change', function(e){
+  Array.prototype.forEach.call(e.target.files, function(f){
+    var url = URL.createObjectURL(f), im = new Image();
+    im.onload = function(){ var r = C.scanSheet(im); URL.revokeObjectURL(url);
+      if (r.ok){ var s = new Image(); s.src = r.dataUrl; addShark(s); } else toast(C.reasonText(r.reason)); };
+    im.src = url;
+  });
+  e.target.value = '';
+});
+function toast(m){ var t = document.getElementById('toast'); t.textContent = m; t.hidden = false; clearTimeout(t._t); t._t = setTimeout(function(){ t.hidden = true; }, 3200); }
+
+// hooks for recording a clip with fixed time steps
+window.__proto = {
+  add: function(src){ var im = new Image(); im.src = src; return new Promise(function(r){ im.onload = function(){ addShark(im); r(); }; }); },
+  manual: function(){ auto = false; },
+  tick: function(dt){ T += dt; step(dt); draw(); },
+  place: function(list){ list.forEach(function(p, i){ var s = sharks[i]; if (!s) return; s.x = p[0]; s.y = p[1]; s.z = p[2]; s.heading = p[3]; if (p[4] != null){ s.tx = p[4]; s.tz = p[5]; s.ty = p[1]; } }); }
+};
+})();
+</script>
+</body>
+</html>
