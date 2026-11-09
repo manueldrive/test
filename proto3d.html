@@ -294,6 +294,15 @@ function overlaps(){
   return c;
 }
 window.__proto = {
+  debug: function(){ return { camera: camera, all: all, renderer: renderer, scene: scene }; },
+  trace: function(kind, seconds){
+    var out = [], steps = Math.round(seconds * 30), prev = {};
+    for (var k = 0; k < steps; k++){ T += 1/30; step(1/30);
+      all.forEach(function(s, i){ if (s.kind !== kind) return; var p = prev[i];
+        if (p && s.mode !== 'away' && p.mode !== 'away') out.push({ i: i, f: k, dpos: Math.hypot(s.x - p.x, s.y - p.y, s.z - p.z), dh: Math.abs(s.heading - p.h), db: Math.abs(s.bank - p.b), dp: Math.abs(s.pitch - p.p), turn: s.avTurn || 0, lift: s.avLift || 0, mode: s.mode });
+        prev[i] = { x: s.x, y: s.y, z: s.z, h: s.heading, b: s.bank, p: s.pitch, mode: s.mode }; }); }
+    return out;
+  },
   add: function(kind, src, fill){ var im = new Image(); im.src = src; return new Promise(function(r){ im.onload = function(){ addCreature(kind, fill ? cropToFill(im) : im); r(); }; }); },
   manual: function(){ auto = false; },
   tick: function(dt){ T += dt; step(dt); draw(); },
