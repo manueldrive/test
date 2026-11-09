@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Shark Coloring Sheet</title>
-<link rel="stylesheet" href="css/lagoon.css?v=202611081705">
+<link rel="stylesheet" href="css/lagoon.css?v=202611091216">
 <style>
 main{max-width:980px;margin:0 auto;display:grid;gap:18px;padding-block:28px;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
@@ -21,12 +21,13 @@ main ul{margin:0;padding-left:20px;display:grid;gap:6px;line-height:1.4;color:va
   .paper svg{width:11in;height:8.5in}
 }
 </style>
-<script src="js/shark-core.js?v=202611081705"></script>
+<script src="js/shark-core.js?v=202611091216"></script>
+<script src="js/creatures3d.js?v=202611091216"></script>
 </head>
 <body>
 <main>
   <div class="noprint" style="display:grid;gap:12px">
-    <h1>Shark coloring sheet</h1>
+    <h1 id="sheetTitle">Shark coloring sheet</h1>
     <ul>
       <li>Print on US Letter paper, landscape, at 100% size ("Actual size", not "Fit to page").</li>
       <li>Print in black and white. The 4 corner squares are how the app finds the drawing, so don't cut them off.</li>
@@ -45,6 +46,8 @@ main ul{margin:0;padding-left:20px;display:grid;gap:6px;line-height:1.4;color:va
     out.push('<rect x="'+(c[0]-m)+'" y="'+(c[1]-m)+'" width="'+S.marker+'" height="'+S.marker+'" fill="#000"/>');
     out.push('<rect x="'+(c[0]-h)+'" y="'+(c[1]-h)+'" width="'+S.hole+'" height="'+S.hole+'" fill="#fff"/>');
   });
+  var kind = new URLSearchParams(location.search).get('c'), D = window.Creatures3D && Creatures3D.DEFS[kind];
+  if (D && D.code && D.rig) { creatureSheet(D, out); svg.innerHTML = out.join(''); return; }
   out.push('<text x="550" y="164" text-anchor="middle" font-family="Lilita One, Arial Rounded MT Bold, Arial Black, sans-serif" font-size="84" fill="#000">Color your shark!</text>');
   // outline of the whole silhouette: stroke every part, then fill every part white on top
   var parts = SharkCore.sheetOutlinePath().split(/(?=M)/);
@@ -54,6 +57,43 @@ main ul{margin:0;padding-left:20px;display:grid;gap:6px;line-height:1.4;color:va
   out.push('<circle cx="'+ex.toFixed(1)+'" cy="'+ey.toFixed(1)+'" r="13" fill="none" stroke="#b9c3ca" stroke-width="3"/>');
   out.push('<text x="550" y="742" text-anchor="middle" textLength="680" lengthAdjust="spacingAndGlyphs" font-family="Nunito, Arial, sans-serif" font-weight="800" font-size="19" fill="#a7b0b6">Color the whole shark, then snap a photo with the QR code on the big screen</text>');
   svg.innerHTML = out.join('');
+
+  // a creature's sheet: same corners and drawing area as the shark sheet, plus its code squares
+  function creatureSheet(D, out){
+    document.getElementById('sheetTitle').textContent = D.label + ' coloring sheet';
+    document.title = D.label + ' Coloring Sheet';
+    out.push('<text x="550" y="164" text-anchor="middle" font-family="Lilita One, Arial Rounded MT Bold, Arial Black, sans-serif" font-size="84" fill="#000">' + D.sheetTitle + '</text>');
+    var R = S.region, B = D.box, k = R.w / B.w;
+    function toPath(fn){ var d = [];
+      function P(x, y){ return ((x - B.x) * k + R.x).toFixed(1) + ' ' + ((y - B.y) * k + R.y).toFixed(1); }
+      fn({ beginPath: function(){}, moveTo: function(x, y){ d.push('M' + P(x, y)); }, lineTo: function(x, y){ d.push('L' + P(x, y)); },
+        quadraticCurveTo: function(a, b, x, y){ d.push('Q' + P(a, b) + ' ' + P(x, y)); }, bezierCurveTo: function(a, b, e, f, x, y){ d.push('C' + P(a, b) + ' ' + P(e, f) + ' ' + P(x, y)); },
+        closePath: function(){ d.push('Z'); },
+        ellipse: function(cx, cy, rx, ry, rot){ // as a path: 4 arcs
+          var c = Math.cos(rot), s2 = Math.sin(rot);
+          function pt(a){ var x = Math.cos(a) * rx, y = Math.sin(a) * ry; return [cx + x * c - y * s2, cy + x * s2 + y * c]; }
+          var p0 = pt(0); d.push('M' + P(p0[0], p0[1]));
+          for (var i = 1; i <= 4; i++){ var q = pt(i * Math.PI / 2); d.push('A' + (rx * k).toFixed(1) + ' ' + (ry * k).toFixed(1) + ' ' + (rot * 180 / Math.PI).toFixed(1) + ' 0 1 ' + P(q[0], q[1])); }
+        } });
+      return d.join(' ');
+    }
+    var body = D.rig.body.map(toPath), limbs = D.rig.limbs.map(function(l){ return toPath(l.part); });
+    // limbs first (behind), then the body's merged outline on top
+    limbs.forEach(function(d){ out.push('<path d="' + d + '" fill="#fff" stroke="#7d8d98" stroke-width="6" stroke-linejoin="round"/>'); });
+    body.forEach(function(d){ out.push('<path d="' + d + '" fill="none" stroke="#7d8d98" stroke-width="8" stroke-linejoin="round"/>'); });
+    body.forEach(function(d){ out.push('<path d="' + d + '" fill="#fff"/>'); });
+    // shell pattern and face, lightly, so kids can color each section
+    if (D.label === 'Sea turtle'){
+      (D.pattern || []).forEach(function(q){ out.push('<path d="' + toPath(function(g){ g.moveTo(q[0], q[1]); g.quadraticCurveTo(q[2], q[3], q[4], q[5]); }) + '" fill="none" stroke="#b9c3ca" stroke-width="4" stroke-linecap="round"/>'); });
+      var e = D.rig.eyes.at; out.push('<circle cx="' + ((e[0] - B.x) * k + R.x).toFixed(1) + '" cy="' + ((e[1] - B.y) * k + R.y).toFixed(1) + '" r="14" fill="none" stroke="#b9c3ca" stroke-width="3"/>');
+    }
+    // creature code squares (the scanner reads these)
+    var K = S.code; D.code.split('').forEach(function(b, i){
+      var y = K.ys[i] - K.size / 2, x = K.x - K.size / 2;
+      out.push(b === '1' ? '<rect x="' + x + '" y="' + y + '" width="' + K.size + '" height="' + K.size + '" fill="#000"/>' : '');
+    });
+    out.push('<text x="550" y="742" text-anchor="middle" textLength="680" lengthAdjust="spacingAndGlyphs" font-family="Nunito, Arial, sans-serif" font-weight="800" font-size="19" fill="#a7b0b6">Color your ' + D.label.toLowerCase() + ', then snap a photo with the QR code on the big screen</text>');
+  }
 })();
 </script>
 </body>

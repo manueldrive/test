@@ -16,8 +16,11 @@
     // the area that becomes the shark skin (same aspect as BOX)
     region: { x: 150, y: 228, w: 800, h: 800 * BOX.h / BOX.w },
     title: { x: 200, y: 92, w: 700, h: 86 },     // bold title band (orientation check)
-    footer: { x: 200, y: 700, w: 700, h: 60 }    // quiet footer band
+    footer: { x: 200, y: 700, w: 700, h: 60 },   // quiet footer band
+    // creature code: three small squares in the left margin (filled = 1). Shark sheets have none (000).
+    code: { x: 85, ys: [330, 425, 520], size: 44 }
   };
+  var CODES = { '000': 'shark', '100': 'turtle', '010': 'whale', '110': 'fish', '001': 'jelly', '101': 'seahorse', '011': 'octopus' };
 
   /* ---------- Shark outline ---------- */
   function sharkPath(c, s) {
@@ -472,6 +475,23 @@
     var dA = bandDarkness(mA, sample, SHEET.title) - bandDarkness(mA, sample, SHEET.footer);
     var map = dA >= 0 ? mA : mB;
 
+    // which creature is this sheet for? compare each code square with the paper right next to it
+    function lum(x0, y0, half, n) {
+      var t = 0, px2 = [0, 0, 0];
+      for (var yy = 0; yy < n; yy++) for (var xx = 0; xx < n; xx++) {
+        var q = map(x0 - half + (xx + .5) / n * half * 2, y0 - half + (yy + .5) / n * half * 2); sample(q[0], q[1], px2);
+        t += (px2[0] + px2[1] + px2[2]) / 3;
+      }
+      return t / (n * n);
+    }
+    var K = SHEET.code, bits = '';
+    K.ys.forEach(function (cy) {
+      var inner = lum(K.x, cy, K.size * .3, 5);
+      var paperNear = Math.max(lum(K.x, cy - K.size * .95, K.size * .18, 3), lum(K.x, cy + K.size * .95, K.size * .18, 3));
+      bits += inner < paperNear * .5 ? '1' : '0';
+    });
+    var kind = CODES[bits] || 'shark';
+
     // paper color, fitted as a smooth surface from the blank margins around the drawing,
     // so shadows and uneven light across the sheet are evened out
     var px = [0, 0, 0], pts = [];
@@ -510,12 +530,12 @@
       var k = (v * TEX_W + u) * 4; d[k] = r; d[k + 1] = g; d[k + 2] = b; d[k + 3] = 255;
     }
     og.putImageData(od, 0, 0);
-    if (colored < TEX_W * TEX_H * 0.008) return { ok: false, reason: 'blank', canvas: out };
-    return { ok: true, canvas: out, dataUrl: out.toDataURL('image/jpeg', 0.82) };
+    if (colored < TEX_W * TEX_H * 0.008) return { ok: false, reason: 'blank', canvas: out, kind: kind };
+    return { ok: true, canvas: out, dataUrl: out.toDataURL('image/jpeg', 0.82), kind: kind, code: bits };
   }
 
   global.SharkCore = {
-    BOX: BOX, TEX_W: TEX_W, TEX_H: TEX_H, SHEET: SHEET,
+    BOX: BOX, TEX_W: TEX_W, TEX_H: TEX_H, SHEET: SHEET, CODES: CODES,
     sharkPath: sharkPath, drawShark: drawShark, Shark3D: Shark3D, sheetOutlinePath: sheetOutlinePath,
     makeScene: makeScene, scanSheet: scanSheet,
     reasonText: function (r) {
