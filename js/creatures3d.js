@@ -241,8 +241,33 @@
     }
     function puff(dd) { var t = Math.min(1, dd / DD); return HH * Math.sqrt(t * (2 - t)) * (.42 + .58 * t); }
     var n = verts.length, pos = new Float32Array(n * 6), uv = new Float32Array(n * 4), faces = [];
+    // 1) heights, then smooth them over the grid: the raw distance field has creases along the middle
+    //    of each shape, which made bodies look faceted. The rim stays at zero.
+    var h = new Float64Array(n), rim = new Uint8Array(n), nb = [];
+    for (i = 0; i < n; i++) { h[i] = puff(verts[i][2]); nb.push([]); }
+    for (j = 0; j < ny; j++) for (i = 0; i < nx; i++) {
+      var me = idx[j * nx + i]; if (me < 0) continue;
+      if (!ins[j * nx + i]) rim[me] = 1;
+      [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, -1], [1, -1], [-1, 1]].forEach(function (o) {
+        var ii = i + o[0], jj = j + o[1]; if (ii < 0 || jj < 0 || ii >= nx || jj >= ny) return;
+        var q = idx[jj * nx + ii]; if (q >= 0) nb[me].push(q);
+      });
+    }
+    var h2 = new Float64Array(n);
+    for (var pass = 0; pass < 14; pass++) {
+      for (i = 0; i < n; i++) { if (rim[i] || !nb[i].length) { h2[i] = h[i]; continue; } var sum = 0; for (var q2 = 0; q2 < nb[i].length; q2++) sum += h[nb[i][q2]]; h2[i] = .5 * h[i] + .5 * sum / nb[i].length; }
+      var tmp = h; h = h2; h2 = tmp;
+    }
+    // 2) texture coordinates: near the rim, read the drawing a little way inside the outline, so the
+    //    printed outline on the sheet doesn't wrap onto the creature's back as a dark seam
+    var INSET = 3.2, gs = .9;
     for (i = 0; i < n; i++) {
-      var v = verts[i], z = puff(v[2]), u = (v[0] - B.x) / B.w, vv = 1 - (v[1] - B.y) / B.h;
+      var v = verts[i], sx = v[0], sy = v[1], dd0 = v[2];
+      if (dd0 < INSET) {
+        var gx = dAt(sx + gs, sy) - dAt(sx - gs, sy), gy = dAt(sx, sy + gs) - dAt(sx, sy - gs), gl = Math.hypot(gx, gy);
+        if (gl > 1e-6) { sx += gx / gl * (INSET - dd0); sy += gy / gl * (INSET - dd0); }
+      }
+      var z = h[i], u = (sx - B.x) / B.w, vv = 1 - (sy - B.y) / B.h;
       pos.set([v[0], -v[1], z], i * 3); pos.set([v[0], -v[1], -z], (n + i) * 3);
       uv.set([u, vv], i * 2); uv.set([u, vv], (n + i) * 2);
     }
@@ -346,7 +371,7 @@
     var p = this.pos, bp = this.base, ph = this.phase, o = this.tmp, df = this.def.deform;
     for (var i = 0; i < p.length; i += 3) { df(bp[i], -bp[i + 1], bp[i + 2], ph, o); p[i] = o[0]; p[i + 1] = -o[1]; p[i + 2] = o[2]; }
     this.geo.attributes.position.needsUpdate = true;
-    if ((this.n++ & 3) === 0) this.geo.computeVertexNormals();
+    this.geo.computeVertexNormals();
     if (!rig) return;
     // every so often, stop rowing and glide with flippers swept back, then start again
     this.glideT -= dt;
