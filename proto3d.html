@@ -67,22 +67,93 @@ function addShark(img){
   newTarget(s); scene.add(s.group); sharks.push(s);
   return s;
 }
+/* ---- keeping sharks from swimming through each other ----
+   Each shark is treated as a capsule along its body. Sharks look ahead about a second and steer
+   away early (mostly dodging over or under, like real fish), the one behind slows down, and if two
+   still get too close they are eased apart. */
+var AVOID = true;
+function axis(s, ahead){
+  var cp = Math.cos(s.pitch), dir = [Math.cos(s.heading) * cp, Math.sin(s.pitch), -Math.sin(s.heading) * cp];
+  var v = s.speed * (ahead || 0), L = 100 * s.size;
+  var cx = s.x + dir[0] * v, cy = s.y + dir[1] * v, cz = s.z + dir[2] * v;
+  return { a: [cx - dir[0] * L, cy - dir[1] * L, cz - dir[2] * L], b: [cx + dir[0] * L * .9, cy + dir[1] * L * .9, cz + dir[2] * L * .9], c: [cx, cy, cz], dir: dir };
+}
+// closest points between two segments (standard method); returns [distance, pointOnA, pointOnB]
+function segDist(p1, q1, p2, q2){
+  var d1 = sub(q1, p1), d2 = sub(q2, p2), r = sub(p1, p2), a = dot(d1, d1), e = dot(d2, d2), f = dot(d2, r), s, t;
+  var c = dot(d1, r), b = dot(d1, d2), den = a * e - b * b;
+  s = den > 1e-6 ? clamp((b * f - c * e) / den) : 0;
+  t = (b * s + f) / e;
+  if (t < 0) { t = 0; s = clamp(-c / a); } else if (t > 1) { t = 1; s = clamp((b - c) / a); }
+  var c1 = add(p1, mul(d1, s)), c2 = add(p2, mul(d2, t));
+  return [Math.sqrt(dot(sub(c1, c2), sub(c1, c2))), c1, c2];
+}
+function sub(a, b){ return [a[0]-b[0], a[1]-b[1], a[2]-b[2]]; } function add(a, b){ return [a[0]+b[0], a[1]+b[1], a[2]+b[2]]; }
+function mul(a, k){ return [a[0]*k, a[1]*k, a[2]*k]; } function dot(a, b){ return a[0]*b[0] + a[1]*b[1] + a[2]*b[2]; }
+function clamp(x){ return x < 0 ? 0 : x > 1 ? 1 : x; }
+
+function avoidance(dt){
+  for (var i = 0; i < sharks.length; i++) { sharks[i].avTurn = 0; sharks[i].avLift = 0; sharks[i].avSlow = 0; }
+  for (i = 0; i < sharks.length; i++) for (var j = i + 1; j < sharks.length; j++) {
+    var A = sharks[i], B = sharks[j], ex = A.x - B.x, ey = A.y - B.y, ez = A.z - B.z;
+    if (ex*ex + ey*ey + ez*ez > 520*520) continue;
+    var R = 46 * (A.size + B.size);                       // comfortable gap between two bodies
+    // look ahead ~1s: steer early so dodges look calm
+    var fa = axis(A, .9), fb = axis(B, .9), fut = segDist(fa.a, fa.b, fb.a, fb.b);
+    var na = axis(A, 0), nb = axis(B, 0), now = segDist(na.a, na.b, nb.a, nb.b);
+    var d = Math.min(fut[0], now[0]);
+    if (d > R * 1.25) continue;
+    var w = Math.min(1, (R * 1.25 - d) / R), pa = fut[0] < now[0] ? fut[1] : now[1], pb = fut[0] < now[0] ? fut[2] : now[2];
+    var n = sub(pa, pb), len = Math.sqrt(dot(n, n)) || 1; n = mul(n, 1 / len);
+    if (len < 1) n = [0, A.y >= B.y ? 1 : -1, 0];
+    // dodge mostly vertically: the higher shark rises, the lower one dips
+    var up = (n[1] >= 0 ? 1 : -1) * Math.max(.6, Math.abs(n[1]));
+    A.avLift += up * w; B.avLift -= up * w;
+    // and turn away sideways: which way to turn depends on where the other shark is
+    var sideA = na.dir[0] * (-n[2]) - na.dir[2] * (-n[0]), sideB = nb.dir[0] * n[2] - nb.dir[2] * n[0];
+    A.avTurn += (sideA > 0 ? -1 : 1) * w * .5; B.avTurn += (sideB > 0 ? -1 : 1) * w * .5;
+    // whoever is behind eases off
+    var aBehind = dot(na.dir, sub(nb.c, na.c)) > 0;
+    (aBehind ? A : B).avSlow = Math.max((aBehind ? A : B).avSlow, w * .45);
+    // last resort: if they are actually touching, ease them apart
+    if (now[0] < R * .8) {
+      var push = (R * .8 - now[0]) * Math.min(1, dt * 4), nn = sub(now[1], now[2]), l2 = Math.sqrt(dot(nn, nn)) || 1; nn = mul(nn, 1 / l2);
+      if (l2 < 1) nn = [0, 1, 0];
+      A.x += nn[0] * push * .5; A.y += nn[1] * push * .5; A.z += nn[2] * push * .5;
+      B.x -= nn[0] * push * .5; B.y -= nn[1] * push * .5; B.z -= nn[2] * push * .5;
+    }
+  }
+}
+
 function step(dt){
+  if (AVOID) avoidance(dt);
   sharks.forEach(function(s){
     var dx = s.tx - s.x, dz = s.tz - s.z, dy = s.ty - s.y;
     if (dx*dx + dz*dz < 120*120) newTarget(s);
     var want = Math.atan2(-dz, dx), diff = want - s.heading;
     while (diff > Math.PI) diff -= 2*Math.PI; while (diff < -Math.PI) diff += 2*Math.PI;
-    var turn = Math.max(-.55, Math.min(.55, diff * 1.1));    // radians per second: gentle, wide turns
+    var turn = Math.max(-.55, Math.min(.55, diff * 1.1 + (AVOID ? s.avTurn || 0 : 0) * .9));   // gentle, wide turns
     s.heading += turn * dt;
     s.bank += ((-turn * .9) - s.bank) * Math.min(1, dt * 2);
-    s.pitch += (Math.max(-.25, Math.min(.25, dy / 400)) - s.pitch) * Math.min(1, dt * 1.5);
-    var v = s.speed * (1 + Math.abs(turn) * .4);
-    s.x += Math.cos(s.heading) * v * dt; s.z -= Math.sin(s.heading) * v * dt; s.y += Math.sin(s.pitch) * v * dt;
+    var climb = Math.max(-.25, Math.min(.25, dy / 400 + (AVOID ? (s.avLift || 0) * .45 : 0)));
+    s.pitch += (Math.max(-.35, Math.min(.35, climb)) - s.pitch) * Math.min(1, dt * 2.2);
+    var v = s.speed * (1 + Math.abs(turn) * .4) * (1 - (AVOID ? s.avSlow || 0 : 0));
+    s.x += Math.cos(s.heading) * Math.cos(s.pitch) * v * dt; s.z -= Math.sin(s.heading) * Math.cos(s.pitch) * v * dt; s.y += Math.sin(s.pitch) * v * dt;
+    s.y = Math.max(-BOUNDS.y - 30, Math.min(BOUNDS.y + 20, s.y));
     s.group.position.set(s.x, s.y, s.z);
     s.group.rotation.set(s.bank, s.heading, s.pitch, 'YXZ');
     s.swim(dt, Math.abs(turn));
   });
+}
+
+// how often bodies actually pass through each other (for testing)
+function overlaps(){
+  var c = 0;
+  for (var i = 0; i < sharks.length; i++) for (var j = i + 1; j < sharks.length; j++) {
+    var A = axis(sharks[i], 0), B = axis(sharks[j], 0), d = segDist(A.a, A.b, B.a, B.b)[0];
+    if (d < 15 * (sharks[i].size + sharks[j].size)) c++;
+  }
+  return c;
 }
 
 var T = 0;
@@ -122,6 +193,12 @@ window.__proto = {
   add: function(src){ var im = new Image(); im.src = src; return new Promise(function(r){ im.onload = function(){ addShark(im); r(); }; }); },
   manual: function(){ auto = false; },
   tick: function(dt){ T += dt; step(dt); draw(); },
+  measure: function(seconds, avoid){
+    AVOID = avoid; var frames = 0, hit = 0, steps = Math.round(seconds * 30);
+    for (var k = 0; k < steps; k++){ step(1/30); var o = overlaps(); if (o) hit++; frames++; }
+    AVOID = true; return { frames: frames, framesWithOverlap: hit };
+  },
+  reset: function(){ sharks.forEach(function(s){ s.x = rand(-400, 400); s.y = rand(-110, 110); s.z = rand(BOUNDS.zMin, BOUNDS.zMax); s.heading = Math.random() * 6.28; newTarget(s); }); },
   place: function(list){ list.forEach(function(p, i){ var s = sharks[i]; if (!s) return; s.x = p[0]; s.y = p[1]; s.z = p[2]; s.heading = p[3]; if (p[4] != null){ s.tx = p[4]; s.tz = p[5]; s.ty = p[1]; } }); }
 };
 })();
