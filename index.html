@@ -56,6 +56,49 @@ h1,h2,h3{margin:0}
 .field{width:100%;min-height:56px;background:rgba(11,11,13,.7);border:1.5px solid #6b6b72;color:#F2EEE6;font:900 24px 'Playfair Display',serif;padding:0 14px}
 .field:focus{outline:none;border-color:#F2EEE6}
 .tip{background:rgba(11,11,13,.72);color:#F2EEE6;padding:16px 18px;border:1px solid #3a3a40;border-left:3px solid var(--red)}
+.rvl{scrollbar-width:none}
+.rv{opacity:0;transform:translateY(14px);animation:rvIn .7s cubic-bezier(.2,.7,.2,1) var(--d,0s) forwards}
+@keyframes rvIn{to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.rv{animation:none;opacity:1;transform:none}.rstamp{animation:none!important}}
+.rhero{position:relative;height:min(78svh,620px);flex:none;overflow:hidden}
+.rhero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 18%;filter:grayscale(1) contrast(1.15) brightness(.82)}
+.rhero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,11,13,.75) 0,transparent 22%,transparent 45%,#0b0b0d 96%),repeating-linear-gradient(-22deg,rgba(0,0,0,.25) 0 16px,transparent 16px 34px)}
+.rtop{position:absolute;z-index:2;left:20px;right:20px;top:18px;display:flex;justify-content:space-between}
+.rname{position:absolute;z-index:2;left:20px;right:20px;bottom:18px}
+.rname h1{font:900 46px/.95 'Playfair Display',serif;letter-spacing:-1px;margin:6px 0 8px;color:#F2EEE6;text-shadow:0 4px 20px rgba(0,0,0,.8)}
+.rname p{margin:0;font:400 16px 'Playfair Display',serif;color:#d8d4cc}
+.rstamp{position:absolute;z-index:3;right:16px;top:36%;font:900 64px 'Playfair Display',serif;letter-spacing:6px;color:var(--red);border:5px solid var(--red);padding:4px 16px 0;transform:rotate(-12deg);opacity:0;background:rgba(11,11,13,.25);text-shadow:0 0 18px rgba(255,59,78,.5);animation:stamp .45s cubic-bezier(.3,1.6,.5,1) 1.1s forwards;box-shadow:inset 0 0 0 2px rgba(255,59,78,.35)}
+@keyframes stamp{0%{opacity:0;transform:rotate(-12deg) scale(2.4)}100%{opacity:.92;transform:rotate(-12deg) scale(1)}}
+.rbody{position:relative;padding:8px 18px 28px;display:flex;flex-direction:column;gap:14px}
+.beat{border-left:3px solid var(--red);padding:4px 0 4px 14px}
+.beat .bk{font:700 12px 'Playfair Display',serif;letter-spacing:4px;color:#8f8f96}
+.beat .ba{font:900 28px/1.05 'Playfair Display',serif;color:#F2EEE6;margin-top:2px}
+.beat .bn{font:400 15px/1.4 'Playfair Display',serif;color:#BDB8AE;margin-top:4px}
+.rpin{width:12px;height:12px;border-radius:50%;background:var(--c);box-shadow:inset -2px -2px 0 rgba(0,0,0,.3)}
+.rpin.miss{background:none;border:1.5px solid var(--c);box-shadow:none;opacity:.6}
+.rcount{font:400 13px 'Playfair Display',serif;color:#8f8f96;margin-left:4px}
+.rsnake{margin:12px -18px 0;position:relative}
+.rsnake img{display:block;width:100%;aspect-ratio:1;object-fit:cover;filter:grayscale(1) contrast(1.1)}
+.rsnake figcaption{position:relative;margin:-90px 18px 0;background:rgba(11,11,13,.86);border:1px solid #3a3a40;padding:16px 16px 14px;display:flex;flex-direction:column;gap:6px}
+.rsnake q{font:italic 900 26px/1.1 'Playfair Display',serif;color:#F2EEE6;quotes:"“" "”"}
+.rsnake p{margin:0;font:400 15px/1.45 'Playfair Display',serif;color:#BDB8AE}
+.rh{font:900 26px 'Playfair Display',serif;color:#F2EEE6;margin:18px 0 0}
+.rchain{list-style:none;margin:0;padding:0 0 0 0;position:relative;display:flex;flex-direction:column;gap:14px}
+.rchain::before{content:"";position:absolute;left:31px;top:20px;bottom:20px;width:3px;background:var(--red);box-shadow:0 0 8px rgba(255,59,78,.6)}
+.rchain li{position:relative;display:flex;gap:14px;align-items:center}
+.rchain img{width:64px;height:64px;flex:none;object-fit:cover;border:2px solid #F2EEE6;filter:grayscale(.4);box-shadow:0 8px 16px rgba(0,0,0,.6);background:#1c1c20}
+.rchain li>div{display:flex;flex-direction:column;gap:1px}
+.rchain b{font:900 18px/1.15 'Playfair Display',serif;color:#F2EEE6}
+.rchain p{margin:0;font:400 14px/1.4 'Playfair Display',serif;color:#BDB8AE}
+.rnext{margin:6px 0 0;font:italic 700 17px/1.4 'Playfair Display',serif;color:#F2EEE6;border-top:1px solid #2c2c31;padding-top:14px}
+.rboard{border-top:1px solid #2c2c31}
+.rrow{display:flex;align-items:center;gap:12px;min-height:56px;border-bottom:1px solid #2c2c31}
+.rrow .pin{width:14px;height:14px;border-radius:50%;flex:none;box-shadow:inset -2px -2px 0 rgba(0,0,0,.3)}
+.rrow b{font:900 20px 'Playfair Display',serif;color:#F2EEE6}
+.rrank{width:18px;font:700 14px 'Playfair Display',serif;color:#8f8f96}
+.rbest{font:700 10px 'Playfair Display',serif;letter-spacing:2px;color:#0b0b0d;background:#F2EEE6;padding:3px 6px}
+.rpts{margin-left:auto;font:900 26px 'Playfair Display',serif;color:#F2EEE6}.rpts small{font-size:13px;color:#8f8f96}
+.rrow.top .rpts{color:var(--red)}
 .sw{display:flex;gap:12px}.sw button{width:44px;height:44px;border-radius:50%;border:3px solid transparent;box-shadow:inset -3px -3px 0 rgba(0,0,0,.28)}
 .sw button[aria-pressed=true]{border-color:#F2EEE6;outline:2px solid #0b0b0d;outline-offset:-5px}
 .blinds{background:repeating-linear-gradient(-22deg,rgba(0,0,0,.6) 0 16px,transparent 16px 34px),radial-gradient(ellipse at 78% 8%,rgba(255,194,61,.28),transparent 55%),var(--bg)}
@@ -399,15 +442,36 @@ function vote() {
 }
 function score(x) { return (x.who === ANSWER.who) + (x.how === ANSWER.how) + (x.why === ANSWER.why); }
 function reveal() {
-  const all = [{p:'me', ...S.vote}, ...Object.entries(S.bots).map(([p, x]) => ({p, ...x}))];
-  const mine = score(S.vote), ck = (a, b) => a === b ? '<span class="ok">✓</span>' : '<span class="no">✗</span>';
-  return `<section class="scr"><div class="lbl amber">SOLUTION · CASE 0221</div>
-    <div class="row"><img src="${IMG('suspect-roylott')}" alt="" style="width:88px;height:110px;object-fit:cover;object-position:top;filter:grayscale(1)"><div><span class="stamp" style="display:inline-block;font-size:22px;margin:6px 0 8px">${mine === 3 ? 'CASE CLOSED' : 'GUILTY'}</span><h2 class="serif" style="font:900 24px/1.1 'Playfair Display'">Dr. Grimesby Roylott</h2></div></div>
-    <p style="margin:0;color:#d8d8dc">He sent a <b>swamp adder</b> through the ventilator. It climbed down the fake bell-rope onto Julia's bed and bit her. A whistle called it back, and he locked it in his iron safe. Julia's wedding would have cut into the money he controlled under her mother's will.</p>
-    <p style="margin:0;font:italic 700 18px/1.35 'Playfair Display';border-left:3px solid var(--red);padding-left:12px">The speckled band was the snake.</p>
-    <table><thead><tr><th>DETECTIVE</th><th>WHO</th><th>HOW</th><th>WHY</th><th>PTS</th></tr></thead><tbody>${all.map(x => `<tr><td><span class="dot" style="display:inline-block;background:${P_(x.p).c};margin-right:6px"></span>${P_(x.p).n}</td><td>${SUS.find(s => s.id === x.who).s} ${ck(x.who, ANSWER.who)}</td><td>${ck(x.how, ANSWER.how)}</td><td>${ck(x.why, ANSWER.why)}</td><td><b>${score(x)}</b></td></tr>`).join('')}</tbody></table>
-    <details><summary style="cursor:pointer;font-weight:700;min-height:44px;display:flex;align-items:center">How the clues connect</summary><ol style="margin:0;padding-left:20px;color:#cfcfd4;font-size:14px"><li>The room was sealed, so no one came through the door or window.</li><li>A vent into Roylott's room was fitted just before she died.</li><li>The bell-rope rings nothing and runs from the vent to the pillow; the bed can't move.</li><li>The whistle and the clang match calling an animal back and shutting the safe.</li><li>Milk on the safe and a looped leash: he keeps and handles a creature.</li><li>The will and the wedding give him the motive.</li></ol></details>
-    <div class="grow"></div><button class="btn ghost" data-a="again">PLAY AGAIN</button></section>`;
+  const all = [{p:'me', ...S.vote}, ...Object.entries(S.bots).map(([p, x]) => ({p, ...x}))].map(x => ({...x, pts:score(x)})).sort((a, b) => b.pts - a.pts);
+  const pins = key => all.map(x => `<span class="rpin${x[key] === ANSWER[key] ? '' : ' miss'}" style="--c:${P_(x.p).c}" title="${esc(P_(x.p).n)}"></span>`).join('');
+  const got = key => all.filter(x => x[key] === ANSWER[key]).length;
+  const beat = (n, k, ans, note) => `<div class="beat rv" style="--d:${n * 0.12 + 0.5}s"><div class="bk">${k}</div><div class="ba">${ans}</div><div class="bn">${note}</div><div class="row" style="gap:6px;margin-top:10px">${pins(k.toLowerCase())}<span class="rcount">${got(k.toLowerCase())} of ${all.length} detectives</span></div></div>`;
+  const chain = [
+    ['A-1', 'A-1-ventilator', 'A vent cut through to his room', 'Fitted weeks before she died. It lets in no air, only a way between the rooms.'],
+    ['A-2', 'A-2-bell-rope', 'A bell-rope that rings nothing', 'Hooked under the vent and hanging to her pillow: a ladder down.'],
+    ['A-3', 'A-3-bolted-bed', 'A bed that cannot move', 'Bolted to the floor, right under the rope.'],
+    ['A-4', '3d-saucer', 'Milk on the safe', 'He keeps no cat. Something else was fed here.'],
+    ['A-5', '3d-lash', 'A lash tied into a loop', 'Not for a dog. For catching something by the neck.'],
+    ['A-6', 'A-6-iron-safe', 'The clang in the night', 'Helen heard a whistle, then metal shutting: the safe closing on it.']
+  ];
+  return `<section class="scr noir rvl" style="padding:0;gap:0">
+    <div class="rhero"><img src="${IMG('suspect-roylott')}" alt="Dr. Grimesby Roylott">
+      <div class="rtop rv" style="--d:.1s"><span class="kick">THE SEALED ENVELOPE</span><span class="kick" style="letter-spacing:2px">CASE 0221</span></div>
+      <span class="rstamp">GUILTY</span>
+      <div class="rname rv" style="--d:.3s"><div class="kick" style="color:#d8d4cc">THE KILLER WAS</div><h1>Dr. Grimesby Roylott</h1><p>Julia’s stepfather. He slept in the room next to hers.</p></div></div>
+    <div class="rbody">
+      ${beat(1, 'WHO', 'Dr. Grimesby Roylott', 'Her stepfather, in the room next door.')}
+      ${beat(2, 'HOW', 'A snake through the vent', 'A swamp adder, sent down the bell-rope onto her bed.')}
+      ${beat(3, 'WHY', 'To keep the family money', 'Her wedding would cut into the income he controlled.')}
+      <figure class="rsnake rv" style="--d:.2s"><img src="${IMG('reveal-snake')}" onerror="this.onerror=null;this.src='${IMG('A-2-bell-rope')}'" alt="A speckled snake coiled on the bell-rope under the vent">
+        <figcaption><span class="kick" style="color:var(--red)">THE SPECKLED BAND</span><q>It was the band! The speckled band!</q><p>Julia wasn’t describing a ribbon. She saw the snake: a swamp adder, the deadliest in India, trained to come back to his whistle.</p></figcaption></figure>
+      <h2 class="rh">How he did it</h2>
+      <ol class="rchain">${chain.map(([t, im, h, d], i) => `<li class="rv" style="--d:${0.1 + i * 0.06}s"><img src="${IMG(im)}" onerror="this.onerror=null;this.style.visibility='hidden'" alt=""><div><span class="kick" style="letter-spacing:2px">${t}</span><b>${h}</b><p>${d}</p></div></li>`).join('')}</ol>
+      <p class="rnext">Helen was next. The same whistle had started outside her new room.</p>
+      <h2 class="rh">The detectives</h2>
+      <div class="rboard">${all.map((x, i) => `<div class="rrow${i === 0 ? ' top' : ''}"><span class="rrank">${i + 1}</span><span class="pin" style="background:${P_(x.p).c}"></span><b>${esc(P_(x.p).n)}</b>${i === 0 ? '<span class="rbest">BEST DETECTIVE</span>' : ''}<span class="rpts">${x.pts}<small>/3</small></span></div>`).join('')}</div>
+      <button class="cbtn" data-a="again" style="margin-top:22px">PLAY ANOTHER CASE</button>
+    </div></section>`;
 }
 function overlays() {
   let h = '';
