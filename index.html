@@ -97,7 +97,10 @@ h1,h2,h3{margin:0}
 .ev .cap{padding:8px 10px 10px;line-height:1.2}
 .ev .cap small{display:block;font:11px 'IBM Plex Mono',monospace;color:var(--mute)}
 .ev .cap b{font:700 16px 'Playfair Display',serif}
-.ev .new{position:absolute;margin:8px;background:var(--amber);color:#141414;font:600 10px 'IBM Plex Mono',monospace;letter-spacing:2px;padding:2px 6px}
+.ev .d3{position:absolute;z-index:1;right:0;margin:8px;background:rgba(11,11,13,.8);border:1px solid #6b6b72;color:#ECE8DF;font:600 10px 'IBM Plex Mono',monospace;letter-spacing:2px;padding:1px 6px}
+.evh{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-top:4px}
+.evlater{margin:-4px 0 4px;font-size:11px;color:var(--mute)}
+.ev .new{position:absolute;z-index:1;margin:8px;background:var(--amber);color:#141414;font:600 10px 'IBM Plex Mono',monospace;letter-spacing:2px;padding:2px 6px}
 .sus{display:grid;grid-template-columns:84px minmax(0,1fr);gap:12px;padding:10px;background:var(--panel);border:1px solid var(--line);border-radius:6px;text-align:left;width:100%}
 .sus img{width:84px;height:104px;object-fit:cover;object-position:top;filter:grayscale(1)}
 .sus b{font:900 20px 'Playfair Display',serif}
@@ -201,15 +204,15 @@ const ITEMS = [
   {id:'D3', kind:'doc', r:2, tag:'D-3', n:'Mrs. Stoner\'s will', sub:'Extract', style:'will', body:`<h3>Last Will &amp; Testament</h3><div class="of">of Mrs. Margaret Stoner, widow, of Stoke Moran</div><p class="first">I give and bequeath my whole income of one thousand pounds a year unto my husband, Doctor Grimesby Roylott, <b>so long as my daughters shall reside with him</b>.</p><p>Upon the marriage of either daughter, the said daughter shall receive a yearly portion of the said income for her own sole use and benefit.</p><div class="wit"><div><span class="sig" style="font-size:24px;color:#2a1d0e">E. Farrow</span><br>Witness</div><div><span class="sig" style="font-size:24px;color:#2a1d0e">T. Lyle</span><br>Witness</div></div><div class="seal">S</div>`},
   {id:'D4', kind:'doc', r:2, tag:'D-4', n:'Julia\'s letter', sub:'Found in her desk', style:'letter', body:`<div class="date">Stoke Moran, Tuesday</div><h3>Dearest Helen,</h3><p>Strange things this week. Workmen came and fitted a new ventilator high in my wall, and a bell-rope beside my bed, though I never asked for either. The ventilator opens into the doctor's room, not outside. Some nights I smell his cigars through it.</p><p>And that whistle again, at three in the morning. You must hear it too?</p><p style="text-align:right">Your loving sister,<br>Julia</p>`},
   {id:'P1', kind:'photo', r:1, tag:'Photo 1', n:'Julia\'s bedroom', img:'photo-1-bedroom', d:'The bolted bed, the bell-rope dangling to the pillow, the vent high above.'},
-  {id:'R1', kind:'ev', r:1, tag:'R-1', n:'Muddy boots', img:'R-1-muddy-boots', d:'Croft\'s work boots by the back door, caked in wet mud.', v3d:1},
-  {id:'R2', kind:'ev', r:1, tag:'R-2', n:'Train ticket', img:'ticket-front', back:'ticket-back', paper:1, d:'Found in Price\'s coat. Third class, Leatherhead to Waterloo, punched by the guard.', v3d:1},
-  {id:'A7', kind:'ev', r:1, tag:'A-7', n:'Matchbox', icon:'box', d:'Found in Julia\'s left hand, with one burnt match.', v3d:1},
-  {id:'R3', kind:'ev', r:2, tag:'R-3', n:'Helen\'s copy of the will', img:'will-front', back:'will-back', paper:1, d:'Her copy of her mother\'s will, stamped by the solicitors, with her own pencil marks.', v3d:1},
+  {id:'R1', kind:'ev', k3d:'boots', r:1, tag:'R-1', n:'Muddy boots', img:'R-1-muddy-boots', d:'Croft\'s work boots by the back door, caked in wet mud.', v3d:1},
+  {id:'R2', kind:'ev', k3d:'ticket', r:1, tag:'R-2', n:'Train ticket', img:'ticket-front', back:'ticket-back', paper:1, d:'Found in Price\'s coat. Third class, Leatherhead to Waterloo, punched by the guard.', v3d:1},
+  {id:'A7', kind:'ev', k3d:'matchbox', r:1, tag:'A-7', n:'Matchbox', icon:'box', d:'Found in Julia\'s left hand, with one burnt match.', v3d:1},
+  {id:'R3', kind:'ev', k3d:'will', r:2, tag:'R-3', n:'Helen\'s copy of the will', img:'will-front', back:'will-back', paper:1, d:'Her copy of her mother\'s will, stamped by the solicitors, with her own pencil marks.', v3d:1},
   {id:'A2', kind:'photo', r:2, tag:'A-2', n:'Bell-rope', img:'A-2-bell-rope', d:'Hangs to the pillow. Pulled, it rings nothing: the wire isn\'t attached. Hooked just under the ventilator.'},
   {id:'A3', kind:'photo', r:2, tag:'A-3', n:'Bolted bed', img:'A-3-bolted-bed', d:'Bolted to the floor, so it can\'t be moved away from the rope.'},
   {id:'A1', kind:'photo', r:2, tag:'A-1', n:'Ventilator', icon:'vent', d:'A small vent high in Julia\'s wall. It opens into Roylott\'s room, not outside.'},
-  {id:'A4', kind:'ev', r:3, tag:'A-4', n:'Saucer of milk', img:'A-4-saucer', d:'On top of the iron safe in Roylott\'s room. He keeps no cat.', v3d:1},
-  {id:'A5', kind:'ev', r:3, tag:'A-5', n:'Looped dog lash', img:'A-5-dog-lash', d:'By Roylott\'s bed, its end tied into a small loop.', v3d:1},
+  {id:'A4', kind:'ev', k3d:'saucer', r:3, tag:'A-4', n:'Saucer of milk', img:'A-4-saucer', d:'On top of the iron safe in Roylott\'s room. He keeps no cat.', v3d:1},
+  {id:'A5', kind:'ev', k3d:'lash', r:3, tag:'A-5', n:'Looped dog lash', img:'A-5-dog-lash', d:'By Roylott\'s bed, its end tied into a small loop.', v3d:1},
   {id:'A6', kind:'photo', r:3, tag:'A-6', n:'Iron safe', img:'A-6-iron-safe', d:'A heavy safe in Roylott\'s room. Its door clangs shut.'}
 ];
 const ICON = {
@@ -355,8 +358,11 @@ function files() {
     <div class="grow"></div>${readyBar()}`;
 }
 function evidence() {
-  const ev = ITEMS.filter(i => i.kind !== 'doc');
-  return `<div class="grid">${ev.map(e => e.r <= S.round ? `<button class="ev" data-a="open" data-v="${e.id}" style="position:relative">${!S.seen.has(e.id) ? '<span class="new">NEW</span>' : ''}<div class="im" style="${e.img ? `background-image:url(${IMG(e.img)});${e.paper ? 'background-size:86%;background-repeat:no-repeat;background-color:#121214;filter:none' : ''}` : ''}">${e.img ? '' : svgI(e.icon)}</div><div class="cap"><small>${e.tag} · ${e.kind === 'photo' ? 'at the scene' : 'bagged'}</small><b>${e.n}</b></div></button>` : `<div class="ev lock"><div class="im">${svgI('box').replace('#ECE8DF', '#6B6B72')}</div><div class="cap"><small>${e.tag}</small><b>Round ${e.r}</b></div></div>`).join('')}</div>
+  const tile = e => `<button class="ev" data-a="open" data-v="${e.id}" style="position:relative">${!S.seen.has(e.id) ? '<span class="new">NEW</span>' : ''}${e.kind === 'ev' ? '<span class="d3">3D</span>' : ''}<div class="im" style="${e.img ? `background-image:url(${IMG(e.img)});${e.paper ? 'background-size:86%;background-repeat:no-repeat;background-color:#121214;filter:none' : ''}` : ''}">${e.img ? '' : svgI(e.icon)}</div><div class="cap"><small>${e.tag}</small><b>${e.n}</b></div></button>`;
+  const group = (kind, title, note) => { const all = ITEMS.filter(i => i.kind === kind), open = all.filter(i => i.r <= S.round), later = all.length - open.length;
+    return `<div class="evh"><span class="lbl">${title}</span><span class="mono" style="font-size:11px;color:var(--mute)">${note}</span></div>
+      <div class="grid">${open.map(tile).join('')}</div>${later ? `<p class="mono evlater">+${later} more in later rounds</p>` : ''}`; };
+  return `${group('ev', 'BAGGED BY POLICE', 'spin in 3D')}${group('photo', 'AT THE SCENE', 'too big to move · photos')}
     ${readyBar()}`;
 }
 function suspects() {
@@ -434,7 +440,8 @@ function pinMoment(name) { S.sheet = null; S.ov = `<div class="lbl amber">YOU FO
 function openItem(id) {
   const it = ITEMS.find(i => i.id === id); S.seen.add(id);
   const pinBtn = pinned(id) ? `<button class="btn ghost" disabled>PINNED BY ${P_(pinned(id).by).n.toUpperCase()}</button>` : `<button class="btn" data-a="pin" data-v="${id}">PIN TO BOARD</button>`;
-  if (it.kind === 'doc') S.sheet = `<div class="paper ${it.style || ''}">${it.body}</div>${pinBtn}<button class="btn ghost" data-a="close">CLOSE</button>`;
+  if (it.k3d) S.sheet = `<div class="row" style="align-items:baseline"><div class="grow"><div class="lbl">${it.tag} · BAGGED EVIDENCE</div><h2 class="serif" style="font:900 26px/1.1 'Playfair Display';margin-top:2px">${it.n}</h2></div></div><iframe src="${VIEWER}index.html?item=${it.k3d}&embed=1" title="${it.n} in 3D" style="width:100%;height:min(54vh,460px);border:0;border-radius:6px;background:#08080a" allow="fullscreen"></iframe><p style="margin:0;color:#d8d8dc">${it.d}</p>${pinBtn}<button class="btn ghost" data-a="close">CLOSE</button>`;
+  else if (it.kind === 'doc') S.sheet = `<div class="paper ${it.style || ''}">${it.body}</div>${pinBtn}<button class="btn ghost" data-a="close">CLOSE</button>`;
   else S.sheet = `${it.paper ? `<div style="background:#121214;border-radius:4px;padding:14px;display:grid;place-items:center"><img id="pimg" src="${IMG(it.img)}" data-f="${IMG(it.img)}" data-b="${IMG(it.back)}" alt="${it.n}, front" style="max-width:100%;max-height:52vh;box-shadow:0 10px 24px rgba(0,0,0,.6);transition:transform .35s"></div><button class="btn ghost" data-a="flip">TURN IT OVER</button>` : it.img ? `<img src="${IMG(it.img)}" alt="${it.n}" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:4px;filter:grayscale(.3)">` : `<div style="aspect-ratio:4/3;display:grid;place-items:center;background:#1c1c20;border-radius:4px">${svgI(it.icon)}</div>`}
     <div><div class="lbl">${it.tag} · ${it.kind === 'photo' ? 'AT THE SCENE' : 'BAGGED EVIDENCE'}</div><h2 class="serif" style="font:900 28px/1.1 'Playfair Display';margin-top:4px">${it.n}</h2><p style="margin:6px 0 0;color:#d8d8dc">${it.d}</p></div>
     ${it.v3d ? `<a class="btn ghost" href="${VIEWER}" style="text-decoration:none">INSPECT IN 3D</a>` : ''}${pinBtn}<button class="btn ghost" data-a="close">CLOSE</button>`;
