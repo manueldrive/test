@@ -26,6 +26,37 @@ h1,h2,h3{margin:0}
 .big span{color:var(--red)}
 .lbl{font:12px 'IBM Plex Mono',monospace;letter-spacing:3px;color:var(--mute)}
 .amber{color:var(--amber)}
+.noir{position:relative;background:radial-gradient(ellipse at 50% 38%,#26262b 0%,#0b0b0d 62%)}
+.noir::before{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(-22deg,rgba(0,0,0,.25) 0 16px,transparent 16px 34px),radial-gradient(ellipse at 78% 8%,rgba(235,235,240,.08),transparent 55%),repeating-linear-gradient(104deg,transparent 0 22px,rgba(255,255,255,.025) 22px 23px)}
+.noir>*{position:relative}
+.cz{font-family:Cinzel,serif;font-weight:800;letter-spacing:4px}
+.kick{font:600 12px Cinzel,serif;letter-spacing:5px;color:#BDB8AE}
+.back{width:44px;height:44px;border:1px solid #3a3a40;background:rgba(11,11,13,.6);border-radius:50%;font-size:20px;line-height:1;display:flex;align-items:center;justify-content:center;flex:none}
+.mini{font:900 26px/.9 'Playfair Display',serif;letter-spacing:-.5px}.mini span{color:var(--red)}
+.cbtn{min-height:58px;width:100%;border:0;background:#F2EEE6;color:#0b0b0d;font:800 16px Cinzel,serif;letter-spacing:5px;display:flex;align-items:center;justify-content:center}
+.cbtn:disabled{background:#2a2a2e;color:#8a8a90;cursor:default}
+.ticket{position:relative;background:#F2EEE6;color:#0b0b0d;padding:16px 18px 14px;text-align:center;box-shadow:0 18px 36px rgba(0,0,0,.7);transform:rotate(-1.2deg);-webkit-mask:radial-gradient(circle 10px at 0 50%,#0000 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 10px at 100% 50%,#0000 98%,#000) right/51% 100% no-repeat;mask:radial-gradient(circle 10px at 0 50%,#0000 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 10px at 100% 50%,#0000 98%,#000) right/51% 100% no-repeat}
+.ticket .rc{font:900 64px/1.15 'Playfair Display',serif;margin-bottom:2px;letter-spacing:14px;margin-right:-14px}
+.ticket small{display:block;font:italic 14px 'Old Standard TT',serif;color:#4A4740}
+.seg{display:grid;grid-template-columns:1fr 1fr;border:1px solid #4a4a50}
+.seg button{background:none;border:0;min-height:64px;padding:8px 10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:#BDB8AE}
+.seg button+button{border-left:1px solid #4a4a50}
+.seg button b{font:800 14px Cinzel,serif;letter-spacing:3px;color:inherit}
+.seg button small{font:italic 12px 'Old Standard TT',serif}
+.seg button[aria-pressed=true]{background:#F2EEE6;color:#0b0b0d}
+.det{display:flex;align-items:center;gap:12px;min-height:50px;border-bottom:1px solid #2c2c31}
+.det .pin{width:14px;height:14px;border-radius:50%;flex:none;box-shadow:inset -2px -2px 0 rgba(0,0,0,.3),0 2px 4px rgba(0,0,0,.6)}
+.det b{font:italic 900 21px 'Playfair Display',serif}
+.det em{margin-left:auto;font:600 11px Cinzel,serif;letter-spacing:3px;font-style:normal;color:#8f8f96}
+.det.open{color:#6f6f76}.det.open .pin{background:none;border:1.5px dashed #5a5a60;box-shadow:none}
+.boxes{position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.boxes span{height:82px;border:1.5px solid #6b6b72;background:rgba(11,11,13,.7);display:flex;align-items:center;justify-content:center;font:900 52px 'Playfair Display',serif;color:#F2EEE6}
+.boxes span.on{border-color:#F2EEE6;box-shadow:0 0 0 1px #F2EEE6}
+.boxes input{position:absolute;inset:0;width:100%;opacity:0;font-size:16px;text-transform:uppercase}
+.field{width:100%;min-height:56px;background:rgba(11,11,13,.7);border:1.5px solid #6b6b72;color:#F2EEE6;font:italic 900 24px 'Playfair Display',serif;padding:0 14px}
+.field:focus{outline:none;border-color:#F2EEE6}
+.sw{display:flex;gap:12px}.sw button{width:44px;height:44px;border-radius:50%;border:3px solid transparent;box-shadow:inset -3px -3px 0 rgba(0,0,0,.28)}
+.sw button[aria-pressed=true]{border-color:#F2EEE6;outline:2px solid #0b0b0d;outline-offset:-5px}
 .blinds{background:repeating-linear-gradient(-22deg,rgba(0,0,0,.6) 0 16px,transparent 16px 34px),radial-gradient(ellipse at 78% 8%,rgba(255,194,61,.28),transparent 55%),var(--bg)}
 .tag{position:relative;background:var(--paper);color:#141414;border-radius:6px;padding:14px 18px 14px 54px;transform:rotate(-1.5deg);box-shadow:0 14px 30px rgba(0,0,0,.6)}
 .tag::before{content:"";position:absolute;left:18px;top:50%;width:18px;height:18px;margin-top:-9px;border-radius:50%;background:var(--bg);box-shadow:inset 0 0 0 4px #CFC9BC}
@@ -203,12 +234,12 @@ let timerId = null, botId = null, toastId = null;
 
 /* ---------- renderers ---------- */
 function render() {
-  const f = {title, lobby, brief, game, vote, reveal}[S.screen];
+  const f = {title, lobby, join, joined, brief, game, vote, reveal}[S.screen];
   app.innerHTML = f() + overlays();
   if (S.screen === 'game' && S.tab === 'board') drawStrings();
 }
 function title() {
-  return `<section class="scr" style="position:relative;padding:0;min-height:780px;overflow:hidden;background:radial-gradient(ellipse at 50% 38%,#26262b 0%,#0b0b0d 62%);color:#F2EEE6;font-family:'Old Standard TT',serif">
+  return `<section class="scr" style="position:relative;padding:0;min-height:780px;overflow:hidden;background:radial-gradient(ellipse at 50% 38%,#26262b 0%,#0b0b0d 62%);color:#F2EEE6;font-family:'Old Standard TT',serif"><div style="position:absolute;inset:0;background:repeating-linear-gradient(-22deg,rgba(0,0,0,.25) 0 16px,transparent 16px 34px),radial-gradient(ellipse at 78% 8%,rgba(235,235,240,.08),transparent 55%)"></div>
   <div style="position: absolute; left: -120px; top: -40px; width: 300px; height: 900px; background: linear-gradient(90deg, transparent, rgba(255,250,235,0.07), transparent); transform: rotate(24deg); transform-origin: top"></div>
   <div style="position: absolute; right: -140px; top: -40px; width: 300px; height: 900px; background: linear-gradient(90deg, transparent, rgba(255,250,235,0.06), transparent); transform: rotate(-20deg); transform-origin: top"></div>
   <div style="position: absolute; inset: 0; background: repeating-linear-gradient(104deg, transparent 0 22px, rgba(255,255,255,0.025) 22px 23px)"></div>
@@ -234,21 +265,53 @@ function title() {
 
   <div style="position: absolute; left: 32px; right: 32px; bottom: 28px; display: flex; flex-direction: column; gap: 12px">
     <button data-a="host" style="display: flex; align-items: center; justify-content: center; height: 58px; width: 100%; cursor: pointer; border: 0; background: #F2EEE6; color: #0b0b0d; font: 800 17px 'Cinzel', serif; letter-spacing: 5px">HOST A CASE</button>
-    <button data-a="host" style="display: flex; align-items: center; justify-content: center; height: 58px; width: 100%; cursor: pointer; color: #F2EEE6; border: 1.5px solid #F2EEE6; background: #0b0b0d; font: 800 17px 'Cinzel', serif; letter-spacing: 5px">JOIN WITH A CODE</button>
+    <button data-a="join" style="display: flex; align-items: center; justify-content: center; height: 58px; width: 100%; cursor: pointer; color: #F2EEE6; border: 1.5px solid #F2EEE6; background: #0b0b0d; font: 800 17px 'Cinzel', serif; letter-spacing: 5px">JOIN WITH A CODE</button>
     <p class="mono" style="margin:0;font-size:11px;color:var(--mute);text-align:center">Prototype · the other 3 detectives are simulated</p>
   </div>
 </section>`;
 }
+const SWATCH = ['#FF3B4E', '#5AA9FF', '#FF8A3D', '#7CE38B', '#F2EEE6'];
+function head(k) {
+  return `<div class="row" style="gap:12px"><button class="back" data-a="home" aria-label="Back to title">‹</button><div><div class="kick">${k}</div><div class="mini">Red <span>String</span></div></div></div>`;
+}
+function seats(host) {
+  const list = S.joined.map(P_);
+  const rows = list.map(p => `<div class="det"><span class="pin" style="background:${p.c}"></span><b>${esc(p.n)}${p.id === 'me' && host !== 'me' ? ' <span style="font:600 11px Cinzel;letter-spacing:2px;color:#8f8f96;font-style:normal">(YOU)</span>' : ''}</b><em>${p.id === host ? 'HOST' : 'READY'}</em></div>`);
+  for (let i = list.length; i < 6; i++) rows.push(`<div class="det open"><span class="pin"></span><span style="font:italic 16px 'Old Standard TT'">${i < 4 ? 'waiting for a detective…' : 'open seat'}</span></div>`);
+  return `<div class="row" style="justify-content:space-between;margin-top:2px"><span class="kick">DETECTIVES</span><span class="kick" style="letter-spacing:2px">${list.length} / 6</span></div><div style="border-top:1px solid #2c2c31;margin-top:-6px">${rows.join('')}</div>`;
+}
 function lobby() {
-  const full = S.joined.length === 4;
-  return `<section class="scr blinds">
-    <div><div class="lbl amber">CASE 0221 · THE SPECKLED BAND</div><h1 class="big" style="font-size:52px;margin-top:6px">Red <span>String</span></h1></div>
-    <div class="tag"><div class="mono" style="font-size:12px;font-weight:600;letter-spacing:4px">ROOM CODE</div><div class="code">KXQZ</div><div style="font-size:13px;color:#4A4740">Friends join on their phones with this code</div></div>
-    <div class="lbl">WHERE DOES THE BOARD LIVE?</div>
-    <div class="choice">${[['tv','On the TV','Board on the big screen, files on phones'],['phones','Phones only','Everyone carries the full board']].map(([k, a, b]) => `<button class="opt" data-a="mode" data-v="${k}" aria-pressed="${S.mode === k}"><b>${a}</b><small>${b}</small></button>`).join('')}</div>
-    <div class="list">${PLAYERS.map(p => S.joined.includes(p.id) ? `<div class="li" style="min-height:44px"><span class="dot" style="background:${p.c}"></span><b>${p.n}</b><span class="grow"></span><span class="mono" style="font-size:11px;color:var(--mute)">${p.id === 'me' ? 'HOST' : 'READY'}</span></div>` : `<div class="li" style="min-height:44px;color:var(--mute)"><span class="dot" style="border:2px dashed #6B6B72"></span>waiting…</div>`).join('')}</div>
+  const ok = S.joined.length >= 4;
+  return `<section class="scr noir" style="gap:16px">${head('HOSTING · CASE 0221')}
+    <div class="ticket"><div class="kick" style="color:#4A4740">ROOM CODE</div><div class="rc">KXQZ</div><small>Friends tap <b style="font:800 11px Cinzel;letter-spacing:2px">JOIN WITH A CODE</b> and enter this</small></div>
+    <div><div class="kick" style="margin-bottom:8px">WHERE DOES THE BOARD LIVE?</div>
+    <div class="seg">${[['tv', 'ON THE TV', 'board on the big screen'], ['phones', 'PHONES ONLY', 'everyone holds the board']].map(([k, a, b]) => `<button data-a="mode" data-v="${k}" aria-pressed="${S.mode === k}"><b>${a}</b><small>${b}</small></button>`).join('')}</div></div>
+    ${seats('me')}
     <div class="grow"></div>
-    <button class="btn" data-a="start" ${full ? '' : 'disabled'}>${full ? 'OPEN THE CASE' : 'WAITING FOR DETECTIVES…'}</button></section>`;
+    <button class="cbtn" data-a="start" ${ok ? '' : 'disabled'}>${ok ? 'OPEN THE CASE' : 'WAITING FOR DETECTIVES…'}</button>
+    <p style="margin:-6px 0 0;text-align:center;font:italic 13px 'Old Standard TT';color:#8f8f96">4 to 6 detectives · about 30 minutes</p></section>`;
+}
+function join() {
+  const me = P_('me'), code = S.code || '';
+  return `<section class="scr noir" style="gap:18px">${head('JOIN A CASE')}
+    <div><label class="kick" for="jc" style="display:block;margin-bottom:10px">ROOM CODE</label>
+    <div class="boxes">${[0, 1, 2, 3].map(i => `<span class="${i === code.length ? 'on' : ''}">${esc(code[i] || '')}</span>`).join('')}<input id="jc" maxlength="4" autocomplete="off" autocapitalize="characters" spellcheck="false" value="${esc(code)}" aria-label="Room code, 4 letters"></div>
+    <p id="jerr" style="margin:8px 0 0;font:italic 14px 'Old Standard TT';color:${S.joinErr ? 'var(--red)' : '#8f8f96'}">${S.joinErr ? 'No case with that code. Check the TV or the host’s phone.' : 'It’s on the TV or the host’s phone. Try KXQZ.'}</p></div>
+    <div><label class="kick" for="jn" style="display:block;margin-bottom:10px">YOUR DETECTIVE NAME</label><input id="jn" class="field" maxlength="14" placeholder="e.g. Jess" value="${esc(S.name || '')}"></div>
+    <div><div class="kick" style="margin-bottom:10px">YOUR STRING</div><div class="sw">${SWATCH.map(c => `<button data-a="swatch" data-v="${c}" style="background:${c}" aria-pressed="${me.c === c}" aria-label="String colour"></button>`).join('')}</div></div>
+    <div class="grow"></div>
+    <button class="cbtn" id="jgo" data-a="dojoin" ${code.length === 4 && (S.name || '').trim() ? '' : 'disabled'}>JOIN THE CASE</button></section>`;
+}
+function joined() {
+  const me = P_('me');
+  return `<section class="scr noir" style="gap:16px">${head('CASE 0221')}
+    <div style="text-align:center;padding:10px 0 4px"><div class="kick">YOU’RE ON THE CASE</div>
+    <div style="display:inline-block;margin-top:12px;background:#F2EEE6;color:#0b0b0d;padding:14px 26px 12px;transform:rotate(-2deg);box-shadow:0 16px 30px rgba(0,0,0,.7);position:relative">
+      <span style="position:absolute;top:-9px;left:50%;margin-left:-9px;width:18px;height:18px;border-radius:50%;background:${me.c};box-shadow:inset -3px -3px 0 rgba(0,0,0,.3),0 3px 6px rgba(0,0,0,.6)"></span>
+      <div style="font:600 10px Cinzel;letter-spacing:3px;color:#4A4740">DETECTIVE</div><div style="font:italic 900 40px/1.05 'Playfair Display'">${esc(me.n)}</div></div></div>
+    ${seats('jess')}
+    <div class="grow"></div>
+    <p style="margin:0;text-align:center;font:italic 17px 'Old Standard TT';color:#BDB8AE">${S.joined.length >= 4 ? 'Jess is opening the case…' : 'Waiting for the host to open the case…'}</p></section>`;
 }
 function brief() {
   return `<section class="scr" style="background:radial-gradient(circle at 50% 30%,#2a2a30,#0b0b0d 70%)">
@@ -392,7 +455,14 @@ function botTick() {
 app.addEventListener('click', e => {
   const t = e.target.closest('[data-a]'); if (!t) return;
   const a = t.dataset.a, v = t.dataset.v;
-  if (a === 'host') { S.screen = 'lobby'; render(); ['jess', 'marcus', 'priya'].forEach((b, i) => setTimeout(() => { S.joined.push(b); if (S.screen === 'lobby') render(); }, 900 + i * 1100)); }
+  if (a === 'host') { S.screen = 'lobby'; S.joined = ['me']; P_('me').n = 'You'; render(); ['jess', 'marcus', 'priya'].forEach((b, i) => setTimeout(() => { if (S.screen !== 'lobby' || S.joined.includes(b)) return; S.joined.push(b); render(); }, 900 + i * 1100)); }
+  else if (a === 'join') { S.screen = 'join'; S.joinErr = false; render(); $('#jc').focus(); }
+  else if (a === 'home') { S.screen = 'title'; render(); }
+  else if (a === 'swatch') { P_('me').c = v; S.name = $('#jn').value; S.code = $('#jc').value.toUpperCase(); render(); }
+  else if (a === 'dojoin') { S.code = $('#jc').value.toUpperCase(); S.name = $('#jn').value.trim(); if (S.code !== 'KXQZ') { S.joinErr = true; render(); return; }
+    P_('me').n = S.name; S.screen = 'joined'; S.joined = ['jess', 'marcus', 'me']; render();
+    setTimeout(() => { if (S.screen !== 'joined') return; S.joined.push('priya'); render(); }, 1400);
+    setTimeout(() => { if (S.screen === 'joined') { S.screen = 'brief'; render(); } }, 3800); }
   else if (a === 'mode') { S.mode = v; render(); }
   else if (a === 'start') { S.screen = 'brief'; render(); }
   else if (a === 'begin') { S.screen = 'game'; addPin('victim', 'me'); S.pins[0].x = 50; S.pins[0].y = 16; render();
@@ -420,6 +490,12 @@ app.addEventListener('click', e => {
   else if (a === 'again') location.reload();
 });
 
+app.addEventListener('input', e => {
+  if (e.target.id === 'jc') { const v = e.target.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 4); e.target.value = v; S.code = v; S.joinErr = false;
+    document.querySelectorAll('.boxes span').forEach((b, i) => { b.textContent = v[i] || ''; b.className = i === v.length ? 'on' : ''; });
+    const er = $('#jerr'); er.style.color = '#8f8f96'; er.textContent = 'It’s on the TV or the host’s phone. Try KXQZ.'; if (v.length === 4) $('#jn').focus(); }
+  if (e.target.id === 'jc' || e.target.id === 'jn') { if (e.target.id === 'jn') S.name = e.target.value; $('#jgo').disabled = !((S.code || '').length === 4 && (S.name || '').trim()); }
+});
 /* board: drag cards, tap to tie strings */
 let drag = null;
 app.addEventListener('pointerdown', e => {
