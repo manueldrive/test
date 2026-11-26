@@ -27,7 +27,7 @@ h1,h2,h3{margin:0}
 .lbl{font:12px 'IBM Plex Mono',monospace;letter-spacing:3px;color:var(--mute)}
 .amber{color:var(--amber)}
 .noir{position:relative;background:radial-gradient(ellipse at 50% 38%,#26262b 0%,#0b0b0d 62%)}
-.noir::before{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(-22deg,rgba(0,0,0,.25) 0 16px,transparent 16px 34px),radial-gradient(ellipse at 78% 8%,rgba(235,235,240,.08),transparent 55%),repeating-linear-gradient(104deg,transparent 0 22px,rgba(255,255,255,.025) 22px 23px)}
+.noir::before{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(-22deg,rgba(0,0,0,.25) 0 16px,transparent 16px 34px),radial-gradient(ellipse at 78% 8%,rgba(235,235,240,.08),transparent 55%)}
 .noir>*{position:relative}
 .cz{font-family:Cinzel,serif;font-weight:800;letter-spacing:4px}
 .kick{font:700 12px 'Playfair Display',serif;letter-spacing:4px;color:#BDB8AE}
@@ -55,7 +55,7 @@ h1,h2,h3{margin:0}
 .boxes input{position:absolute;inset:0;width:100%;opacity:0;font-size:16px;text-transform:uppercase}
 .field{width:100%;min-height:56px;background:rgba(11,11,13,.7);border:1.5px solid #6b6b72;color:#F2EEE6;font:900 24px 'Playfair Display',serif;padding:0 14px}
 .field:focus{outline:none;border-color:#F2EEE6}
-.tip{background:#F2EEE6;color:#0b0b0d;padding:16px 18px;box-shadow:0 16px 30px rgba(0,0,0,.6);transform:rotate(.6deg)}
+.tip{background:rgba(11,11,13,.72);color:#F2EEE6;padding:16px 18px;border:1px solid #3a3a40;border-left:3px solid var(--red)}
 .sw{display:flex;gap:12px}.sw button{width:44px;height:44px;border-radius:50%;border:3px solid transparent;box-shadow:inset -3px -3px 0 rgba(0,0,0,.28)}
 .sw button[aria-pressed=true]{border-color:#F2EEE6;outline:2px solid #0b0b0d;outline-offset:-5px}
 .blinds{background:repeating-linear-gradient(-22deg,rgba(0,0,0,.6) 0 16px,transparent 16px 34px),radial-gradient(ellipse at 78% 8%,rgba(255,194,61,.28),transparent 55%),var(--bg)}
@@ -243,7 +243,7 @@ function title() {
   return `<section class="scr" style="position:relative;padding:0;min-height:780px;overflow:hidden;background:radial-gradient(ellipse at 50% 38%,#26262b 0%,#0b0b0d 62%);color:#F2EEE6;font-family:'Old Standard TT',serif"><div style="position:absolute;inset:0;background:repeating-linear-gradient(-22deg,rgba(0,0,0,.25) 0 16px,transparent 16px 34px),radial-gradient(ellipse at 78% 8%,rgba(235,235,240,.08),transparent 55%)"></div>
   <div style="position: absolute; left: -120px; top: -40px; width: 300px; height: 900px; background: linear-gradient(90deg, transparent, rgba(255,250,235,0.07), transparent); transform: rotate(24deg); transform-origin: top"></div>
   <div style="position: absolute; right: -140px; top: -40px; width: 300px; height: 900px; background: linear-gradient(90deg, transparent, rgba(255,250,235,0.06), transparent); transform: rotate(-20deg); transform-origin: top"></div>
-  <div style="position: absolute; inset: 0; background: repeating-linear-gradient(104deg, transparent 0 22px, rgba(255,255,255,0.025) 22px 23px)"></div>
+  
 
   <svg aria-hidden="true" width="390" height="190" viewBox="0 0 390 190" style="position: absolute; left: 0; bottom: 0">
     <g fill="#050506"><rect x="0" y="110" width="40" height="80"></rect><rect x="34" y="70" width="34" height="120"></rect><rect x="64" y="96" width="30" height="94"></rect><rect x="92" y="40" width="44" height="150"></rect><rect x="132" y="88" width="30" height="102"></rect><rect x="158" y="60" width="26" height="130"></rect><rect x="182" y="104" width="44" height="86"></rect><rect x="224" y="30" width="38" height="160"></rect><rect x="258" y="82" width="34" height="108"></rect><rect x="288" y="56" width="40" height="134"></rect><rect x="326" y="98" width="30" height="92"></rect><rect x="354" y="74" width="36" height="116"></rect></g>
@@ -319,9 +319,9 @@ function joined() {
       <div style="font:700 10px 'Playfair Display';letter-spacing:3px;color:#4A4740">DETECTIVE</div><div style="font:900 40px/1.05 'Playfair Display'">${esc(me.n)}</div></div></div>
     ${seats('jess')}
     <div class="grow"></div>
-    <div class="tip" aria-live="polite"><div class="row" style="justify-content:space-between"><span class="kick" style="color:#4A4740">HOW TO PLAY · ${S.tip + 1} OF ${TIPS.length}</span><button data-a="tipnext" aria-label="Next tip" style="background:none;border:0;font:900 22px 'Playfair Display';color:#0b0b0d;width:44px;height:36px;margin:-8px -10px -8px 0">›</button></div>
-      <h3 style="font:900 26px/1.05 'Playfair Display';margin:6px 0 6px">${TIPS[S.tip][0]}</h3><p style="margin:0;font:400 15px/1.45 'Playfair Display';color:#2e2c28">${TIPS[S.tip][1]}</p>
-      <div class="row" style="gap:6px;margin-top:12px">${TIPS.map((_, i) => `<span style="width:${i === S.tip ? 18 : 6}px;height:6px;border-radius:3px;background:${i === S.tip ? 'var(--red)' : '#BDB8AE'}"></span>`).join('')}</div></div>
+    <div class="tip" aria-live="polite"><div class="row" style="justify-content:space-between"><span class="kick">HOW TO PLAY · ${S.tip + 1} OF ${TIPS.length}</span><button data-a="tipnext" aria-label="Next tip" style="background:none;border:0;font:900 22px 'Playfair Display';color:#F2EEE6;width:44px;height:36px;margin:-8px -10px -8px 0">›</button></div>
+      <h3 style="font:900 26px/1.05 'Playfair Display';margin:6px 0 6px">${TIPS[S.tip][0]}</h3><p style="margin:0;font:400 15px/1.45 'Playfair Display';color:#BDB8AE">${TIPS[S.tip][1]}</p>
+      <div class="row" style="gap:6px;margin-top:12px">${TIPS.map((_, i) => `<span style="width:${i === S.tip ? 18 : 6}px;height:6px;border-radius:3px;background:${i === S.tip ? 'var(--red)' : '#4a4a50'}"></span>`).join('')}</div></div>
     <p style="margin:0;text-align:center;font:400 15px 'Playfair Display';color:#BDB8AE">${S.joined.length >= 4 ? 'Everyone’s here. Waiting for Jess to open the case…' : 'Waiting for more detectives…'} <button data-a="hoststart" style="background:none;border:0;font:700 11px 'Playfair Display';letter-spacing:2px;color:#8f8f96;text-decoration:underline;padding:8px">SKIP ▸</button></p></section>`;
 }
 function brief() {
