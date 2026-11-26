@@ -127,6 +127,25 @@ h1,h2,h3{margin:0}
 .rbest{font:700 10px 'Playfair Display',serif;letter-spacing:2px;color:#0b0b0d;background:#F2EEE6;padding:3px 6px}
 .rpts{margin-left:auto;font:900 26px 'Playfair Display',serif;color:#F2EEE6}.rpts small{font-size:13px;color:#8f8f96}
 .rrow.top .rpts{color:var(--red)}
+.cases{position:relative;flex:none;margin:auto 0;padding:clamp(8px,2.5svh,40px) 0}
+@media (max-height:760px){.tblock{zoom:.82}}
+.ckick{display:flex;justify-content:space-between;padding:0 24px 10px;font:600 11px Cinzel,serif;letter-spacing:4px;color:#BDB8AE}
+.ckick span+span{letter-spacing:2px;color:#8f8f96}
+.ctrack{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:6px 24px 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.ctrack::-webkit-scrollbar{display:none}
+.ccard{flex:none;width:min(64vw,250px);scroll-snap-align:center;background:#111114;border:1.5px solid #34343a;padding:0;text-align:left;color:#F2EEE6;display:flex;flex-direction:column;transition:transform .2s}
+.ccard[aria-pressed=true]{border-color:#F2EEE6;box-shadow:0 14px 30px rgba(0,0,0,.6)}
+.cimg{position:relative;height:clamp(78px,13svh,140px);background:linear-gradient(160deg,hsl(var(--h) 14% 20%),#0b0b0d 75%) 30% 62%/cover;overflow:hidden}
+.cghost{position:absolute;right:-6px;bottom:-18px;font:900 74px 'Playfair Display',serif;color:rgba(242,238,230,.07);letter-spacing:-2px}
+.csoon{position:absolute;left:10px;top:10px;font:600 9px Cinzel,serif;letter-spacing:3px;color:#F2EEE6;border:1px solid rgba(242,238,230,.6);padding:3px 6px 2px;background:rgba(11,11,13,.55)}
+.cpin{position:absolute;right:10px;top:10px;width:14px;height:14px;border-radius:50%;background:var(--red);box-shadow:inset -3px -3px 0 rgba(0,0,0,.3),0 3px 6px rgba(0,0,0,.6)}
+.ctext{padding:10px 12px 12px;display:flex;flex-direction:column;gap:3px}
+.cno{font:600 9px Cinzel,serif;letter-spacing:3px;color:#8f8f96}
+.ctext b{font:900 18px/1.1 'Playfair Display',serif}
+.cmeta{font:400 12px 'Playfair Display',serif;color:#8f8f96}
+.ccard.soon .ctext b{color:#8f8f96}
+.ccard.nope{animation:nope .35s}
+@keyframes nope{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
 .sw{display:flex;gap:12px}.sw button{width:44px;height:44px;border-radius:50%;border:3px solid transparent;box-shadow:inset -3px -3px 0 rgba(0,0,0,.28)}
 .sw button[aria-pressed=true]{border-color:#F2EEE6;outline:2px solid #0b0b0d;outline-offset:-5px}
 .blinds{background:repeating-linear-gradient(-22deg,rgba(0,0,0,.6) 0 16px,transparent 16px 34px),radial-gradient(ellipse at 78% 8%,rgba(255,194,61,.28),transparent 55%),var(--bg)}
@@ -300,7 +319,7 @@ const WHY = ['To keep the family money', 'Jealousy', 'Revenge for being reported
 const ANSWER = {who:'roylott', how:1, why:0};
 const ROUND_SECS = 480;
 
-const S = {screen:'title', mode:'tv', joined:['me'], round:1, t:ROUND_SECS, tab:'files', seen:new Set(), pins:[], strings:[], tie:false, sel:null, ready:new Set(), vote:{who:null, how:null, why:null}, bots:{}, sheet:null, ov:null, toast:null, tv:false};
+const S = {screen:'title', case:'speckled', mode:'tv', joined:['me'], round:1, t:ROUND_SECS, tab:'files', seen:new Set(), pins:[], strings:[], tie:false, sel:null, ready:new Set(), vote:{who:null, how:null, why:null}, bots:{}, sheet:null, ov:null, toast:null, tv:false};
 const P_ = id => PLAYERS.find(p => p.id === id);
 const unlocked = () => ITEMS.filter(i => i.r <= S.round);
 const newCount = kinds => unlocked().filter(i => kinds.includes(i.kind) && !S.seen.has(i.id)).length;
@@ -322,16 +341,15 @@ function title() {
 
   <div style="position: relative; text-align: center; flex: none; font: 600 13px 'Cinzel', serif; letter-spacing: 6px; color: #BDB8AE">A PARTY MURDER MYSTERY</div>
 
-  <div style="position: relative; margin-top: clamp(34px,6.5svh,72px); flex: none; display: flex; flex-direction: column; align-items: center; transform: rotate(-5deg) skewX(-6deg)">
+  <div class="tblock" style="position: relative; margin-top: clamp(26px,6svh,72px); flex: none; display: flex; flex-direction: column; align-items: center; transform: rotate(-5deg) skewX(-6deg)">
     <div style="position: relative; width: 290px; height: 110px; display: flex; justify-content: center; align-items: center"><svg aria-hidden="true" width="370" height="230" viewBox="-40 -60 370 230" style="position: absolute; left: -40px; top: -60px; overflow: visible; pointer-events: none; z-index: 0"><path d="M-40.0 54.2 L-36.0 52.8 L-32.0 51.6 L-28.0 50.4 L-24.0 45.5 L-20.0 39.8 L-16.0 33.5 L-12.0 27.5 L-8.0 22.4 L-4.0 18.9 L0.0 17.6 L4.0 17.9 L8.0 18.9 L12.0 20.6 L16.0 22.8 L20.0 25.7 L24.0 29.0 L28.0 32.9 L32.0 37.2 L36.0 41.7 L40.0 46.6 L44.0 51.6 L48.0 56.8 L52.0 61.9 L56.0 67.0 L60.0 71.9 L64.0 76.5 L68.0 80.8 L72.0 84.7 L76.0 88.2 L80.0 91.1 L84.0 93.5 L88.0 95.2 L92.0 96.3 L96.0 96.8 L100.0 96.6 L104.0 95.7 L108.0 94.1 L112.0 92.0 L116.0 89.2 L120.0 85.9 L124.0 82.2 L128.0 78.0 L132.0 73.4 L136.0 68.6 L140.0 63.6 L144.0 58.5 L148.0 53.3 L152.0 48.3 L156.0 43.3 L160.0 38.7 L164.0 34.3 L168.0 30.3 L172.0 26.7 L176.0 23.7 L180.0 21.3 L184.0 19.4 L188.0 18.2 L192.0 17.6 L196.0 17.7 L200.0 18.5 L204.0 20.0 L208.0 22.0 L212.0 24.7 L216.0 27.9 L220.0 31.6 L224.0 35.7 L228.0 40.2 L232.0 45.0 L236.0 49.9 L240.0 55.1 L244.0 60.2 L248.0 65.3 L252.0 70.3 L256.0 75.0 L260.0 79.4 L264.0 83.5 L268.0 87.1 L272.0 90.2 L276.0 92.8 L280.0 94.7 L284.0 96.0 L288.0 96.7 L292.0 96.5 L296.0 94.0 L300.0 89.6 L304.0 83.9 L308.0 77.7 L312.0 71.7 L316.0 66.3 L320.0 63.5 L324.0 62.2 L328.0 60.9" fill="none" stroke="#FF3B4E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 4px rgba(255,59,78,0.85))"></path><circle cx="-36" cy="54.2" r="6" fill="#F2EEE6"></circle><circle cx="326" cy="60.9" r="6" fill="#F2EEE6"></circle></svg><span style="position: relative; z-index: 1; font: 900 128px/0.86 'Playfair Display', serif; letter-spacing: -2px; color: #F2EEE6; text-shadow: 1px 1px 0 #b4afa5, 2px 2px 0 #a19c92, 3px 3px 0 #8e8a80, 4px 4px 0 #7b776e, 5px 5px 0 #68655d, 6px 6px 0 #56534c, 7px 7px 0 #44413b, 8px 8px 0 #33312c, 14px 18px 22px rgba(0,0,0,0.85)">RED</span><svg aria-hidden="true" width="370" height="230" viewBox="-40 -60 370 230" style="position: absolute; left: -40px; top: -60px; overflow: visible; pointer-events: none; z-index: 2; filter: drop-shadow(3px 6px 4px rgba(0,0,0,0.75)) drop-shadow(0 0 4px rgba(255,59,78,0.7))"><defs><clipPath id="wvm"><rect x="-60" y="-60" width="159" height="230"></rect><rect x="191" y="-60" width="200" height="230"></rect></clipPath></defs><path d="M-40.0 54.2 L-36.0 52.8 L-32.0 51.6 L-28.0 50.4 L-24.0 45.5 L-20.0 39.8 L-16.0 33.5 L-12.0 27.5 L-8.0 22.4 L-4.0 18.9 L0.0 17.6 L4.0 17.9 L8.0 18.9 L12.0 20.6 L16.0 22.8 L20.0 25.7 L24.0 29.0 L28.0 32.9 L32.0 37.2 L36.0 41.7 L40.0 46.6 L44.0 51.6 L48.0 56.8 L52.0 61.9 L56.0 67.0 L60.0 71.9 L64.0 76.5 L68.0 80.8 L72.0 84.7 L76.0 88.2 L80.0 91.1 L84.0 93.5 L88.0 95.2 L92.0 96.3 L96.0 96.8 L100.0 96.6 L104.0 95.7 L108.0 94.1 L112.0 92.0 L116.0 89.2 L120.0 85.9 L124.0 82.2 L128.0 78.0 L132.0 73.4 L136.0 68.6 L140.0 63.6 L144.0 58.5 L148.0 53.3 L152.0 48.3 L156.0 43.3 L160.0 38.7 L164.0 34.3 L168.0 30.3 L172.0 26.7 L176.0 23.7 L180.0 21.3 L184.0 19.4 L188.0 18.2 L192.0 17.6 L196.0 17.7 L200.0 18.5 L204.0 20.0 L208.0 22.0 L212.0 24.7 L216.0 27.9 L220.0 31.6 L224.0 35.7 L228.0 40.2 L232.0 45.0 L236.0 49.9 L240.0 55.1 L244.0 60.2 L248.0 65.3 L252.0 70.3 L256.0 75.0 L260.0 79.4 L264.0 83.5 L268.0 87.1 L272.0 90.2 L276.0 92.8 L280.0 94.7 L284.0 96.0 L288.0 96.7 L292.0 96.5 L296.0 94.0 L300.0 89.6 L304.0 83.9 L308.0 77.7 L312.0 71.7 L316.0 66.3 L320.0 63.5 L324.0 62.2 L328.0 60.9" fill="none" stroke="#FF3B4E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" clip-path="url(#wvm)"></path></svg></div>
     <span style="font: 900 74px/0.95 'Playfair Display', serif; letter-spacing: 1px; color: #FF3B4E; text-shadow: 1px 1px 0 #d22b3d, 2px 2px 0 #b72535, 3px 3px 0 #9c1f2d, 4px 4px 0 #821a26, 5px 5px 0 #69151e, 6px 6px 0 #501017, 12px 16px 20px rgba(0,0,0,0.85)">STRING</span>
   </div>
-
-  <div style="position: relative; margin: auto 0; padding: clamp(10px,3svh,48px) 0; flex: none; display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center">
-    <span style="font: italic 17px 'Old Standard TT', serif; color: #BDB8AE">starring</span>
-    <span style="font: 800 20px 'Cinzel', serif; letter-spacing: 4px">YOU &amp; FIVE FRIENDS</span>
-    <span style="font: italic 17px 'Old Standard TT', serif; color: #BDB8AE; margin-top: 6px">in</span>
-    <span style="font: italic 900 30px 'Playfair Display', serif">The Speckled Band</span>
+  <div class="cases" aria-label="Choose a case">
+    <div class="ckick"><span>CHOOSE A CASE</span><span>${CASES.filter(c => !c.soon).length} OPEN · ${CASES.filter(c => c.soon).length} COMING</span></div>
+    <div class="ctrack" id="ctrack">${CASES.map(c => `<button class="ccard${c.soon ? ' soon' : ''}" data-a="case" data-v="${c.id}" aria-pressed="${S.case === c.id}" ${c.soon ? 'aria-disabled="true"' : ''}>
+      <div class="cimg" style="${c.img ? `background-image:url(${IMG(c.img)})` : `--h:${c.hue}`}">${c.img ? '' : `<span class="cghost">${c.no}</span>`}${c.soon ? '<span class="csoon">COMING SOON</span>' : ''}${S.case === c.id ? '<span class="cpin"></span>' : ''}</div>
+      <div class="ctext"><span class="cno">CASE ${c.no} · ${c.where}</span><b>${c.n}</b><span class="cmeta">${c.meta}</span></div></button>`).join('')}</div>
   </div>
 
   <div style="position: relative; flex: none; margin: 0 32px; display: flex; flex-direction: column; gap: 12px">
@@ -347,6 +365,13 @@ const TIPS = [
   ['Pin what matters', 'Pin a clue and it lands on the murder board, on the TV and on every phone.'],
   ['Tie the string', 'Connect two cards to show they’re linked. Everyone sees your string in your colour.'],
   ['Three rounds, then the lineup', 'Name who did it, how, and why. You score a point for each one you get right.']
+];
+const CASES = [
+  {id:'speckled', no:'0221', n:'The Speckled Band', where:'SURREY · 1883', meta:'4–6 detectives · 30 min · Medium', img:'cover-stoke-moran'},
+  {id:'redheaded', no:'0222', n:'The Red-Headed League', where:'LONDON · 1890', meta:'4–6 detectives · 35 min · Easy', soon:1, hue:'210deg'},
+  {id:'hound', no:'0223', n:'The Hound of the Baskervilles', where:'DARTMOOR · 1889', meta:'5–8 detectives · 45 min · Hard', soon:1, hue:'30deg'},
+  {id:'express', no:'0224', n:'Death on the Midnight Express', where:'CALAIS · 1931', meta:'4–6 detectives · 40 min · Medium', soon:1, hue:'350deg'},
+  {id:'lighthouse', no:'0225', n:'The Last Light at Gull Rock', where:'CORNWALL · 1952', meta:'3–5 detectives · 30 min · Medium', soon:1, hue:'190deg'}
 ];
 const SWATCH = ['#FF3B4E', '#5AA9FF', '#FF8A3D', '#7CE38B', '#F2EEE6'];
 function head(k) {
@@ -573,6 +598,7 @@ app.addEventListener('click', e => {
   const t = e.target.closest('[data-a]'); if (!t) return;
   const a = t.dataset.a, v = t.dataset.v;
   if (a === 'host') { S.screen = 'lobby'; S.joined = ['me']; P_('me').n = 'You'; render(); ['jess', 'marcus', 'priya'].forEach((b, i) => setTimeout(() => { if (S.screen !== 'lobby' || S.joined.includes(b)) return; S.joined.push(b); render(); }, 900 + i * 1100)); }
+  else if (a === 'case') { const c = CASES.find(x => x.id === v); if (c.soon) { t.classList.remove('nope'); void t.offsetWidth; t.classList.add('nope'); return; } S.case = v; render(); }
   else if (a === 'join') { S.screen = 'join'; S.joinErr = false; render(); $('#jc').focus(); }
   else if (a === 'home') { S.screen = 'title'; render(); }
   else if (a === 'swatch') { P_('me').c = v; S.name = $('#jn').value; S.code = $('#jc').value.toUpperCase(); render(); }
