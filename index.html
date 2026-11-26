@@ -421,15 +421,12 @@ function join() {
 function joined() {
   const me = P_('me');
   return `<section class="scr noir" style="gap:16px">${head('CASE 0221')}
-    <div style="text-align:center;padding:10px 0 4px"><div class="kick">YOU’RE ON THE CASE</div>
-    <div style="display:inline-block;margin-top:12px;background:#F2EEE6;color:#0b0b0d;padding:14px 26px 12px;transform:rotate(-2deg);box-shadow:0 16px 30px rgba(0,0,0,.7);position:relative">
-      <span style="position:absolute;top:-9px;left:50%;margin-left:-9px;width:18px;height:18px;border-radius:50%;background:${me.c};box-shadow:inset -3px -3px 0 rgba(0,0,0,.3),0 3px 6px rgba(0,0,0,.6)"></span>
-      <div style="font:700 10px 'Playfair Display';letter-spacing:3px;color:#4A4740">DETECTIVE</div><div style="font:900 40px/1.05 'Playfair Display'">${esc(me.n)}</div></div></div>
-    ${seats('jess')}
-    <div class="grow"></div>
     <div class="tip" aria-live="polite"><div class="row" style="justify-content:space-between"><span class="kick">HOW TO PLAY · ${S.tip + 1} OF ${TIPS.length}</span><button data-a="tipnext" aria-label="Next tip" style="background:none;border:0;font:900 22px 'Playfair Display';color:#F2EEE6;width:44px;height:36px;margin:-8px -10px -8px 0">›</button></div>
       <h3 style="font:900 26px/1.05 'Playfair Display';margin:6px 0 6px">${TIPS[S.tip][0]}</h3><p style="margin:0;font:400 15px/1.45 'Playfair Display';color:#BDB8AE">${TIPS[S.tip][1]}</p>
       <div class="row" style="gap:6px;margin-top:12px">${TIPS.map((_, i) => `<span style="width:${i === S.tip ? 18 : 6}px;height:6px;border-radius:3px;background:${i === S.tip ? 'var(--red)' : '#4a4a50'}"></span>`).join('')}</div></div>
+    ${seats('jess')}
+    <div class="grow"></div>
+
     <p style="margin:0;text-align:center;font:400 15px 'Playfair Display';color:#BDB8AE">${S.joined.length >= 4 ? 'Everyone’s here. Waiting for Jess to open the case…' : 'Waiting for more detectives…'} <button data-a="hoststart" style="background:none;border:0;font:700 11px 'Playfair Display';letter-spacing:2px;color:#8f8f96;text-decoration:underline;padding:8px">SKIP ▸</button></p></section>`;
 }
 function brief(inSheet) {
