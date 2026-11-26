@@ -29,7 +29,6 @@ h1{margin:0;font:italic 900 30px/1 'Playfair Display',serif}
 .view.on{display:flex}
 .stage{position:relative;flex:1;min-height:300px;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:radial-gradient(ellipse at 60% 25%,#2a2620 0%,#121214 55%,#08080a 100%)}
 .stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
-.blinds{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(-22deg,rgba(0,0,0,.22) 0 16px,transparent 16px 34px);mix-blend-mode:multiply}
 .tag{position:absolute;left:12px;top:12px;background:var(--amber);color:#141414;font:600 11px 'IBM Plex Mono',monospace;letter-spacing:2px;padding:3px 8px}
 .lamp{position:absolute;right:10px;top:10px;height:36px;padding:0 12px;border:1px solid var(--line);border-radius:4px;background:rgba(11,11,13,.85);font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px}
 .lamp i{width:8px;height:8px;border-radius:50%;background:var(--amber);box-shadow:0 0 8px var(--amber)}
@@ -93,7 +92,7 @@ h1{margin:0;font:italic 900 30px/1 'Playfair Display',serif}
 
   <section class="view on" id="v-bag" role="tabpanel" aria-labelledby="t-bag">
     <div class="stage" id="stage">
-      <div class="blinds"></div><div class="vig"></div><div class="grain"></div>
+      <div class="vig"></div><div class="grain"></div>
       <span class="tag" id="tag">A-4</span>
       <div id="spots"></div>
       <div class="hint" id="hint">Spin it, zoom in, tap anything that looks wrong</div>
