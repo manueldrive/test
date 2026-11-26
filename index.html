@@ -170,9 +170,9 @@ const ITEMS = [
   {id:'D4', kind:'doc', r:2, tag:'D-4', n:'Julia\'s letter', sub:'Found in her desk', style:'letter', body:`<div class="date">Stoke Moran, Tuesday</div><h3>Dearest Helen,</h3><p>Strange things this week. Workmen came and fitted a new ventilator high in my wall, and a bell-rope beside my bed, though I never asked for either. The ventilator opens into the doctor's room, not outside. Some nights I smell his cigars through it.</p><p>And that whistle again, at three in the morning. You must hear it too?</p><p style="text-align:right">Your loving sister,<br>Julia</p>`},
   {id:'P1', kind:'photo', r:1, tag:'Photo 1', n:'Julia\'s bedroom', img:'photo-1-bedroom', d:'The bolted bed, the bell-rope dangling to the pillow, the vent high above.'},
   {id:'R1', kind:'ev', r:1, tag:'R-1', n:'Muddy boots', img:'R-1-muddy-boots', d:'Croft\'s work boots by the back door, caked in wet mud.', v3d:1},
-  {id:'R2', kind:'ev', r:1, tag:'R-2', n:'Train ticket', icon:'ticket', d:'Evening train from Leatherhead, punched, dated the night of the death.', v3d:1},
+  {id:'R2', kind:'ev', r:1, tag:'R-2', n:'Train ticket', img:'ticket-front', back:'ticket-back', paper:1, d:'Found in Price\'s coat. Third class, Leatherhead to Waterloo, punched by the guard.', v3d:1},
   {id:'A7', kind:'ev', r:1, tag:'A-7', n:'Matchbox', icon:'box', d:'Found in Julia\'s left hand, with one burnt match.', v3d:1},
-  {id:'R3', kind:'ev', r:2, tag:'R-3', n:'Copy of the will', icon:'doc', d:'Helen\'s copy, with the shares underlined in pencil.', v3d:1},
+  {id:'R3', kind:'ev', r:2, tag:'R-3', n:'Helen\'s copy of the will', img:'will-front', back:'will-back', paper:1, d:'Her copy of her mother\'s will, stamped by the solicitors, with her own pencil marks.', v3d:1},
   {id:'A2', kind:'photo', r:2, tag:'A-2', n:'Bell-rope', img:'A-2-bell-rope', d:'Hangs to the pillow. Pulled, it rings nothing: the wire isn\'t attached. Hooked just under the ventilator.'},
   {id:'A3', kind:'photo', r:2, tag:'A-3', n:'Bolted bed', img:'A-3-bolted-bed', d:'Bolted to the floor, so it can\'t be moved away from the rope.'},
   {id:'A1', kind:'photo', r:2, tag:'A-1', n:'Ventilator', icon:'vent', d:'A small vent high in Julia\'s wall. It opens into Roylott\'s room, not outside.'},
@@ -257,7 +257,7 @@ function files() {
 }
 function evidence() {
   const ev = ITEMS.filter(i => i.kind !== 'doc');
-  return `<div class="grid">${ev.map(e => e.r <= S.round ? `<button class="ev" data-a="open" data-v="${e.id}" style="position:relative">${!S.seen.has(e.id) ? '<span class="new">NEW</span>' : ''}<div class="im" style="${e.img ? `background-image:url(${IMG(e.img)})` : ''}">${e.img ? '' : svgI(e.icon)}</div><div class="cap"><small>${e.tag} · ${e.kind === 'photo' ? 'at the scene' : 'bagged'}</small><b>${e.n}</b></div></button>` : `<div class="ev lock"><div class="im">${svgI('box').replace('#ECE8DF', '#6B6B72')}</div><div class="cap"><small>${e.tag}</small><b>Round ${e.r}</b></div></div>`).join('')}</div>
+  return `<div class="grid">${ev.map(e => e.r <= S.round ? `<button class="ev" data-a="open" data-v="${e.id}" style="position:relative">${!S.seen.has(e.id) ? '<span class="new">NEW</span>' : ''}<div class="im" style="${e.img ? `background-image:url(${IMG(e.img)});${e.paper ? 'background-size:86%;background-repeat:no-repeat;background-color:#121214;filter:none' : ''}` : ''}">${e.img ? '' : svgI(e.icon)}</div><div class="cap"><small>${e.tag} · ${e.kind === 'photo' ? 'at the scene' : 'bagged'}</small><b>${e.n}</b></div></button>` : `<div class="ev lock"><div class="im">${svgI('box').replace('#ECE8DF', '#6B6B72')}</div><div class="cap"><small>${e.tag}</small><b>Round ${e.r}</b></div></div>`).join('')}</div>
     ${readyBar()}`;
 }
 function suspects() {
@@ -336,7 +336,7 @@ function openItem(id) {
   const it = ITEMS.find(i => i.id === id); S.seen.add(id);
   const pinBtn = pinned(id) ? `<button class="btn ghost" disabled>PINNED BY ${P_(pinned(id).by).n.toUpperCase()}</button>` : `<button class="btn" data-a="pin" data-v="${id}">PIN TO BOARD</button>`;
   if (it.kind === 'doc') S.sheet = `<div class="paper ${it.style || ''}">${it.body}</div>${pinBtn}<button class="btn ghost" data-a="close">CLOSE</button>`;
-  else S.sheet = `${it.img ? `<img src="${IMG(it.img)}" alt="${it.n}" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:4px;filter:grayscale(.3)">` : `<div style="aspect-ratio:4/3;display:grid;place-items:center;background:#1c1c20;border-radius:4px">${svgI(it.icon)}</div>`}
+  else S.sheet = `${it.paper ? `<div style="background:#121214;border-radius:4px;padding:14px;display:grid;place-items:center"><img id="pimg" src="${IMG(it.img)}" data-f="${IMG(it.img)}" data-b="${IMG(it.back)}" alt="${it.n}, front" style="max-width:100%;max-height:52vh;box-shadow:0 10px 24px rgba(0,0,0,.6);transition:transform .35s"></div><button class="btn ghost" data-a="flip">TURN IT OVER</button>` : it.img ? `<img src="${IMG(it.img)}" alt="${it.n}" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:4px;filter:grayscale(.3)">` : `<div style="aspect-ratio:4/3;display:grid;place-items:center;background:#1c1c20;border-radius:4px">${svgI(it.icon)}</div>`}
     <div><div class="lbl">${it.tag} · ${it.kind === 'photo' ? 'AT THE SCENE' : 'BAGGED EVIDENCE'}</div><h2 class="serif" style="font:900 28px/1.1 'Playfair Display';margin-top:4px">${it.n}</h2><p style="margin:6px 0 0;color:#d8d8dc">${it.d}</p></div>
     ${it.v3d ? `<a class="btn ghost" href="${VIEWER}" style="text-decoration:none">INSPECT IN 3D</a>` : ''}${pinBtn}<button class="btn ghost" data-a="close">CLOSE</button>`;
   render();
@@ -378,6 +378,7 @@ app.addEventListener('click', e => {
   else if (a === 'opensus') { const s = SUS.find(x => x.id === v); S.sheet = `<img src="${IMG(s.img)}" alt="${s.n}" style="width:100%;aspect-ratio:1;object-fit:cover;object-position:top;filter:grayscale(1);border-radius:4px"><div><div class="row"><span class="dot" style="background:${s.c}"></span><span class="lbl">SUSPECT</span></div><h2 class="serif" style="font:900 28px/1.1 'Playfair Display';margin-top:4px">${s.n}</h2><p style="margin:6px 0;color:#d8d8dc">${s.who}</p><p class="mono" style="margin:0;font-size:12px;color:var(--mute)">ALIBI: ${s.alibi}</p></div>${pinned(v) ? `<button class="btn ghost" disabled>PINNED BY ${P_(pinned(v).by).n.toUpperCase()}</button>` : `<button class="btn" data-a="pin" data-v="${v}">PIN TO BOARD</button>`}<button class="btn ghost" data-a="close">CLOSE</button>`; render(); }
   else if (a === 'pin') { addPin(v, 'me'); const s = SUS.find(x => x.id === v); pinMoment(s ? s.s : ITEMS.find(i => i.id === v).n); }
   else if (a === 'close') { S.sheet = null; render(); }
+  else if (a === 'flip') { const im = $('#pimg'); if (!im) return; const back = im.dataset.side !== 'b'; im.style.transform = 'rotateX(90deg)'; setTimeout(() => { im.src = back ? im.dataset.b : im.dataset.f; im.dataset.side = back ? 'b' : 'f'; im.alt = im.alt.replace(/(front|back)$/, back ? 'back' : 'front'); im.style.transform = 'none'; }, 180); t.textContent = back ? 'TURN IT BACK' : 'TURN IT OVER'; }
   else if (a === 'ovclose') { S.ov = null; render(); }
   else if (a === 'skip') { if (S.t > 20) S.t = 15; else nextRound(); render(); }
   else if (a === 'ready') { S.ready.add('me'); const rnd = S.round; ['jess', 'marcus', 'priya'].forEach((b, i) => setTimeout(() => { if (S.screen !== 'game' || S.round !== rnd) return; S.ready.add(b); if (S.ready.size === 4) nextRound(); else render(); }, 1200 + i * 1300)); render(); }
