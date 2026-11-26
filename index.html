@@ -32,7 +32,8 @@ h1,h2,h3{margin:0}
 .cz{font-family:Cinzel,serif;font-weight:800;letter-spacing:4px}
 .kick{font:700 12px 'Playfair Display',serif;letter-spacing:4px;color:#BDB8AE}
 .back{width:44px;height:44px;border:1px solid #3a3a40;background:rgba(11,11,13,.6);border-radius:50%;font-size:20px;line-height:1;display:flex;align-items:center;justify-content:center;flex:none}
-.mini{font:900 26px/.9 'Playfair Display',serif;letter-spacing:-.5px}.mini span{color:var(--red)}
+.mini{font:900 24px/1 'Playfair Display',serif;letter-spacing:.5px;color:#F2EEE6;margin-top:3px;text-shadow:1px 1px 0 #a19c92,2px 2px 0 #68655d,3px 3px 0 #33312c,5px 7px 10px rgba(0,0,0,.8)}.mini span{color:var(--red);text-shadow:1px 1px 0 #b72535,2px 2px 0 #821a26,3px 3px 0 #501017,5px 7px 10px rgba(0,0,0,.8)}
+.kick.hk{font:600 11px Cinzel,serif;letter-spacing:5px}
 .cbtn{min-height:58px;width:100%;border:0;background:#F2EEE6;color:#0b0b0d;font:900 17px 'Playfair Display',serif;letter-spacing:4px;display:flex;align-items:center;justify-content:center}
 .cbtn:disabled{background:#2a2a2e;color:#8a8a90;cursor:default}
 .ticket{position:relative;background:#F2EEE6;color:#0b0b0d;padding:16px 18px 14px;text-align:center;box-shadow:0 18px 36px rgba(0,0,0,.7);transform:rotate(-1.2deg);-webkit-mask:radial-gradient(circle 10px at 0 50%,#0000 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 10px at 100% 50%,#0000 98%,#000) right/51% 100% no-repeat;mask:radial-gradient(circle 10px at 0 50%,#0000 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 10px at 100% 50%,#0000 98%,#000) right/51% 100% no-repeat}
@@ -349,7 +350,7 @@ const TIPS = [
 ];
 const SWATCH = ['#FF3B4E', '#5AA9FF', '#FF8A3D', '#7CE38B', '#F2EEE6'];
 function head(k) {
-  return `<div class="row" style="gap:12px"><button class="back" data-a="home" aria-label="Back to title">‹</button><div><div class="kick">${k}</div><div class="mini">Red <span>String</span></div></div></div>`;
+  return `<div class="row" style="gap:12px"><button class="back" data-a="home" aria-label="Back to title">‹</button><div><div class="kick hk">${k}</div><div class="mini">RED <span>STRING</span></div></div></div>`;
 }
 function seats(host) {
   const list = S.joined.map(P_);
