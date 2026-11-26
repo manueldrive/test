@@ -350,7 +350,6 @@ function title() {
     <span style="font: 900 74px/0.95 'Playfair Display', serif; letter-spacing: 1px; color: #FF3B4E; text-shadow: 1px 1px 0 #d22b3d, 2px 2px 0 #b72535, 3px 3px 0 #9c1f2d, 4px 4px 0 #821a26, 5px 5px 0 #69151e, 6px 6px 0 #501017, 12px 16px 20px rgba(0,0,0,0.85)">STRING</span>
   </div>
   <div class="cases" aria-label="Choose a case">
-    <div class="ckick"><span>CHOOSE A CASE</span><span>${CASES.filter(c => !c.soon).length} OPEN · ${CASES.filter(c => c.soon).length} COMING</span></div>
     <div class="ctrack" id="ctrack">${CASES.map(c => `<article class="ccard${c.soon ? ' soon' : ''}" ${c.soon ? `data-a="case" data-v="${c.id}" aria-disabled="true"` : ''} style="${c.img ? `--img:url(${IMG(c.img)})` : `--h:${c.hue}`}">
       <div class="ctop"><span class="cno">CASE ${c.no}</span>${c.soon ? '<span class="csoon">COMING SOON</span>' : '<span class="cpin"></span>'}</div>
       ${c.img ? '' : `<span class="cghost">${c.no}</span>`}
