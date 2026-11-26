@@ -62,6 +62,7 @@ h1,h2,h3{margin:0}
 .field:focus{outline:none;border-color:#F2EEE6}
 .tip{background:rgba(11,11,13,.72);color:#F2EEE6;padding:16px 18px;border:1px solid #3a3a40;border-left:3px solid var(--red)}
 .bf{scrollbar-width:none}
+.bftab{flex:none;overflow:visible;min-height:auto}.bftab .rv{animation:none;opacity:1;transform:none}.bftab .bfhero{height:230px}
 .bfsheet{margin:-18px -16px -18px;flex:none;overflow:visible;border-radius:12px 12px 0 0}.bfsheet .rv{animation:none;opacity:1;transform:none}.bfsheet .bfhero{height:240px}
 .bfhero{position:relative;height:min(46svh,380px);flex:none;overflow:hidden}
 .bfhero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:40% 40%;filter:grayscale(1) contrast(1.1) brightness(.85);-webkit-mask-image:linear-gradient(180deg,#000 45%,transparent 100%);mask-image:linear-gradient(180deg,#000 45%,transparent 100%)}
@@ -180,7 +181,7 @@ h1,h2,h3{margin:0}
 .timer{margin-left:auto;font:600 22px 'IBM Plex Mono',monospace;color:var(--amber);text-shadow:0 0 14px rgba(255,194,61,.45)}
 .timer.low{color:var(--red);text-shadow:0 0 14px rgba(255,59,78,.5)}
 .skip{border:1px solid var(--line);background:none;border-radius:4px;height:32px;padding:0 8px;font:11px 'IBM Plex Mono',monospace;color:var(--mute)}
-.tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--line);background:#0e0e10}
+.tabs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));border-top:1px solid var(--line);background:#0e0e10}
 .tabs button{background:none;border:0;padding:8px 0 10px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:700;color:var(--mute);min-height:58px;position:relative}
 .tabs button[aria-selected=true]{color:var(--ink)}
 .tabs button[aria-selected=true]::before{content:"";position:absolute;top:0;left:25%;right:25%;height:3px;background:var(--red)}
@@ -424,7 +425,7 @@ function joined() {
     <p style="margin:0;text-align:center;font:400 15px 'Playfair Display';color:#BDB8AE">${S.joined.length >= 4 ? 'Everyone’s here. Waiting for Jess to open the case…' : 'Waiting for more detectives…'} <button data-a="hoststart" style="background:none;border:0;font:700 11px 'Playfair Display';letter-spacing:2px;color:#8f8f96;text-decoration:underline;padding:8px">SKIP ▸</button></p></section>`;
 }
 function brief(inSheet) {
-  return `<section class="scr noir bf${inSheet ? ' bfsheet' : ''}" style="padding:0;gap:0">
+  return `<section class="scr noir bf${inSheet === 'tab' ? ' bftab' : inSheet ? ' bfsheet' : ''}" style="padding:0;gap:0">
     <div class="bfhero"><img src="${IMG('cover-stoke-moran')}" alt="Stoke Moran manor at night in a storm">
       <div class="bftop rv" style="--d:.1s"><span class="kick">CASE 0221</span><span class="kick" style="letter-spacing:2px">SURREY · 1883</span></div>
       <div class="bftitle rv" style="--d:.25s"><div class="kick" style="color:#d8d4cc">STOKE MORAN MANOR</div><h1>The Speckled Band</h1></div></div>
@@ -442,7 +443,7 @@ function brief(inSheet) {
       <div class="rv" style="--d:1.05s"><div class="kick" style="margin-bottom:10px">YOUR JOB: FIND OUT</div>
         <div class="bfask"><span>WHO</span><span>HOW</span><span>WHY</span></div></div>
       <p class="bfrules rv" style="--d:1.15s">Three rounds of eight minutes. New files open each round. Then the lineup.</p>
-      ${inSheet ? '<button class="cbtn" data-a="close">BACK TO THE CASE</button>' : '<button class="cbtn rv" style="--d:1.25s" data-a="begin">OPEN THE CASE FILE</button>'}
+      ${inSheet === 'tab' ? '' : inSheet ? '<button class="cbtn" data-a="close">BACK TO THE CASE</button>' : '<button class="cbtn rv" style="--d:1.25s" data-a="begin">OPEN THE CASE FILE</button>'}
     </div></section>`;
 }
 function game() {
@@ -451,8 +452,8 @@ function game() {
   const mm = String(Math.floor(S.t / 60)), ss = String(S.t % 60).padStart(2, '0');
   return `<div class="top"><h2>Round ${S.round}</h2><span class="mono" style="font-size:11px;color:var(--mute)">${ROUNDS[S.round - 1].n.toUpperCase()}</span>
     <span class="timer ${S.t < 60 ? 'low' : ''}">${mm}:${ss}</span><button class="skip" data-a="skip" title="Prototype only">SKIP ▸</button></div>
-    <section class="scr" style="padding-top:14px">${{files, evidence, board, suspects}[S.tab]()}</section>
-    <nav class="tabs" role="tablist">${tab('files', 'Files', '<path d="M3 7h6l2 2h10v10H3z"/>', nf)}${tab('evidence', 'Evidence', '<circle cx="11" cy="11" r="6"/><path d="M20 20l-4-4"/>', ne)}${tab('board', 'Board', '<rect x="3" y="4" width="18" height="16"/><path d="M7 9l5 5 5-6"/>', 0)}${tab('suspects', 'Suspects', '<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/>', 0)}</nav>`;
+    ${S.tab === 'brief' ? `<section class="scr" style="padding:0;gap:0">${brief('tab')}</section>` : `<section class="scr" style="padding-top:14px">${{files, evidence, board, suspects}[S.tab]()}</section>`}
+    <nav class="tabs" role="tablist">${tab('brief', 'Briefing', '<rect x="4" y="3" width="16" height="18" rx="1"/><path d="M8 8h8M8 12h8M8 16h5"/>', 0)}${tab('files', 'Files', '<path d="M3 7h6l2 2h10v10H3z"/>', nf)}${tab('evidence', 'Evidence', '<circle cx="11" cy="11" r="6"/><path d="M20 20l-4-4"/>', ne)}${tab('board', 'Board', '<rect x="3" y="4" width="18" height="16"/><path d="M7 9l5 5 5-6"/>', 0)}${tab('suspects', 'Suspects', '<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/>', 0)}</nav>`;
 }
 function readyBar() {
   const n = S.ready.size, last = S.round === 3;
@@ -461,7 +462,7 @@ function readyBar() {
 function files() {
   const docs = ITEMS.filter(i => i.kind === 'doc');
   return `<p class="mono" style="margin:0;font-size:12px;color:var(--amber)">${ROUNDS[S.round - 1].q}</p>
-    <div class="list"><button class="li" data-a="openbrief"><span class="mono" style="font-size:12px;color:var(--mute);width:34px">B-0</span><span class="grow"><b class="serif" style="font-size:20px">Case briefing</b><br><small style="color:var(--mute)">Julia Stoner · the locked room</small></span></button>${docs.map(d => d.r <= S.round ? `<button class="li" data-a="open" data-v="${d.id}"><span class="mono" style="font-size:12px;color:var(--mute);width:34px">${d.tag}</span><span class="grow"><b class="serif" style="font-size:20px">${d.n}</b><br><small style="color:var(--mute)">${d.sub}</small></span>${!S.seen.has(d.id) ? '<span class="mono" style="background:var(--amber);color:#141414;font-size:10px;padding:2px 6px">NEW</span>' : ''}${pinned(d.id) ? pinDot(pinned(d.id).by) : ''}</button>` : `<div class="li lock"><span class="mono" style="font-size:12px;width:34px">${d.tag}</span><span class="grow"><b class="serif" style="font-size:20px">Sealed</b><br><small>Opens in round ${d.r}</small></span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A3A3AA" stroke-width="2" aria-hidden="true"><rect x="5" y="11" width="14" height="10"/><path d="M8 11V7a4 4 0 018 0v4"/></svg></div>`).join('')}</div>
+    <div class="list">${docs.map(d => d.r <= S.round ? `<button class="li" data-a="open" data-v="${d.id}"><span class="mono" style="font-size:12px;color:var(--mute);width:34px">${d.tag}</span><span class="grow"><b class="serif" style="font-size:20px">${d.n}</b><br><small style="color:var(--mute)">${d.sub}</small></span>${!S.seen.has(d.id) ? '<span class="mono" style="background:var(--amber);color:#141414;font-size:10px;padding:2px 6px">NEW</span>' : ''}${pinned(d.id) ? pinDot(pinned(d.id).by) : ''}</button>` : `<div class="li lock"><span class="mono" style="font-size:12px;width:34px">${d.tag}</span><span class="grow"><b class="serif" style="font-size:20px">Sealed</b><br><small>Opens in round ${d.r}</small></span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A3A3AA" stroke-width="2" aria-hidden="true"><rect x="5" y="11" width="14" height="10"/><path d="M8 11V7a4 4 0 018 0v4"/></svg></div>`).join('')}</div>
     <div class="grow"></div>${readyBar()}`;
 }
 function evidence() {
