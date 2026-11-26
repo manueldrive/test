@@ -65,6 +65,16 @@ h1,h2,h3{margin:0}
 .boxes input{position:absolute;inset:0;width:100%;opacity:0;font-size:16px;text-transform:uppercase}
 .field{width:100%;min-height:56px;background:rgba(11,11,13,.7);border:1.5px solid #6b6b72;color:#F2EEE6;font:900 24px 'Playfair Display',serif;padding:0 14px}
 .field:focus{outline:none;border-color:#F2EEE6}
+.tipC{flex:none;padding:6px 0 4px;height:214px;display:flex;flex-direction:column}
+.tCrow{display:flex;align-items:center;margin-bottom:14px}
+.tCrow i{flex:1;height:2px;background:#3a3a40}
+.tCpin{width:28px;height:28px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font:900 13px 'Playfair Display',serif;color:#8f8f96;border:1.5px solid #4a4a50;background:#0b0b0d}
+.tCpin.done{background:#3a3a40;color:#F2EEE6;border-color:#3a3a40}
+.tCpin.on{background:var(--red);color:#fff;border-color:var(--red);box-shadow:0 0 14px rgba(255,59,78,.6)}
+.tCrow .tCpin.done+i{background:var(--red);box-shadow:0 0 6px rgba(255,59,78,.6)}
+.tipC h3{font:900 30px/1.02 'Playfair Display',serif;margin:0 0 6px;color:#F2EEE6}
+.tipC p{margin:0;font:400 16px/1.45 'Playfair Display',serif;color:#BDB8AE;flex:1}
+.tipC button{align-self:flex-start;margin-top:8px;background:none;border:0;padding:8px 0;font:600 12px Cinzel,serif;letter-spacing:3px;color:var(--red);text-transform:uppercase;cursor:pointer}
 .tipA{position:relative;flex:none;margin-top:8px;height:232px;display:flex;flex-direction:column;background:#F2EEE6;color:#0b0b0d;padding:22px 18px 16px;transform:rotate(-1.2deg);box-shadow:0 16px 30px rgba(0,0,0,.65);background-image:repeating-linear-gradient(180deg,transparent 0 25px,rgba(90,140,200,.25) 25px 26px),linear-gradient(180deg,transparent 0 40px,rgba(255,59,78,.5) 40px 41.5px,transparent 41.5px);font-family:'Special Elite',monospace}
 .tpin{position:absolute;left:50%;top:-8px;margin-left:-8px;width:16px;height:16px;border-radius:50%;background:var(--red);box-shadow:inset -3px -3px 0 rgba(0,0,0,.3),0 3px 6px rgba(0,0,0,.6)}
 .tAhead{display:flex;justify-content:space-between;align-items:center;font:13px 'Special Elite',monospace;letter-spacing:2px;color:#4A4740}
@@ -430,10 +440,8 @@ function join() {
 function joined() {
   const me = P_('me');
   return `<section class="scr noir" style="gap:16px">${head('CASE 0221')}
-    <div class="tipA" aria-live="polite"><span class="tpin"></span>
-      <div class="tAhead"><span>RULE ${S.tip + 1} OF ${TIPS.length}</span><span class="tdots">${TIPS.map((_, i) => `<i class="${i === S.tip ? 'on' : ''}"></i>`).join('')}</span></div>
-      <h3>${TIPS[S.tip][0]}</h3><p>${TIPS[S.tip][1]}</p>
-      <button class="tnext" data-a="tipnext" aria-label="Next rule">${S.tip === TIPS.length - 1 ? 'BACK TO RULE 1' : 'NEXT RULE'} <b>→</b></button></div>
+    <div class="tipC" aria-live="polite"><div class="tCrow">${TIPS.map((_, i) => `<span class="tCpin${i === S.tip ? ' on' : i < S.tip ? ' done' : ''}">${i + 1}</span>`).join('<i></i>')}</div>
+      <h3>${TIPS[S.tip][0]}</h3><p>${TIPS[S.tip][1]}</p><button data-a="tipnext" aria-label="Next tip">${S.tip === TIPS.length - 1 ? 'Back to the first clue' : 'Next clue'} ›</button></div>
     ${seats('jess')}
     <div class="grow"></div>
 
