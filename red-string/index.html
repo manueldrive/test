@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Red String — Prototype</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@500;700;800&display=swap">
+<style>
+/* VOICE: a noir party game, tense but playful
+   IDEA: a case file passed around a table; the murder board is the shared heart
+   PICTURE: each screen is the working game itself (lobby, files, board, lineup)
+   COLOUR and TYPE: black, smoke, paper white; red string, amber lamp light, one colour per player; Playfair italic, Plex Mono, Inter
+   LAYOUT: phone column with a bottom tab bar during play */
+:root{color-scheme:dark;--bg:#0B0B0D;--panel:#151518;--line:#34343A;--ink:#ECE8DF;--mute:#A3A3AA;--red:#FF3B4E;--btn:#E3263A;--amber:#FFC23D;--paper:#ECE8DF;--pink:#141414}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0;height:100%;background:#050506}
+body{color:var(--ink);font:15px/1.5 Inter,system-ui,sans-serif;display:flex;justify-content:center;overflow:hidden}
+button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+a{color:inherit}
+#app{position:relative;width:100%;max-width:440px;height:100svh;background:var(--bg);display:flex;flex-direction:column;overflow:hidden}
+.scr{flex:1;display:flex;flex-direction:column;gap:14px;padding:18px 16px 16px;overflow-y:auto;min-height:0}
+.serif{font-family:'Playfair Display',serif}.mono{font-family:'IBM Plex Mono',monospace}
+h1,h2,h3{margin:0}
+.big{font:italic 900 64px/.92 'Playfair Display',serif;letter-spacing:-2px}
+.big span{color:var(--red)}
+.lbl{font:12px 'IBM Plex Mono',monospace;letter-spacing:3px;color:var(--mute)}
+.amber{color:var(--amber)}
+.blinds{background:repeating-linear-gradient(-22deg,rgba(0,0,0,.6) 0 16px,transparent 16px 34px),radial-gradient(ellipse at 78% 8%,rgba(255,194,61,.28),transparent 55%),var(--bg)}
+.tag{position:relative;background:var(--paper);color:#141414;border-radius:6px;padding:14px 18px 14px 54px;transform:rotate(-1.5deg);box-shadow:0 14px 30px rgba(0,0,0,.6)}
+.tag::before{content:"";position:absolute;left:18px;top:50%;width:18px;height:18px;margin-top:-9px;border-radius:50%;background:var(--bg);box-shadow:inset 0 0 0 4px #CFC9BC}
+.code{font:800 64px/1 Inter;letter-spacing:10px}
+.btn{min-height:60px;border:0;border-radius:4px;background:var(--btn);color:#fff;font-weight:800;letter-spacing:3px;font-size:16px;padding:0 18px;display:flex;align-items:center;justify-content:center;gap:10px;width:100%}
+.btn.ghost{background:none;border:1px solid #6B6B72;color:var(--ink);letter-spacing:2px;font-weight:700}
+.btn:disabled{opacity:.45;cursor:default}
+.row{display:flex;gap:10px;align-items:center}
+.grow{flex:1}
+.list{border-top:1px solid var(--line)}
+.li{display:flex;align-items:center;gap:12px;padding:12px 4px;border-bottom:1px solid var(--line);background:none;border-left:0;border-right:0;border-top:0;width:100%;text-align:left;min-height:56px}
+.dot{width:10px;height:10px;border-radius:50%;flex:none}
+.choice{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.opt{background:var(--panel);border:2px solid var(--line);border-radius:6px;padding:12px;text-align:left;min-height:84px;display:flex;flex-direction:column;gap:4px}
+.opt[aria-pressed=true]{border-color:var(--amber);box-shadow:0 0 24px rgba(255,194,61,.15)}
+.opt b{font:italic 700 20px/1.05 'Playfair Display',serif}
+.opt small{color:var(--mute);font-size:12px;line-height:1.35}
+/* game shell */
+.top{display:flex;align-items:center;gap:10px;padding:14px 16px 10px;border-bottom:1px solid var(--line)}
+.top h2{font:italic 900 22px/1 'Playfair Display',serif}
+.timer{margin-left:auto;font:600 22px 'IBM Plex Mono',monospace;color:var(--amber);text-shadow:0 0 14px rgba(255,194,61,.45)}
+.timer.low{color:var(--red);text-shadow:0 0 14px rgba(255,59,78,.5)}
+.skip{border:1px solid var(--line);background:none;border-radius:4px;height:32px;padding:0 8px;font:11px 'IBM Plex Mono',monospace;color:var(--mute)}
+.tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--line);background:#0e0e10}
+.tabs button{background:none;border:0;padding:8px 0 10px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:700;color:var(--mute);min-height:58px;position:relative}
+.tabs button[aria-selected=true]{color:var(--ink)}
+.tabs button[aria-selected=true]::before{content:"";position:absolute;top:0;left:25%;right:25%;height:3px;background:var(--red)}
+.tabs .n{position:absolute;top:6px;right:22%;background:var(--amber);color:#141414;border-radius:999px;font:600 10px 'IBM Plex Mono',monospace;padding:0 5px}
+.lock{opacity:.45}
+.paper{background:var(--paper);color:#141414;padding:18px;font:12.5px/1.6 'IBM Plex Mono',monospace;box-shadow:0 14px 30px rgba(0,0,0,.6)}
+.paper h3{font:900 24px/1.1 'Playfair Display',serif;margin:4px 0 8px}
+.paper p{margin:0 0 10px}
+.paper .hdr{display:flex;justify-content:space-between;border-bottom:2px solid #141414;padding-bottom:6px;font-weight:600;font-size:11px;letter-spacing:2px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.ev{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:0;overflow:hidden;text-align:left;display:flex;flex-direction:column}
+.ev .im{aspect-ratio:1;background:#1c1c20 center/cover;display:grid;place-items:center;filter:grayscale(.35)}
+.ev .cap{padding:8px 10px 10px;line-height:1.2}
+.ev .cap small{display:block;font:11px 'IBM Plex Mono',monospace;color:var(--mute)}
+.ev .cap b{font:700 16px 'Playfair Display',serif}
+.ev .new{position:absolute;margin:8px;background:var(--amber);color:#141414;font:600 10px 'IBM Plex Mono',monospace;letter-spacing:2px;padding:2px 6px}
+.sus{display:grid;grid-template-columns:84px minmax(0,1fr);gap:12px;padding:10px;background:var(--panel);border:1px solid var(--line);border-radius:6px;text-align:left;width:100%}
+.sus img{width:84px;height:104px;object-fit:cover;object-position:top;filter:grayscale(1)}
+.sus b{font:900 20px 'Playfair Display',serif}
+.sus p{margin:2px 0 0;font-size:13px;color:#cfcfd4;line-height:1.4}
+/* board */
+.board{position:relative;flex:1;min-height:380px;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:repeating-linear-gradient(-22deg,rgba(0,0,0,.45) 0 14px,transparent 14px 30px),radial-gradient(ellipse at 70% 10%,rgba(255,194,61,.16),transparent 60%),#1A1A1E;touch-action:none}
+.board svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.board line{stroke:var(--red);stroke-width:2.4;stroke-linecap:round;vector-effect:non-scaling-stroke;filter:drop-shadow(0 0 3px rgba(255,59,78,.9))}
+.bc{position:absolute;transform:translate(-50%,-50%) rotate(var(--r,0deg));width:92px;background:var(--paper);color:#141414;padding:5px 5px 6px;box-shadow:0 8px 16px rgba(0,0,0,.6);border:0;text-align:left;cursor:grab;touch-action:none;user-select:none}
+.bc img{display:block;width:100%;height:58px;object-fit:cover;object-position:top;filter:grayscale(1);pointer-events:none}
+.bc b{display:block;font:900 13px/1.15 'Playfair Display',serif;margin-top:4px}
+.bc small{font:10px 'IBM Plex Mono',monospace}
+.bc .pin{position:absolute;left:50%;top:-6px;width:12px;height:12px;margin-left:-6px;border-radius:50%;box-shadow:0 0 0 2px #141414}
+.bc.sel{outline:3px solid var(--amber);outline-offset:2px}
+.bc.note{background:var(--amber)}
+.bc.doc{background:#e3dccb}
+.btools{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) 64px;gap:8px}
+.chip{border:1px solid var(--line);background:var(--panel);border-radius:4px;min-height:48px;font-weight:700;font-size:13px}
+.chip[aria-pressed=true]{border-color:var(--red);color:#fff;background:#2a1418}
+/* overlays */
+.ov{position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center;background:radial-gradient(circle at 50% 40%,#3a3a42 0%,#141418 45%,#08080a 80%);animation:fade .25s}
+.stamp{border:4px solid var(--red);color:var(--red);font:600 34px 'IBM Plex Mono',monospace;letter-spacing:6px;padding:2px 14px;transform:rotate(-10deg);animation:stamp .35s cubic-bezier(.2,1.6,.5,1)}
+.sheet{position:absolute;left:0;right:0;bottom:0;z-index:15;background:#111114;border-top:1px solid var(--line);border-radius:12px 12px 0 0;padding:18px 16px 18px;max-height:88%;overflow-y:auto;display:flex;flex-direction:column;gap:12px;animation:up .25s;box-shadow:0 -20px 40px rgba(0,0,0,.6)}
+.scrim{position:absolute;inset:0;z-index:14;background:rgba(0,0,0,.55)}
+.toast{position:absolute;left:12px;right:12px;top:64px;z-index:12;background:rgba(21,21,24,.96);border:1px solid var(--line);border-radius:6px;padding:10px 12px;font-size:13px;display:flex;gap:8px;align-items:center;animation:drop .25s}
+@keyframes fade{from{opacity:0}}@keyframes up{from{transform:translateY(40%);opacity:0}}@keyframes drop{from{transform:translateY(-12px);opacity:0}}
+@keyframes stamp{from{transform:rotate(-10deg) scale(2.2);opacity:0}}
+.lineup{position:relative;height:300px;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:repeating-linear-gradient(180deg,transparent 0 37px,#34343A 37px 38px),#151518;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;padding:0 4px;align-items:end}
+.lu{border:0;background:none;padding:0 0 8px;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end;border-radius:4px}
+.lu img{width:100%;object-fit:cover;object-position:top;border-radius:3px;filter:grayscale(1) brightness(.5);transition:filter .2s}
+.lu .pl{background:var(--paper);color:#141414;font:600 14px 'IBM Plex Mono',monospace;padding:1px 9px;margin-top:-16px;position:relative}
+.lu b{font:900 15px 'Playfair Display',serif}
+.lu[aria-pressed=true] img{filter:none}
+.lu[aria-pressed=true]{background:radial-gradient(ellipse at 50% 30%,rgba(255,255,255,.18),transparent 65%)}
+.qs{display:flex;flex-wrap:wrap;gap:8px}
+.q{border:1px solid var(--line);background:var(--panel);border-radius:999px;min-height:44px;padding:0 14px;font-size:14px;font-weight:700}
+.q[aria-pressed=true]{border-color:var(--amber);color:var(--amber)}
+table{width:100%;border-collapse:collapse;font-size:13px}td,th{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line)}th{font:11px 'IBM Plex Mono',monospace;color:var(--mute);letter-spacing:1px}
+.ok{color:#5BD39A}.no{color:var(--red)}
+.tvwrap{position:absolute;inset:0;z-index:25;background:#000;display:flex;flex-direction:column;justify-content:center;padding:12px;gap:10px}
+.tv{aspect-ratio:16/9;width:100%;border:6px solid #222;border-radius:8px;position:relative;overflow:hidden}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<main id="app" aria-live="polite"></main>
+<script>
+{
+const IMG = n => 'img/' + n + '.jpg';
+const VIEWER = 'evidence/';
+const PLAYERS = [
+  {id:'me', n:'You', c:'#FF3B4E'},
+  {id:'jess', n:'Jess', c:'#3FD0C9'},
+  {id:'marcus', n:'Marcus', c:'#B48CFF'},
+  {id:'priya', n:'Priya', c:'#FFC23D'}
+];
+const SUS = [
+  {id:'roylott', n:'Dr. Grimesby Roylott', s:'Roylott', img:'suspect-roylott', c:'#FF3B4E', who:'Julia\'s stepfather. Ex-doctor back from India. Violent temper; keeps Indian animals loose on the grounds.', alibi:'"Asleep in my room all night." (The room next to Julia\'s.)'},
+  {id:'helen', n:'Helen Stoner', s:'Helen', img:'suspect-helen', c:'#B48CFF', who:'Julia\'s twin sister. Brought the case to you.', alibi:'Woke to Julia\'s scream and found her in the hall.'},
+  {id:'croft', n:'Silas Croft', s:'Croft', img:'suspect-croft', c:'#3FD0C9', who:'Groundskeeper. Julia reported him for selling the estate\'s firewood.', alibi:'"In my cottage all night." Muddy boots by the back door.'},
+  {id:'price', n:'Major Edmund Price', s:'Price', img:'suspect-price', c:'#FFC23D', who:'Julia\'s fiancé. Overheard arguing with her the week before.', alibi:'Took the evening train home to Harrow.'}
+];
+const ROUNDS = [
+  {n:'The locked room', q:'How did anyone get in? Was it Croft, or Price?'},
+  {n:'Something in the walls', q:'The room was changed on purpose. And who gains from the will?'},
+  {n:'The room next door', q:'What is Roylott keeping in his room?'}
+];
+const P = (a) => a.map(x => `<p>${x}</p>`).join('');
+const ITEMS = [
+  {id:'D1', kind:'doc', r:1, tag:'D-1', n:'Helen\'s statement', sub:'Witness statement', body:`<div class="hdr"><span>WITNESS STATEMENT</span><span>D-1</span></div><h3>Helen Stoner</h3>` + P(['On the night Julia died, a storm was blowing. Julia came to my room before bed and asked if I ever heard a low, clear whistle in the night, around three. I said no. She said she had heard it for several nights.','Later I woke to a terrible scream. I opened my door and heard a soft whistle, then a clanging sound, like metal falling. Julia staggered out of her room. She cried, "It was the band! The speckled band!" and pointed toward the doctor\'s room. She died within minutes.','Julia always locked her door and barred her shutters at night. My stepfather keeps a cheetah and a baboon loose on the grounds.'])},
+  {id:'D2', kind:'doc', r:1, tag:'D-2', n:'Inquest summary', sub:'Coroner', body:`<div class="hdr"><span>SURREY COUNTY CORONER</span><span>D-2</span></div><h3>Inquest Summary</h3>` + P(['DECEASED: Julia Stoner, 30. FINDING: Open verdict.','No marks of violence. No poison found in tests. Door locked from inside; window shutters barred with iron bars, checked each night. Walls and floor found solid. Chimney wide, but barred with four large staples.','Found in her nightdress. In her right hand, the stump of a burnt match. In her left, a matchbox.','The coroner could not name a cause. Death from fright is possible.'])},
+  {id:'D3', kind:'doc', r:2, tag:'D-3', n:'Mrs. Stoner\'s will', sub:'Extract', body:`<div class="hdr"><span>EXTRACT · LAST WILL</span><span>D-3</span></div><h3>Mrs. Stoner's Will</h3>` + P(['I leave my income of £1,000 a year to my husband, Dr. Grimesby Roylott, <b>while my daughters live with him</b>. On the marriage of either daughter, she is to receive a yearly share of that income for her own use.'])},
+  {id:'D4', kind:'doc', r:2, tag:'D-4', n:'Julia\'s letter', sub:'Found in her desk', body:`<div class="hdr"><span>LETTER</span><span>D-4</span></div><h3>Dear Helen,</h3>` + P(['Strange things this week. Workmen came and fitted a new ventilator high in my wall and a bell-rope beside my bed, though I never asked for either. The ventilator opens into the doctor\'s room, not outside. Some nights I smell his cigars through it.','And that whistle again, at three in the morning. You must hear it too?','Your loving sister,<br>Julia'])},
+  {id:'P1', kind:'photo', r:1, tag:'Photo 1', n:'Julia\'s bedroom', img:'photo-1-bedroom', d:'The bolted bed, the bell-rope dangling to the pillow, the vent high above.'},
+  {id:'R1', kind:'ev', r:1, tag:'R-1', n:'Muddy boots', img:'R-1-muddy-boots', d:'Croft\'s work boots by the back door, caked in wet mud.', v3d:1},
+  {id:'R2', kind:'ev', r:1, tag:'R-2', n:'Train ticket', icon:'ticket', d:'Evening train from Leatherhead, punched, dated the night of the death.', v3d:1},
+  {id:'A7', kind:'ev', r:1, tag:'A-7', n:'Matchbox', icon:'box', d:'Found in Julia\'s left hand, with one burnt match.', v3d:1},
+  {id:'R3', kind:'ev', r:2, tag:'R-3', n:'Copy of the will', icon:'doc', d:'Helen\'s copy, with the shares underlined in pencil.', v3d:1},
+  {id:'A2', kind:'photo', r:2, tag:'A-2', n:'Bell-rope', img:'A-2-bell-rope', d:'Hangs to the pillow. Pulled, it rings nothing: the wire isn\'t attached. Hooked just under the ventilator.'},
+  {id:'A3', kind:'photo', r:2, tag:'A-3', n:'Bolted bed', img:'A-3-bolted-bed', d:'Bolted to the floor, so it can\'t be moved away from the rope.'},
+  {id:'A1', kind:'photo', r:2, tag:'A-1', n:'Ventilator', icon:'vent', d:'A small vent high in Julia\'s wall. It opens into Roylott\'s room, not outside.'},
+  {id:'A4', kind:'ev', r:3, tag:'A-4', n:'Saucer of milk', img:'A-4-saucer', d:'On top of the iron safe in Roylott\'s room. He keeps no cat.', v3d:1},
+  {id:'A5', kind:'ev', r:3, tag:'A-5', n:'Looped dog lash', img:'A-5-dog-lash', d:'By Roylott\'s bed, its end tied into a small loop.', v3d:1},
+  {id:'A6', kind:'photo', r:3, tag:'A-6', n:'Iron safe', img:'A-6-iron-safe', d:'A heavy safe in Roylott\'s room. Its door clangs shut.'}
+];
+const ICON = {
+  ticket:'<path d="M3 7h12l-2 3 2 3-2 3H3z"/><path d="M7 7v9" stroke-dasharray="2 2"/>',
+  box:'<rect x="3" y="7" width="18" height="10" rx="1"/><path d="M14 7v10"/>',
+  doc:'<path d="M6 3h9l4 4v14H6z"/><path d="M9 10h7M9 13h7M9 16h4"/>',
+  vent:'<rect x="5" y="5" width="14" height="14"/><path d="M5 9h14M5 13h14M5 17h14"/>'
+};
+const svgI = k => `<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#ECE8DF" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[k]}</svg>`;
+const HOW = ['Poisoned drink', 'A snake sent through the vent', 'A hidden passage', 'Frightened by the cheetah'];
+const WHY = ['To keep the family money', 'Jealousy', 'Revenge for being reported', 'A lovers\' quarrel'];
+const ANSWER = {who:'roylott', how:1, why:0};
+const ROUND_SECS = 480;
+
+const S = {screen:'title', mode:'tv', joined:['me'], round:1, t:ROUND_SECS, tab:'files', seen:new Set(), pins:[], strings:[], tie:false, sel:null, ready:new Set(), vote:{who:null, how:null, why:null}, bots:{}, sheet:null, ov:null, toast:null, tv:false};
+const P_ = id => PLAYERS.find(p => p.id === id);
+const unlocked = () => ITEMS.filter(i => i.r <= S.round);
+const newCount = kinds => unlocked().filter(i => kinds.includes(i.kind) && !S.seen.has(i.id)).length;
+const $ = s => document.querySelector(s);
+const esc = x => String(x).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const app = $('#app');
+let timerId = null, botId = null, toastId = null;
+
+/* ---------- renderers ---------- */
+function render() {
+  const f = {title, lobby, brief, game, vote, reveal}[S.screen];
+  app.innerHTML = f() + overlays();
+  if (S.screen === 'game' && S.tab === 'board') drawStrings();
+}
+function title() {
+  return `<section class="scr blinds" style="justify-content:space-between">
+    <div><div class="lbl amber">A PARTY MURDER MYSTERY</div><h1 class="big" style="font-size:80px;margin-top:8px">Red<br><span>String</span></h1></div>
+    <p style="margin:0;color:#cfcfd4;max-width:30ch">Gather your detectives. Read the files, pin the clues, tie the string, and name the killer before time runs out.</p>
+    <div style="display:grid;gap:10px"><button class="btn" data-a="host">HOST A CASE</button><button class="btn ghost" data-a="host">JOIN WITH A CODE</button>
+    <p class="mono" style="margin:0;font-size:11px;color:var(--mute);text-align:center">Prototype · the other 3 detectives are simulated</p></div></section>`;
+}
+function lobby() {
+  const full = S.joined.length === 4;
+  return `<section class="scr blinds">
+    <div><div class="lbl amber">CASE 0221 · THE SPECKLED BAND</div><h1 class="big" style="font-size:52px;margin-top:6px">Red <span>String</span></h1></div>
+    <div class="tag"><div class="mono" style="font-size:12px;font-weight:600;letter-spacing:4px">ROOM CODE</div><div class="code">KXQZ</div><div style="font-size:13px;color:#4A4740">Friends join on their phones with this code</div></div>
+    <div class="lbl">WHERE DOES THE BOARD LIVE?</div>
+    <div class="choice">${[['tv','On the TV','Board on the big screen, files on phones'],['phones','Phones only','Everyone carries the full board']].map(([k, a, b]) => `<button class="opt" data-a="mode" data-v="${k}" aria-pressed="${S.mode === k}"><b>${a}</b><small>${b}</small></button>`).join('')}</div>
+    <div class="list">${PLAYERS.map(p => S.joined.includes(p.id) ? `<div class="li" style="min-height:44px"><span class="dot" style="background:${p.c}"></span><b>${p.n}</b><span class="grow"></span><span class="mono" style="font-size:11px;color:var(--mute)">${p.id === 'me' ? 'HOST' : 'READY'}</span></div>` : `<div class="li" style="min-height:44px;color:var(--mute)"><span class="dot" style="border:2px dashed #6B6B72"></span>waiting…</div>`).join('')}</div>
+    <div class="grow"></div>
+    <button class="btn" data-a="start" ${full ? '' : 'disabled'}>${full ? 'OPEN THE CASE' : 'WAITING FOR DETECTIVES…'}</button></section>`;
+}
+function brief() {
+  return `<section class="scr" style="background:radial-gradient(circle at 50% 30%,#2a2a30,#0b0b0d 70%)">
+    <div class="lbl amber">CASE 0221 · STOKE MORAN MANOR · 1883</div>
+    <h1 class="serif" style="font:italic 900 44px/1 'Playfair Display'">The Speckled Band</h1>
+    <div class="row" style="align-items:flex-start;gap:14px"><img src="${IMG('victim-julia')}" alt="Julia Stoner" style="width:96px;height:120px;object-fit:cover;filter:grayscale(1);box-shadow:0 10px 20px rgba(0,0,0,.6)">
+    <p style="margin:0;color:#d8d8dc">Two years ago, <b>Julia Stoner</b>, 30, died in her bedroom. The door was locked from the inside. The shutters were barred. No wound, no poison, no sign of anyone else.</p></div>
+    <p style="margin:0;font:italic 700 22px/1.3 'Playfair Display';border-left:3px solid var(--red);padding-left:14px">"It was the band! The speckled band!"</p>
+    <p style="margin:0;color:#d8d8dc">Her twin sister Helen is now hearing the same whistle at night. Find out <b>who</b> killed Julia, <b>how</b>, and <b>why</b>.</p>
+    <div class="lbl">3 ROUNDS · 8 MINUTES EACH · THEN THE LINEUP</div>
+    <div class="grow"></div><button class="btn" data-a="begin">BEGIN ROUND 1</button></section>`;
+}
+function game() {
+  const nf = newCount(['doc']), ne = newCount(['ev', 'photo']);
+  const tab = (k, label, ic, n) => `<button role="tab" aria-selected="${S.tab === k}" data-a="tab" data-v="${k}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ic}</svg>${label}${n ? `<span class="n">${n}</span>` : ''}</button>`;
+  const mm = String(Math.floor(S.t / 60)), ss = String(S.t % 60).padStart(2, '0');
+  return `<div class="top"><h2>Round ${S.round}</h2><span class="mono" style="font-size:11px;color:var(--mute)">${ROUNDS[S.round - 1].n.toUpperCase()}</span>
+    <span class="timer ${S.t < 60 ? 'low' : ''}">${mm}:${ss}</span><button class="skip" data-a="skip" title="Prototype only">SKIP ▸</button></div>
+    <section class="scr" style="padding-top:14px">${{files, evidence, board, suspects}[S.tab]()}</section>
+    <nav class="tabs" role="tablist">${tab('files', 'Files', '<path d="M3 7h6l2 2h10v10H3z"/>', nf)}${tab('evidence', 'Evidence', '<circle cx="11" cy="11" r="6"/><path d="M20 20l-4-4"/>', ne)}${tab('board', 'Board', '<rect x="3" y="4" width="18" height="16"/><path d="M7 9l5 5 5-6"/>', 0)}${tab('suspects', 'Suspects', '<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/>', 0)}</nav>`;
+}
+function readyBar() {
+  const n = S.ready.size, last = S.round === 3;
+  return `<button class="btn ghost" data-a="ready" ${S.ready.has('me') ? 'disabled' : ''}>${S.ready.has('me') ? `WAITING FOR OTHERS · ${n}/4 READY` : (last ? 'READY FOR THE LINEUP' : 'READY FOR NEXT ROUND')}${!S.ready.has('me') && n ? ` · ${n}/4` : ''}</button>`;
+}
+function files() {
+  const docs = ITEMS.filter(i => i.kind === 'doc');
+  return `<p class="mono" style="margin:0;font-size:12px;color:var(--amber)">${ROUNDS[S.round - 1].q}</p>
+    <div class="list">${docs.map(d => d.r <= S.round ? `<button class="li" data-a="open" data-v="${d.id}"><span class="mono" style="font-size:12px;color:var(--mute);width:34px">${d.tag}</span><span class="grow"><b class="serif" style="font-size:20px">${d.n}</b><br><small style="color:var(--mute)">${d.sub}</small></span>${!S.seen.has(d.id) ? '<span class="mono" style="background:var(--amber);color:#141414;font-size:10px;padding:2px 6px">NEW</span>' : ''}${pinned(d.id) ? pinDot(pinned(d.id).by) : ''}</button>` : `<div class="li lock"><span class="mono" style="font-size:12px;width:34px">${d.tag}</span><span class="grow"><b class="serif" style="font-size:20px">Sealed</b><br><small>Opens in round ${d.r}</small></span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A3A3AA" stroke-width="2" aria-hidden="true"><rect x="5" y="11" width="14" height="10"/><path d="M8 11V7a4 4 0 018 0v4"/></svg></div>`).join('')}</div>
+    <div class="grow"></div>${readyBar()}`;
+}
+function evidence() {
+  const ev = ITEMS.filter(i => i.kind !== 'doc');
+  return `<div class="grid">${ev.map(e => e.r <= S.round ? `<button class="ev" data-a="open" data-v="${e.id}" style="position:relative">${!S.seen.has(e.id) ? '<span class="new">NEW</span>' : ''}<div class="im" style="${e.img ? `background-image:url(${IMG(e.img)})` : ''}">${e.img ? '' : svgI(e.icon)}</div><div class="cap"><small>${e.tag} · ${e.kind === 'photo' ? 'at the scene' : 'bagged'}</small><b>${e.n}</b></div></button>` : `<div class="ev lock"><div class="im">${svgI('box').replace('#ECE8DF', '#6B6B72')}</div><div class="cap"><small>${e.tag}</small><b>Round ${e.r}</b></div></div>`).join('')}</div>
+    ${readyBar()}`;
+}
+function suspects() {
+  return SUS.map(s => `<button class="sus" data-a="opensus" data-v="${s.id}"><img src="${IMG(s.img)}" alt=""><div><div class="row"><span class="dot" style="background:${s.c}"></span><b>${s.s}</b>${pinned(s.id) ? pinDot(pinned(s.id).by) : ''}</div><p>${s.who}</p><p class="mono" style="font-size:11px;color:var(--mute);margin-top:6px">ALIBI: ${s.alibi}</p></div></button>`).join('') + readyBar();
+}
+const pinned = id => S.pins.find(p => p.id === id);
+const pinDot = by => `<span title="pinned" class="dot" style="background:${P_(by).c};box-shadow:0 0 0 2px #141414,0 0 0 3px ${P_(by).c}"></span>`;
+function card(p) {
+  const it = ITEMS.find(i => i.id === p.id), s = SUS.find(x => x.id === p.id), v = p.id === 'victim';
+  const img = v ? 'victim-julia' : s ? s.img : it && it.img;
+  const name = v ? 'Julia Stoner' : s ? s.s : p.note ? esc(p.note) : it.n;
+  const sub = v ? 'VICTIM' : s ? 'SUSPECT' : p.note ? '' : it.tag;
+  const cls = p.note ? 'note' : (it && it.kind === 'doc') ? 'doc' : '';
+  return `<button class="bc ${cls} ${S.sel === p.key ? 'sel' : ''}" data-k="${p.key}" style="left:${p.x}%;top:${p.y}%;--r:${p.r}deg" aria-label="${name}"><span class="pin" style="background:${P_(p.by).c}"></span>${img ? `<img src="${IMG(img)}" alt="">` : ''}<b>${name}</b>${sub ? `<small>${sub}</small>` : ''}</button>`;
+}
+function board() {
+  return `<div class="board" id="board"><svg viewBox="0 0 100 100" preserveAspectRatio="none" id="strs"></svg>${S.pins.map(card).join('')}
+    ${S.pins.length < 2 ? '<p class="mono" style="position:absolute;left:0;right:0;bottom:12px;text-align:center;font-size:12px;color:var(--mute)">Pin files, evidence and suspects to see them here</p>' : ''}</div>
+    <div class="btools"><button class="chip" data-a="tie" aria-pressed="${S.tie}">${S.tie ? (S.sel ? 'Tap the second card' : 'Tap the first card') : 'Tie a string'}</button><button class="chip" data-a="note">Add a note</button>${S.mode === 'tv' ? '<button class="chip" data-a="tvview" title="Preview the TV">TV</button>' : '<button class="chip" data-a="undo" title="Undo my last string">Undo</button>'}</div>
+    <p class="mono" style="margin:0;font-size:11px;color:var(--mute)">${S.strings.length} strings · drag cards to arrange · ${S.mode === 'tv' ? 'mirrored on the TV' : 'synced to every phone'}</p>`;
+}
+function drawStrings() {
+  const svg = $('#strs'); if (!svg) return;
+  svg.innerHTML = S.strings.map(([a, b]) => { const A = S.pins.find(p => p.key === a), B = S.pins.find(p => p.key === b); return A && B ? `<line x1="${A.x}" y1="${A.y}" x2="${B.x}" y2="${B.y}"/>` : ''; }).join('');
+}
+function vote() {
+  const v = S.vote, done = v.who && v.how !== null && v.why !== null;
+  return `<section class="scr"><div class="row"><div class="lbl">THE LINEUP · EVERYONE VOTES</div><span class="timer" style="font-size:18px">${Object.keys(S.bots).length}/3 voted</span></div>
+    <h1 class="serif" style="font:italic 900 48px/1 'Playfair Display'">Who did it?</h1>
+    <div class="lineup">${SUS.map((s, i) => `<button class="lu" data-a="who" data-v="${s.id}" aria-pressed="${v.who === s.id}" style="${v.who === s.id ? `box-shadow:inset 0 -4px 0 ${s.c}` : ''}"><img src="${IMG(s.img)}" alt="${s.s}" style="height:${[220, 190, 205, 212][i]}px;${v.who === s.id ? `outline:2px solid ${s.c}` : ''}"><span class="pl" style="${v.who === s.id ? `background:${s.c}` : ''}">${i + 1}</span><b>${s.s}</b></button>`).join('')}</div>
+    <div class="lbl">HOW?</div><div class="qs">${HOW.map((h, i) => `<button class="q" data-a="how" data-v="${i}" aria-pressed="${v.how === i}">${h}</button>`).join('')}</div>
+    <div class="lbl">WHY?</div><div class="qs">${WHY.map((h, i) => `<button class="q" data-a="why" data-v="${i}" aria-pressed="${v.why === i}">${h}</button>`).join('')}</div>
+    <button class="btn" data-a="lock" ${done ? '' : 'disabled'}>${done ? 'ACCUSE ' + SUS.find(s => s.id === v.who).s.toUpperCase() : 'PICK WHO, HOW AND WHY'}</button></section>`;
+}
+function score(x) { return (x.who === ANSWER.who) + (x.how === ANSWER.how) + (x.why === ANSWER.why); }
+function reveal() {
+  const all = [{p:'me', ...S.vote}, ...Object.entries(S.bots).map(([p, x]) => ({p, ...x}))];
+  const mine = score(S.vote), ck = (a, b) => a === b ? '<span class="ok">✓</span>' : '<span class="no">✗</span>';
+  return `<section class="scr"><div class="lbl amber">SOLUTION · CASE 0221</div>
+    <div class="row"><img src="${IMG('suspect-roylott')}" alt="" style="width:88px;height:110px;object-fit:cover;object-position:top;filter:grayscale(1)"><div><span class="stamp" style="display:inline-block;font-size:22px;margin:6px 0 8px">${mine === 3 ? 'CASE CLOSED' : 'GUILTY'}</span><h2 class="serif" style="font:900 24px/1.1 'Playfair Display'">Dr. Grimesby Roylott</h2></div></div>
+    <p style="margin:0;color:#d8d8dc">He sent a <b>swamp adder</b> through the ventilator. It climbed down the fake bell-rope onto Julia's bed and bit her. A whistle called it back, and he locked it in his iron safe. Julia's wedding would have cut into the money he controlled under her mother's will.</p>
+    <p style="margin:0;font:italic 700 18px/1.35 'Playfair Display';border-left:3px solid var(--red);padding-left:12px">The speckled band was the snake.</p>
+    <table><thead><tr><th>DETECTIVE</th><th>WHO</th><th>HOW</th><th>WHY</th><th>PTS</th></tr></thead><tbody>${all.map(x => `<tr><td><span class="dot" style="display:inline-block;background:${P_(x.p).c};margin-right:6px"></span>${P_(x.p).n}</td><td>${SUS.find(s => s.id === x.who).s} ${ck(x.who, ANSWER.who)}</td><td>${ck(x.how, ANSWER.how)}</td><td>${ck(x.why, ANSWER.why)}</td><td><b>${score(x)}</b></td></tr>`).join('')}</tbody></table>
+    <details><summary style="cursor:pointer;font-weight:700;min-height:44px;display:flex;align-items:center">How the clues connect</summary><ol style="margin:0;padding-left:20px;color:#cfcfd4;font-size:14px"><li>The room was sealed, so no one came through the door or window.</li><li>A vent into Roylott's room was fitted just before she died.</li><li>The bell-rope rings nothing and runs from the vent to the pillow; the bed can't move.</li><li>The whistle and the clang match calling an animal back and shutting the safe.</li><li>Milk on the safe and a looped leash: he keeps and handles a creature.</li><li>The will and the wedding give him the motive.</li></ol></details>
+    <div class="grow"></div><button class="btn ghost" data-a="again">PLAY AGAIN</button></section>`;
+}
+function overlays() {
+  let h = '';
+  if (S.toast) h += `<div class="toast"><span class="dot" style="background:${P_(S.toast.by).c}"></span><span>${S.toast.t}</span></div>`;
+  if (S.sheet) h += `<div class="scrim" data-a="close"></div><div class="sheet" role="dialog">${S.sheet}</div>`;
+  if (S.ov) h += `<div class="ov">${S.ov}</div>`;
+  if (S.tv) h += tvView();
+  return h;
+}
+function tvView() {
+  return `<div class="tvwrap"><div class="lbl" style="text-align:center">TV PREVIEW · WHAT THE ROOM SEES</div><div class="tv">
+    <div style="position:absolute;inset:0;background:repeating-linear-gradient(-22deg,rgba(0,0,0,.45) 0 10px,transparent 10px 22px),#1A1A1E"></div>
+    <div style="position:absolute;left:3%;top:3%;font:italic 900 16px 'Playfair Display'">Red <span style="color:var(--red)">String</span> <span class="mono" style="font-size:8px;color:var(--mute);font-style:normal">ROUND ${S.round}</span></div>
+    <div style="position:absolute;right:3%;top:3%" class="mono amber">${Math.floor(S.t / 60)}:${String(S.t % 60).padStart(2, '0')}</div>
+    <svg viewBox="0 0 100 100" preserveAspectRatio="none" style="position:absolute;left:5%;top:12%;width:90%;height:84%">${S.strings.map(([a, b]) => { const A = S.pins.find(p => p.key === a), B = S.pins.find(p => p.key === b); return A && B ? `<line x1="${A.x}" y1="${A.y}" x2="${B.x}" y2="${B.y}" stroke="#FF3B4E" stroke-width="0.8" vector-effect="non-scaling-stroke"/>` : ''; }).join('')}</svg>
+    <div style="position:absolute;left:5%;top:12%;width:90%;height:84%">${S.pins.map(p => { const s = SUS.find(x => x.id === p.id), it = ITEMS.find(i => i.id === p.id); const nm = p.id === 'victim' ? 'Julia' : s ? s.s : p.note ? esc(p.note) : it.n; return `<div style="position:absolute;left:${p.x}%;top:${p.y}%;transform:translate(-50%,-50%) rotate(${p.r}deg);background:${p.note ? 'var(--amber)' : 'var(--paper)'};color:#141414;font:900 8px 'Playfair Display';padding:3px 5px;box-shadow:0 4px 8px rgba(0,0,0,.6);border-top:2px solid ${P_(p.by).c}">${nm}</div>`; }).join('')}</div></div>
+    <button class="btn ghost" data-a="tvclose">BACK TO MY PHONE</button></div>`;
+}
+
+/* ---------- actions ---------- */
+let K = 0;
+function addPin(id, by, note) {
+  if (!note && pinned(id)) return false;
+  const k = 'p' + (++K);
+  S.pins.push({key:k, id, by, note, x:12 + Math.random() * 76, y:14 + Math.random() * 72, r:Math.round(Math.random() * 8 - 4)});
+  return k;
+}
+function toast(by, t) { S.toast = {by, t}; clearTimeout(toastId); toastId = setTimeout(() => { S.toast = null; render(); }, 2600); }
+function pinMoment(name) { S.sheet = null; S.ov = `<div class="lbl amber">YOU FOUND SOMETHING</div><span class="stamp">PINNED</span><h2 class="serif" style="font:italic 900 34px/1.05 'Playfair Display'">${name}</h2><p class="mono" style="margin:0;color:var(--mute);font-size:12px">${S.mode === 'tv' ? 'Now on the TV board' : 'Now on everyone\'s board'}</p>`; render(); setTimeout(() => { S.ov = null; render(); }, 1300); }
+function openItem(id) {
+  const it = ITEMS.find(i => i.id === id); S.seen.add(id);
+  const pinBtn = pinned(id) ? `<button class="btn ghost" disabled>PINNED BY ${P_(pinned(id).by).n.toUpperCase()}</button>` : `<button class="btn" data-a="pin" data-v="${id}">PIN TO BOARD</button>`;
+  if (it.kind === 'doc') S.sheet = `<div class="paper">${it.body}</div>${pinBtn}<button class="btn ghost" data-a="close">CLOSE</button>`;
+  else S.sheet = `${it.img ? `<img src="${IMG(it.img)}" alt="${it.n}" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:4px;filter:grayscale(.3)">` : `<div style="aspect-ratio:4/3;display:grid;place-items:center;background:#1c1c20;border-radius:4px">${svgI(it.icon)}</div>`}
+    <div><div class="lbl">${it.tag} · ${it.kind === 'photo' ? 'AT THE SCENE' : 'BAGGED EVIDENCE'}</div><h2 class="serif" style="font:900 28px/1.1 'Playfair Display';margin-top:4px">${it.n}</h2><p style="margin:6px 0 0;color:#d8d8dc">${it.d}</p></div>
+    ${it.v3d ? `<a class="btn ghost" href="${VIEWER}" style="text-decoration:none">INSPECT IN 3D</a>` : ''}${pinBtn}<button class="btn ghost" data-a="close">CLOSE</button>`;
+  render();
+}
+function nextRound() {
+  S.ready.clear();
+  if (S.round === 3) { S.screen = 'vote'; clearInterval(timerId); clearInterval(botId); botsVote(); render(); return; }
+  S.round++; S.t = ROUND_SECS;
+  const n = ITEMS.filter(i => i.r === S.round).length;
+  S.ov = `<div class="lbl amber">ROUND ${S.round} OF 3</div><h2 class="serif" style="font:italic 900 40px/1 'Playfair Display'">${ROUNDS[S.round - 1].n}</h2><p class="mono" style="margin:0;color:var(--mute)">${n} new files unsealed</p><button class="btn" data-a="ovclose" style="max-width:260px">OPEN THEM</button>`;
+  render();
+}
+function botsVote() {
+  const plan = {jess:{who:'roylott', how:1, why:0}, marcus:{who:'croft', how:3, why:2}, priya:{who:'roylott', how:0, why:0}};
+  Object.keys(plan).forEach((b, i) => setTimeout(() => { S.bots[b] = plan[b]; S.ready.add(b); if (S.screen === 'vote') render(); }, 1800 + i * 2200));
+}
+function botTick() {
+  const bots = ['jess', 'marcus', 'priya'], b = bots[Math.floor(Math.random() * 3)];
+  const pool = [...unlocked().filter(i => !pinned(i.id)), ...SUS.filter(s => !pinned(s.id))];
+  if (Math.random() < 0.35 && S.pins.length > 2) {
+    const a = S.pins[Math.floor(Math.random() * S.pins.length)], c = S.pins[Math.floor(Math.random() * S.pins.length)];
+    if (a !== c && !S.strings.some(([x, y]) => (x === a.key && y === c.key) || (x === c.key && y === a.key))) { S.strings.push([a.key, c.key, b]); const nm = p => p.id === 'victim' ? 'Julia' : (SUS.find(s => s.id === p.id) || {}).s || (p.note ? esc(p.note) : ITEMS.find(i => i.id === p.id).n); toast(b, `<b>${P_(b).n}</b> tied ${nm(a)} → ${nm(c)}`); }
+  } else if (pool.length) { const pick = pool[Math.floor(Math.random() * pool.length)]; addPin(pick.id, b); toast(b, `<b>${P_(b).n}</b> pinned ${pick.s || pick.n}`); }
+  if (Math.random() < 0.25 && S.t < ROUND_SECS - 30) S.ready.add(b);
+  if (S.ready.size === 4) nextRound(); else render();
+}
+
+app.addEventListener('click', e => {
+  const t = e.target.closest('[data-a]'); if (!t) return;
+  const a = t.dataset.a, v = t.dataset.v;
+  if (a === 'host') { S.screen = 'lobby'; render(); ['jess', 'marcus', 'priya'].forEach((b, i) => setTimeout(() => { S.joined.push(b); if (S.screen === 'lobby') render(); }, 900 + i * 1100)); }
+  else if (a === 'mode') { S.mode = v; render(); }
+  else if (a === 'start') { S.screen = 'brief'; render(); }
+  else if (a === 'begin') { S.screen = 'game'; addPin('victim', 'me'); S.pins[0].x = 50; S.pins[0].y = 16; render();
+    timerId = setInterval(() => { if (S.ov || S.tv) return; S.t--; if (S.t <= 0) nextRound(); else { const el = $('.timer'); if (el && S.screen === 'game') { el.textContent = Math.floor(S.t / 60) + ':' + String(S.t % 60).padStart(2, '0'); el.classList.toggle('low', S.t < 60); } } }, 1000);
+    botId = setInterval(() => { if (!S.ov && !S.sheet && !drag) botTick(); }, 9000); }
+  else if (a === 'tab') { S.tab = v; S.sel = null; S.tie = false; render(); }
+  else if (a === 'open') openItem(v);
+  else if (a === 'opensus') { const s = SUS.find(x => x.id === v); S.sheet = `<img src="${IMG(s.img)}" alt="${s.n}" style="width:100%;aspect-ratio:1;object-fit:cover;object-position:top;filter:grayscale(1);border-radius:4px"><div><div class="row"><span class="dot" style="background:${s.c}"></span><span class="lbl">SUSPECT</span></div><h2 class="serif" style="font:900 28px/1.1 'Playfair Display';margin-top:4px">${s.n}</h2><p style="margin:6px 0;color:#d8d8dc">${s.who}</p><p class="mono" style="margin:0;font-size:12px;color:var(--mute)">ALIBI: ${s.alibi}</p></div>${pinned(v) ? `<button class="btn ghost" disabled>PINNED BY ${P_(pinned(v).by).n.toUpperCase()}</button>` : `<button class="btn" data-a="pin" data-v="${v}">PIN TO BOARD</button>`}<button class="btn ghost" data-a="close">CLOSE</button>`; render(); }
+  else if (a === 'pin') { addPin(v, 'me'); const s = SUS.find(x => x.id === v); pinMoment(s ? s.s : ITEMS.find(i => i.id === v).n); }
+  else if (a === 'close') { S.sheet = null; render(); }
+  else if (a === 'ovclose') { S.ov = null; render(); }
+  else if (a === 'skip') { if (S.t > 20) S.t = 15; else nextRound(); render(); }
+  else if (a === 'ready') { S.ready.add('me'); const rnd = S.round; ['jess', 'marcus', 'priya'].forEach((b, i) => setTimeout(() => { if (S.screen !== 'game' || S.round !== rnd) return; S.ready.add(b); if (S.ready.size === 4) nextRound(); else render(); }, 1200 + i * 1300)); render(); }
+  else if (a === 'tie') { S.tie = !S.tie; S.sel = null; render(); }
+  else if (a === 'note') { S.sheet = `<h2 class="serif" style="font:italic 900 26px 'Playfair Display'">Add a note</h2><label for="nt" class="lbl">WHAT ARE YOU THINKING?</label><input id="nt" maxlength="40" placeholder="e.g. 3 a.m. whistle" style="min-height:52px;font-size:16px;padding:0 14px;background:#1c1c20;border:1px solid var(--line);border-radius:4px;color:var(--ink)"><button class="btn" data-a="addnote">PIN THE NOTE</button><button class="btn ghost" data-a="close">CANCEL</button>`; render(); setTimeout(() => $('#nt') && $('#nt').focus(), 50); }
+  else if (a === 'addnote') { const txt = ($('#nt').value || '').trim(); if (!txt) return; addPin('note', 'me', txt); S.sheet = null; render(); }
+  else if (a === 'tvview') { S.tv = true; render(); }
+  else if (a === 'tvclose') { S.tv = false; render(); }
+  else if (a === 'undo') { for (let i = S.strings.length - 1; i >= 0; i--) if (S.strings[i][2] === 'me') { S.strings.splice(i, 1); break; } render(); }
+  else if (a === 'who') { S.vote.who = v; render(); }
+  else if (a === 'how') { S.vote.how = +v; render(); }
+  else if (a === 'why') { S.vote.why = +v; render(); }
+  else if (a === 'lock') { S.ready.add('me'); const go = () => { if (Object.keys(S.bots).length === 3) { S.screen = 'reveal'; S.ov = `<span class="stamp" style="font-size:28px">THE VERDICT</span><p class="mono" style="color:var(--mute);margin:0">Opening the sealed envelope…</p>`; render(); setTimeout(() => { S.ov = null; render(); }, 1600); } else setTimeout(go, 500); }; S.ov = `<div class="lbl amber">VOTE LOCKED</div><h2 class="serif" style="font:italic 900 34px 'Playfair Display'">Waiting for the others…</h2>`; render(); go(); }
+  else if (a === 'again') location.reload();
+});
+
+/* board: drag cards, tap to tie strings */
+let drag = null;
+app.addEventListener('pointerdown', e => {
+  const c = e.target.closest('.bc'); if (!c) return; const b = $('#board').getBoundingClientRect();
+  drag = {k:c.dataset.k, el:c, b, sx:e.clientX, sy:e.clientY, moved:false}; c.setPointerCapture(e.pointerId);
+});
+app.addEventListener('pointermove', e => {
+  if (!drag) return; const d = Math.hypot(e.clientX - drag.sx, e.clientY - drag.sy); if (d > 6) drag.moved = true; if (!drag.moved || S.tie) return;
+  const p = S.pins.find(x => x.key === drag.k); p.x = Math.min(94, Math.max(6, (e.clientX - drag.b.left) / drag.b.width * 100)); p.y = Math.min(94, Math.max(6, (e.clientY - drag.b.top) / drag.b.height * 100));
+  drag.el.style.left = p.x + '%'; drag.el.style.top = p.y + '%'; drawStrings();
+});
+app.addEventListener('pointerup', () => {
+  if (!drag) return; const k = drag.k, moved = drag.moved; drag = null;
+  if (moved && !S.tie) return;
+  if (S.tie) { if (!S.sel) { S.sel = k; } else if (S.sel !== k) { if (!S.strings.some(([x, y]) => (x === S.sel && y === k) || (x === k && y === S.sel))) S.strings.push([S.sel, k, 'me']); S.sel = null; S.tie = false; } render(); }
+});
+
+render();
+}
+</script>
+</body>
+</html>
