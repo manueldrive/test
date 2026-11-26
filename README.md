@@ -1,4 +1,4 @@
-# Red String · Prototype (test build)
+# Red Thread · Prototype (test build)
 
 A noir party murder-mystery game, playing a test case adapted from *The Adventure of the Speckled Band* (Arthur Conan Doyle, 1892, public domain).
 
