@@ -127,7 +127,7 @@ h1,h2,h3{margin:0}
 .rbest{font:700 10px 'Playfair Display',serif;letter-spacing:2px;color:#0b0b0d;background:#F2EEE6;padding:3px 6px}
 .rpts{margin-left:auto;font:900 26px 'Playfair Display',serif;color:#F2EEE6}.rpts small{font-size:13px;color:#8f8f96}
 .rrow.top .rpts{color:var(--red)}
-.cases{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;margin-top:clamp(10px,2.5svh,30px)}
+.cases{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;margin-top:clamp(28px,6svh,64px)}
 @media (max-height:760px){.tblock{zoom:.82}}
 .ckick{display:flex;justify-content:space-between;padding:0 24px 10px;font:600 11px Cinzel,serif;letter-spacing:4px;color:#BDB8AE}
 .ckick span+span{letter-spacing:2px;color:#8f8f96}
@@ -356,7 +356,6 @@ function title() {
       <div class="ctext"><span class="cwhere">${c.where}</span><b>${c.n}</b><span class="cmeta">${c.meta}</span>
       ${c.soon ? '' : `<div class="cbtns"><button class="cbtn" data-a="host">HOST</button><button class="cbtn ghostc" data-a="join">JOIN</button></div>`}</div></article>`).join('')}</div>
   </div>
-    <p class="mono" style="margin:0 0 4px;position:relative;flex:none;font-size:11px;color:var(--mute);text-align:center">Prototype · the other 3 detectives are simulated</p>
 </section>`;
 }
 const TIPS = [
