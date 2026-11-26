@@ -358,11 +358,11 @@ function files() {
     <div class="grow"></div>${readyBar()}`;
 }
 function evidence() {
-  const tile = e => `<button class="ev" data-a="open" data-v="${e.id}" style="position:relative">${!S.seen.has(e.id) ? '<span class="new">NEW</span>' : ''}${e.kind === 'ev' ? '<span class="d3">3D</span>' : ''}<div class="im" style="${e.img ? `background-image:url(${IMG(e.img)});${e.paper ? 'background-size:86%;background-repeat:no-repeat;background-color:#121214;filter:none' : ''}` : ''}">${e.img ? '' : svgI(e.icon)}</div><div class="cap"><small>${e.tag}</small><b>${e.n}</b></div></button>`;
+  const tile = e => `<button class="ev" data-a="open" data-v="${e.id}" style="position:relative">${!S.seen.has(e.id) ? '<span class="new">NEW</span>' : ''}<div class="im" style="${e.img ? `background-image:url(${IMG(e.img)});${e.paper ? 'background-size:86%;background-repeat:no-repeat;background-color:#121214;filter:none' : ''}` : ''}">${e.img ? '' : svgI(e.icon)}</div><div class="cap"><small>${e.tag}</small><b>${e.n}</b></div></button>`;
   const group = (kind, title, note) => { const all = ITEMS.filter(i => i.kind === kind), open = all.filter(i => i.r <= S.round), later = all.length - open.length;
     return `<div class="evh"><span class="lbl">${title}</span><span class="mono" style="font-size:11px;color:var(--mute)">${note}</span></div>
       <div class="grid">${open.map(tile).join('')}</div>${later ? `<p class="mono evlater">+${later} more in later rounds</p>` : ''}`; };
-  return `${group('ev', 'BAGGED BY POLICE', 'spin in 3D')}${group('photo', 'AT THE SCENE', 'too big to move · photos')}
+  return `${group('ev', 'BAGGED BY POLICE', '')}${group('photo', 'AT THE SCENE', '')}
     ${readyBar()}`;
 }
 function suspects() {

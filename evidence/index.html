@@ -96,7 +96,7 @@ h1{margin:0;font:italic 900 30px/1 'Playfair Display',serif}
       <div class="vig"></div><div class="grain"></div>
       <span class="tag" id="tag">A-4</span>
       <div id="spots"></div>
-      <div class="hint" id="hint">Spin it, zoom in, tap anything that looks wrong</div>
+      <div class="hint" id="hint">Look closely. Something here doesn’t add up.</div>
       <div class="card" id="card" role="dialog" aria-live="polite"><button class="x" id="cardX" aria-label="Close detail">×</button><h3 id="cardH"></h3><p id="cardP"></p></div>
       <div class="err" id="err">3D couldn't start on this device. The photo view still works under "At the scene".</div>
     </div>
@@ -252,6 +252,24 @@ const builders = {
       {p:[0,0,0], n:[0,-1,0], h:'Maker\'s stamp', t:'"Calcutta Pottery Co." Brought back from India, the same as Roylott\'s animals.'}
     ]};
   },
+  _model(url, size, fallback, label) { // scanned model from Tripo, fitted to the stage; coded version only if it fails to load
+    const g = new THREE.Group(), fb = builders[fallback]();
+    const hint = $('hint'), was = hint.textContent; hint.textContent = 'Bringing ' + label + ' up from the evidence room…'; hint.style.opacity = 1;
+    const fail = () => { g.add(fb.g); hint.textContent = was; };
+    if (!THREE.GLTFLoader) { fail(); return {g, target:fb.target, spots:fb.spots}; }
+    new THREE.GLTFLoader().load(url, gl => {
+      const m = gl.scene;
+      m.traverse(o => { if (o.isMesh) { o.castShadow = o.receiveShadow = true; o.material.envMapIntensity = 0.9; if (o.material.map) o.material.map.anisotropy = renderer.capabilities.getMaxAnisotropy(); } });
+      let box = new THREE.Box3().setFromObject(m), dim = box.getSize(new THREE.Vector3());
+      m.scale.multiplyScalar(size / Math.max(dim.x, dim.y, dim.z));
+      box = new THREE.Box3().setFromObject(m); const c = box.getCenter(new THREE.Vector3());
+      m.position.x -= c.x; m.position.z -= c.z; m.position.y -= box.min.y;
+      g.add(m); hint.textContent = was; hint.style.opacity = controls.autoRotate ? 1 : 0;
+    }, undefined, fail);
+    return {g, target:fb.target, spots:fb.spots};
+  },
+  lash() { return builders._model(MODELS.lash, 1.8, 'lashCoded', 'the lash'); },
+  matchbox() { return builders._model(MODELS.matchbox, 1.3, 'matchboxCoded', 'the matchbox'); },
   lashCoded() {
     const k = kit(), g = new THREE.Group();
     const leather = phys({color:0x5b3a20, roughness:0.62, normalMap:k.braidN, normalScale:new THREE.Vector2(1, 1), clearcoat:0.25, clearcoatRoughness:0.5});
