@@ -65,12 +65,15 @@ h1,h2,h3{margin:0}
 .boxes input{position:absolute;inset:0;width:100%;opacity:0;font-size:16px;text-transform:uppercase}
 .field{width:100%;min-height:56px;background:rgba(11,11,13,.7);border:1.5px solid #6b6b72;color:#F2EEE6;font:900 24px 'Playfair Display',serif;padding:0 14px}
 .field:focus{outline:none;border-color:#F2EEE6}
-.tipA{position:relative;flex:none;margin-top:8px;background:#F2EEE6;color:#0b0b0d;padding:22px 18px 16px;transform:rotate(-1.2deg);box-shadow:0 16px 30px rgba(0,0,0,.65);background-image:repeating-linear-gradient(180deg,transparent 0 25px,rgba(90,140,200,.25) 25px 26px),linear-gradient(180deg,transparent 0 40px,rgba(255,59,78,.5) 40px 41.5px,transparent 41.5px);font-family:'Special Elite',monospace}
+.tipA{position:relative;flex:none;margin-top:8px;height:232px;display:flex;flex-direction:column;background:#F2EEE6;color:#0b0b0d;padding:22px 18px 16px;transform:rotate(-1.2deg);box-shadow:0 16px 30px rgba(0,0,0,.65);background-image:repeating-linear-gradient(180deg,transparent 0 25px,rgba(90,140,200,.25) 25px 26px),linear-gradient(180deg,transparent 0 40px,rgba(255,59,78,.5) 40px 41.5px,transparent 41.5px);font-family:'Special Elite',monospace}
 .tpin{position:absolute;left:50%;top:-8px;margin-left:-8px;width:16px;height:16px;border-radius:50%;background:var(--red);box-shadow:inset -3px -3px 0 rgba(0,0,0,.3),0 3px 6px rgba(0,0,0,.6)}
 .tAhead{display:flex;justify-content:space-between;align-items:center;font:13px 'Special Elite',monospace;letter-spacing:2px;color:#4A4740}
 .tAhead button{background:none;border:0;font:13px 'Special Elite',monospace;letter-spacing:2px;color:#b3202e;padding:10px 0 10px 16px;margin:-10px 0}
 .tipA h3{font:24px/1.1 'Special Elite',monospace;margin:12px 0 4px;text-decoration:underline;text-decoration-color:var(--red);text-underline-offset:4px}
-.tipA p{margin:0;font:15px/26px 'Special Elite',monospace;color:#2e2c28}
+.tipA p{margin:0;font:15px/26px 'Special Elite',monospace;color:#2e2c28;flex:1;overflow:hidden}
+.tdots{display:flex;gap:5px}.tdots i{width:7px;height:7px;border-radius:50%;background:#cfc8b8}.tdots i.on{background:var(--red)}
+.tnext{align-self:flex-end;display:flex;align-items:center;gap:8px;min-height:40px;margin-top:6px;padding:0 14px;border:1.5px solid #0b0b0d;background:#0b0b0d;color:#F2EEE6;font:13px 'Special Elite',monospace;letter-spacing:2px;cursor:pointer}
+.tnext b{font:16px monospace;color:var(--red)}
 .tip{background:rgba(11,11,13,.72);color:#F2EEE6;padding:16px 18px;border:1px solid #3a3a40;border-left:3px solid var(--red)}
 .bf{scrollbar-width:none}
 .bftab{flex:none;overflow:visible;min-height:auto}.bftab .rv{animation:none;opacity:1;transform:none}.bftab .bfhero{height:230px}
@@ -428,8 +431,9 @@ function joined() {
   const me = P_('me');
   return `<section class="scr noir" style="gap:16px">${head('CASE 0221')}
     <div class="tipA" aria-live="polite"><span class="tpin"></span>
-      <div class="tAhead"><span>RULE ${S.tip + 1} OF ${TIPS.length}</span><button data-a="tipnext" aria-label="Next tip">NEXT ›</button></div>
-      <h3>${TIPS[S.tip][0]}</h3><p>${TIPS[S.tip][1]}</p></div>
+      <div class="tAhead"><span>RULE ${S.tip + 1} OF ${TIPS.length}</span><span class="tdots">${TIPS.map((_, i) => `<i class="${i === S.tip ? 'on' : ''}"></i>`).join('')}</span></div>
+      <h3>${TIPS[S.tip][0]}</h3><p>${TIPS[S.tip][1]}</p>
+      <button class="tnext" data-a="tipnext" aria-label="Next rule">${S.tip === TIPS.length - 1 ? 'BACK TO RULE 1' : 'NEXT RULE'} <b>→</b></button></div>
     ${seats('jess')}
     <div class="grow"></div>
 
