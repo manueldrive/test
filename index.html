@@ -58,6 +58,7 @@ h1,h2,h3{margin:0}
 .field:focus{outline:none;border-color:#F2EEE6}
 .tip{background:rgba(11,11,13,.72);color:#F2EEE6;padding:16px 18px;border:1px solid #3a3a40;border-left:3px solid var(--red)}
 .bf{scrollbar-width:none}
+.bfsheet{margin:-18px -16px -18px;flex:none;overflow:visible;border-radius:12px 12px 0 0}.bfsheet .rv{animation:none;opacity:1;transform:none}.bfsheet .bfhero{height:240px}
 .bfhero{position:relative;height:min(46svh,380px);flex:none;overflow:hidden}
 .bfhero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:40% 40%;filter:grayscale(1) contrast(1.1) brightness(.85);-webkit-mask-image:linear-gradient(180deg,#000 45%,transparent 100%);mask-image:linear-gradient(180deg,#000 45%,transparent 100%)}
 .bfhero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,11,13,.7) 0,transparent 25%,transparent 50%,rgba(11,11,13,.55) 80%,rgba(11,11,13,0) 100%)}
@@ -418,8 +419,8 @@ function joined() {
       <div class="row" style="gap:6px;margin-top:12px">${TIPS.map((_, i) => `<span style="width:${i === S.tip ? 18 : 6}px;height:6px;border-radius:3px;background:${i === S.tip ? 'var(--red)' : '#4a4a50'}"></span>`).join('')}</div></div>
     <p style="margin:0;text-align:center;font:400 15px 'Playfair Display';color:#BDB8AE">${S.joined.length >= 4 ? 'Everyone’s here. Waiting for Jess to open the case…' : 'Waiting for more detectives…'} <button data-a="hoststart" style="background:none;border:0;font:700 11px 'Playfair Display';letter-spacing:2px;color:#8f8f96;text-decoration:underline;padding:8px">SKIP ▸</button></p></section>`;
 }
-function brief() {
-  return `<section class="scr noir bf" style="padding:0;gap:0">
+function brief(inSheet) {
+  return `<section class="scr noir bf${inSheet ? ' bfsheet' : ''}" style="padding:0;gap:0">
     <div class="bfhero"><img src="${IMG('cover-stoke-moran')}" alt="Stoke Moran manor at night in a storm">
       <div class="bftop rv" style="--d:.1s"><span class="kick">CASE 0221</span><span class="kick" style="letter-spacing:2px">SURREY · 1883</span></div>
       <div class="bftitle rv" style="--d:.25s"><div class="kick" style="color:#d8d4cc">STOKE MORAN MANOR</div><h1>The Speckled Band</h1></div></div>
@@ -437,7 +438,7 @@ function brief() {
       <div class="rv" style="--d:1.05s"><div class="kick" style="margin-bottom:10px">YOUR JOB: FIND OUT</div>
         <div class="bfask"><span>WHO</span><span>HOW</span><span>WHY</span></div></div>
       <p class="bfrules rv" style="--d:1.15s">Three rounds of eight minutes. New files open each round. Then the lineup.</p>
-      <button class="cbtn rv" style="--d:1.25s" data-a="begin">OPEN THE CASE FILE</button>
+      ${inSheet ? '<button class="cbtn" data-a="close">BACK TO THE CASE</button>' : '<button class="cbtn rv" style="--d:1.25s" data-a="begin">OPEN THE CASE FILE</button>'}
     </div></section>`;
 }
 function game() {
@@ -456,7 +457,7 @@ function readyBar() {
 function files() {
   const docs = ITEMS.filter(i => i.kind === 'doc');
   return `<p class="mono" style="margin:0;font-size:12px;color:var(--amber)">${ROUNDS[S.round - 1].q}</p>
-    <div class="list">${docs.map(d => d.r <= S.round ? `<button class="li" data-a="open" data-v="${d.id}"><span class="mono" style="font-size:12px;color:var(--mute);width:34px">${d.tag}</span><span class="grow"><b class="serif" style="font-size:20px">${d.n}</b><br><small style="color:var(--mute)">${d.sub}</small></span>${!S.seen.has(d.id) ? '<span class="mono" style="background:var(--amber);color:#141414;font-size:10px;padding:2px 6px">NEW</span>' : ''}${pinned(d.id) ? pinDot(pinned(d.id).by) : ''}</button>` : `<div class="li lock"><span class="mono" style="font-size:12px;width:34px">${d.tag}</span><span class="grow"><b class="serif" style="font-size:20px">Sealed</b><br><small>Opens in round ${d.r}</small></span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A3A3AA" stroke-width="2" aria-hidden="true"><rect x="5" y="11" width="14" height="10"/><path d="M8 11V7a4 4 0 018 0v4"/></svg></div>`).join('')}</div>
+    <div class="list"><button class="li" data-a="openbrief"><span class="mono" style="font-size:12px;color:var(--mute);width:34px">B-0</span><span class="grow"><b class="serif" style="font-size:20px">Case briefing</b><br><small style="color:var(--mute)">Julia Stoner · the locked room</small></span></button>${docs.map(d => d.r <= S.round ? `<button class="li" data-a="open" data-v="${d.id}"><span class="mono" style="font-size:12px;color:var(--mute);width:34px">${d.tag}</span><span class="grow"><b class="serif" style="font-size:20px">${d.n}</b><br><small style="color:var(--mute)">${d.sub}</small></span>${!S.seen.has(d.id) ? '<span class="mono" style="background:var(--amber);color:#141414;font-size:10px;padding:2px 6px">NEW</span>' : ''}${pinned(d.id) ? pinDot(pinned(d.id).by) : ''}</button>` : `<div class="li lock"><span class="mono" style="font-size:12px;width:34px">${d.tag}</span><span class="grow"><b class="serif" style="font-size:20px">Sealed</b><br><small>Opens in round ${d.r}</small></span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A3A3AA" stroke-width="2" aria-hidden="true"><rect x="5" y="11" width="14" height="10"/><path d="M8 11V7a4 4 0 018 0v4"/></svg></div>`).join('')}</div>
     <div class="grow"></div>${readyBar()}`;
 }
 function evidence() {
@@ -617,6 +618,7 @@ app.addEventListener('click', e => {
   else if (a === 'open') openItem(v);
   else if (a === 'opensus') { const s = SUS.find(x => x.id === v); S.sheet = `<img src="${IMG(s.img)}" alt="${s.n}" style="width:100%;aspect-ratio:1;object-fit:cover;object-position:top;filter:grayscale(1);border-radius:4px"><div><div class="row"><span class="dot" style="background:${s.c}"></span><span class="lbl">SUSPECT</span></div><h2 class="serif" style="font:900 28px/1.1 'Playfair Display';margin-top:4px">${s.n}</h2><p style="margin:6px 0;color:#d8d8dc">${s.who}</p><p class="mono" style="margin:0;font-size:12px;color:var(--mute)">ALIBI: ${s.alibi}</p></div>${pinned(v) ? `<button class="btn ghost" disabled>PINNED BY ${P_(pinned(v).by).n.toUpperCase()}</button>` : `<button class="btn" data-a="pin" data-v="${v}">PIN TO BOARD</button>`}<button class="btn ghost" data-a="close">CLOSE</button>`; render(); }
   else if (a === 'pin') { addPin(v, 'me'); const s = SUS.find(x => x.id === v); pinMoment(s ? s.s : ITEMS.find(i => i.id === v).n); }
+  else if (a === 'openbrief') { S.sheet = brief(true); render(); }
   else if (a === 'close') { S.sheet = null; render(); }
   else if (a === 'flip') { const im = $('#pimg'); if (!im) return; const back = im.dataset.side !== 'b'; im.style.transform = 'rotateX(90deg)'; setTimeout(() => { im.src = back ? im.dataset.b : im.dataset.f; im.dataset.side = back ? 'b' : 'f'; im.alt = im.alt.replace(/(front|back)$/, back ? 'back' : 'front'); im.style.transform = 'none'; }, 180); t.textContent = back ? 'TURN IT BACK' : 'TURN IT OVER'; }
   else if (a === 'ovclose') { S.ov = null; render(); }
