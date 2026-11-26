@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Red String — Prototype</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@500;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@500;700;800&family=Special+Elite&family=Cormorant+Garamond:ital,wght@0,500;0,700;1,500&family=UnifrakturMaguntia&family=Homemade+Apple&family=Mrs+Saint+Delafield&display=swap">
 <style>
 /* VOICE: a noir party game, tense but playful
    IDEA: a case file passed around a table; the murder board is the shared heart
@@ -70,6 +70,35 @@ h1,h2,h3{margin:0}
 .sus img{width:84px;height:104px;object-fit:cover;object-position:top;filter:grayscale(1)}
 .sus b{font:900 20px 'Playfair Display',serif}
 .sus p{margin:2px 0 0;font-size:13px;color:#cfcfd4;line-height:1.4}
+/* documents: each one its own physical object */
+.paper.form{background:repeating-linear-gradient(180deg,transparent 0 25px,#c3cee0 25px 26px),#f3f1e8;background-position:0 6px;font:13px/26px 'Special Elite',monospace;padding:16px 16px 44px 44px;position:relative}
+.paper.form::before{content:"";position:absolute;left:32px;top:0;bottom:0;width:1.5px;background:#d9898f}
+.paper.form .fhead{border:1.5px solid #2b2b2b;margin:0 0 6px;font:11px/1.4 Inter,sans-serif;display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+.paper.form .fhead div{padding:4px 6px;border-bottom:1px solid #2b2b2b}.paper.form .fhead div:nth-child(odd){border-right:1px solid #2b2b2b}
+.paper.form .fhead b{display:block;font-size:9px;letter-spacing:1px;color:#555}
+.paper.form .ftitle{font:700 12px Inter,sans-serif;letter-spacing:3px;text-align:center;line-height:26px}
+.paper.form p{margin:0}
+.sig{font:34px/1 'Mrs Saint Delafield',cursive;color:#1f3a7a}
+.bstamp{position:absolute;right:12px;bottom:8px;border:3px double #2c4fa3;color:#2c4fa3;border-radius:50%;width:80px;height:80px;display:grid;place-items:center;text-align:center;font:700 8.5px/1.3 Inter,sans-serif;letter-spacing:.5px;transform:rotate(-14deg);opacity:.75}
+.paper.official{background:#ebe6d8;font:15px/1.5 'Cormorant Garamond',serif;color:#1d1a14;padding:18px 18px 16px;position:relative;border-top:6px solid #1d1a14}
+.paper.official .crest{display:flex;flex-direction:column;align-items:center;gap:2px;margin-bottom:8px;text-align:center}
+.paper.official .crest b{font:700 13px 'Cormorant Garamond',serif;letter-spacing:2px}
+.paper.official .crest small{font:italic 13px 'Cormorant Garamond',serif}
+.paper.official table{font:14px 'Cormorant Garamond',serif;margin:6px 0 10px}.paper.official td{border-bottom:1px solid #b9b19c;padding:3px 4px}.paper.official td:first-child{font-variant:small-caps;letter-spacing:1px;width:38%;color:#5a5240}
+.paper.official p{margin:0 0 8px}
+.rstamp{display:inline-block;border:3px solid #b3202e;color:#b3202e;font:700 15px Inter,sans-serif;letter-spacing:4px;padding:3px 10px;transform:rotate(-5deg);opacity:.85}
+.paper.will{background:radial-gradient(ellipse at 50% 40%,#f2e5c2 30%,#dcc38c 100%);font:15px/1.55 'Cormorant Garamond',serif;color:#2a1d0e;padding:22px 22px 18px;position:relative;box-shadow:inset 0 0 0 6px #f0e2bd,inset 0 0 0 7px #8a6a3a,inset 0 0 0 10px #f0e2bd,inset 0 0 0 11px #8a6a3a,0 14px 30px rgba(0,0,0,.6)}
+.paper.will h3{font:32px/1.1 'UnifrakturMaguntia',serif;text-align:center;margin:6px 0 2px}
+.paper.will .of{text-align:center;font:italic 14px 'Cormorant Garamond',serif;margin-bottom:10px}
+.paper.will p{text-align:justify;margin:0 0 8px}
+.paper.will p.first::first-letter{float:left;font:700 50px/.8 'Cormorant Garamond',serif;padding:4px 6px 0 0;color:#7a1414}
+.paper.will .wit{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:10px;font:12px 'Cormorant Garamond',serif}
+.paper.will .wit div{border-top:1px solid #6a5030;padding-top:2px}
+.seal{position:absolute;right:18px;bottom:14px;width:64px;height:64px;border-radius:50%;background:radial-gradient(circle at 38% 34%,#d2453f,#8a1411 70%);box-shadow:0 3px 6px rgba(0,0,0,.4),inset 0 0 0 6px rgba(0,0,0,.15);display:grid;place-items:center;font:italic 700 26px 'Cormorant Garamond',serif;color:#f1c7a8}
+.paper.letter{background:linear-gradient(180deg,transparent 49.6%,rgba(120,100,70,.18) 50%,transparent 50.6%),radial-gradient(circle at 88% 10%,transparent 26px,rgba(140,95,40,.22) 28px,rgba(140,95,40,.08) 33px,transparent 35px),#f7f1e3;font:14px/2 'Homemade Apple',cursive;color:#253463;padding:20px 20px 18px;transform:rotate(.8deg)}
+.paper.letter p{margin:0 0 6px}
+.paper.letter .date{text-align:right;font-size:12px;margin-bottom:6px}
+.paper.letter h3{font:16px/2 'Homemade Apple',cursive;margin:0}
 /* board */
 .board{position:relative;flex:1;min-height:380px;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:repeating-linear-gradient(-22deg,rgba(0,0,0,.45) 0 14px,transparent 14px 30px),radial-gradient(ellipse at 70% 10%,rgba(255,194,61,.16),transparent 60%),#1A1A1E;touch-action:none}
 .board svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
@@ -135,10 +164,10 @@ const ROUNDS = [
 ];
 const P = (a) => a.map(x => `<p>${x}</p>`).join('');
 const ITEMS = [
-  {id:'D1', kind:'doc', r:1, tag:'D-1', n:'Helen\'s statement', sub:'Witness statement', body:`<div class="hdr"><span>WITNESS STATEMENT</span><span>D-1</span></div><h3>Helen Stoner</h3>` + P(['On the night Julia died, a storm was blowing. Julia came to my room before bed and asked if I ever heard a low, clear whistle in the night, around three. I said no. She said she had heard it for several nights.','Later I woke to a terrible scream. I opened my door and heard a soft whistle, then a clanging sound, like metal falling. Julia staggered out of her room. She cried, "It was the band! The speckled band!" and pointed toward the doctor\'s room. She died within minutes.','Julia always locked her door and barred her shutters at night. My stepfather keeps a cheetah and a baboon loose on the grounds.'])},
-  {id:'D2', kind:'doc', r:1, tag:'D-2', n:'Inquest summary', sub:'Coroner', body:`<div class="hdr"><span>SURREY COUNTY CORONER</span><span>D-2</span></div><h3>Inquest Summary</h3>` + P(['DECEASED: Julia Stoner, 30. FINDING: Open verdict.','No marks of violence. No poison found in tests. Door locked from inside; window shutters barred with iron bars, checked each night. Walls and floor found solid. Chimney wide, but barred with four large staples.','Found in her nightdress. In her right hand, the stump of a burnt match. In her left, a matchbox.','The coroner could not name a cause. Death from fright is possible.'])},
-  {id:'D3', kind:'doc', r:2, tag:'D-3', n:'Mrs. Stoner\'s will', sub:'Extract', body:`<div class="hdr"><span>EXTRACT · LAST WILL</span><span>D-3</span></div><h3>Mrs. Stoner's Will</h3>` + P(['I leave my income of £1,000 a year to my husband, Dr. Grimesby Roylott, <b>while my daughters live with him</b>. On the marriage of either daughter, she is to receive a yearly share of that income for her own use.'])},
-  {id:'D4', kind:'doc', r:2, tag:'D-4', n:'Julia\'s letter', sub:'Found in her desk', body:`<div class="hdr"><span>LETTER</span><span>D-4</span></div><h3>Dear Helen,</h3>` + P(['Strange things this week. Workmen came and fitted a new ventilator high in my wall and a bell-rope beside my bed, though I never asked for either. The ventilator opens into the doctor\'s room, not outside. Some nights I smell his cigars through it.','And that whistle again, at three in the morning. You must hear it too?','Your loving sister,<br>Julia'])},
+  {id:'D1', kind:'doc', r:1, tag:'D-1', n:'Helen\'s statement', sub:'Witness statement', style:'form', body:`<div class="ftitle">SURREY CONSTABULARY<br>STATEMENT OF WITNESS</div><div class="fhead"><div><b>NAME</b>Helen Stoner</div><div><b>AGE</b>30</div><div><b>ADDRESS</b>Stoke Moran Manor</div><div><b>TAKEN BY</b>Sgt. W. Hale</div></div><p>On the night Julia died, a storm was blowing. Julia came to my room before bed and asked if I ever heard a low, clear whistle in the night, around three. I said no. She said she had heard it for several nights.</p><p>Later I woke to a terrible scream. I opened my door and heard a soft whistle, then a clanging sound, like metal falling. Julia staggered out of her room. She cried, "It was the band! The speckled band!" and pointed toward the doctor's room. She died within minutes.</p><p>Julia always locked her door and barred her shutters at night. My stepfather keeps a cheetah and a baboon loose on the grounds.</p><p style="margin-top:6px">Signed: <span class="sig">Helen Stoner</span></p><div class="bstamp">RECEIVED<br>SURREY<br>CONSTABULARY</div>`},
+  {id:'D2', kind:'doc', r:1, tag:'D-2', n:'Inquest summary', sub:'Coroner', style:'official', body:`<div class="crest"><svg width="38" height="42" viewBox="0 0 38 42" aria-hidden="true"><path d="M19 2l15 6v12c0 10-7 17-15 20C11 37 4 30 4 20V8z" fill="none" stroke="#1d1a14" stroke-width="1.5"/><path d="M19 10v22M11 18h16" stroke="#1d1a14" stroke-width="1.5"/></svg><b>CORONER'S COURT · COUNTY OF SURREY</b><small>Summary of Inquest held at Leatherhead</small></div><table><tr><td>Deceased</td><td>Julia Stoner, spinster, aged 30</td></tr><tr><td>Place of death</td><td>Stoke Moran Manor, west wing</td></tr><tr><td>Finding</td><td><span class="rstamp">OPEN VERDICT</span></td></tr></table><p>No marks of violence upon the body. No poison found in tests. The bedroom door was locked from within; the window shutters barred with iron bars, checked each night. Walls and floor found solid. The chimney is wide, but barred with four large staples.</p><p>The deceased was found in her nightdress. In her right hand, the charred stump of a match; in her left, a matchbox.</p><p>The Court is unable to name a cause of death. Death from fright is possible.</p><p style="text-align:right;margin:0">J. Whitmore, <i>H.M. Coroner</i> <span class="sig" style="font-size:28px;color:#1d1a14">J Whitmore</span></p>`},
+  {id:'D3', kind:'doc', r:2, tag:'D-3', n:'Mrs. Stoner\'s will', sub:'Extract', style:'will', body:`<h3>Last Will &amp; Testament</h3><div class="of">of Mrs. Margaret Stoner, widow, of Stoke Moran</div><p class="first">I give and bequeath my whole income of one thousand pounds a year unto my husband, Doctor Grimesby Roylott, <b>so long as my daughters shall reside with him</b>.</p><p>Upon the marriage of either daughter, the said daughter shall receive a yearly portion of the said income for her own sole use and benefit.</p><div class="wit"><div><span class="sig" style="font-size:24px;color:#2a1d0e">E. Farrow</span><br>Witness</div><div><span class="sig" style="font-size:24px;color:#2a1d0e">T. Lyle</span><br>Witness</div></div><div class="seal">S</div>`},
+  {id:'D4', kind:'doc', r:2, tag:'D-4', n:'Julia\'s letter', sub:'Found in her desk', style:'letter', body:`<div class="date">Stoke Moran, Tuesday</div><h3>Dearest Helen,</h3><p>Strange things this week. Workmen came and fitted a new ventilator high in my wall, and a bell-rope beside my bed, though I never asked for either. The ventilator opens into the doctor's room, not outside. Some nights I smell his cigars through it.</p><p>And that whistle again, at three in the morning. You must hear it too?</p><p style="text-align:right">Your loving sister,<br>Julia</p>`},
   {id:'P1', kind:'photo', r:1, tag:'Photo 1', n:'Julia\'s bedroom', img:'photo-1-bedroom', d:'The bolted bed, the bell-rope dangling to the pillow, the vent high above.'},
   {id:'R1', kind:'ev', r:1, tag:'R-1', n:'Muddy boots', img:'R-1-muddy-boots', d:'Croft\'s work boots by the back door, caked in wet mud.', v3d:1},
   {id:'R2', kind:'ev', r:1, tag:'R-2', n:'Train ticket', icon:'ticket', d:'Evening train from Leatherhead, punched, dated the night of the death.', v3d:1},
@@ -306,7 +335,7 @@ function pinMoment(name) { S.sheet = null; S.ov = `<div class="lbl amber">YOU FO
 function openItem(id) {
   const it = ITEMS.find(i => i.id === id); S.seen.add(id);
   const pinBtn = pinned(id) ? `<button class="btn ghost" disabled>PINNED BY ${P_(pinned(id).by).n.toUpperCase()}</button>` : `<button class="btn" data-a="pin" data-v="${id}">PIN TO BOARD</button>`;
-  if (it.kind === 'doc') S.sheet = `<div class="paper">${it.body}</div>${pinBtn}<button class="btn ghost" data-a="close">CLOSE</button>`;
+  if (it.kind === 'doc') S.sheet = `<div class="paper ${it.style || ''}">${it.body}</div>${pinBtn}<button class="btn ghost" data-a="close">CLOSE</button>`;
   else S.sheet = `${it.img ? `<img src="${IMG(it.img)}" alt="${it.n}" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:4px;filter:grayscale(.3)">` : `<div style="aspect-ratio:4/3;display:grid;place-items:center;background:#1c1c20;border-radius:4px">${svgI(it.icon)}</div>`}
     <div><div class="lbl">${it.tag} · ${it.kind === 'photo' ? 'AT THE SCENE' : 'BAGGED EVIDENCE'}</div><h2 class="serif" style="font:900 28px/1.1 'Playfair Display';margin-top:4px">${it.n}</h2><p style="margin:6px 0 0;color:#d8d8dc">${it.d}</p></div>
     ${it.v3d ? `<a class="btn ghost" href="${VIEWER}" style="text-decoration:none">INSPECT IN 3D</a>` : ''}${pinBtn}<button class="btn ghost" data-a="close">CLOSE</button>`;
