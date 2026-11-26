@@ -8,7 +8,7 @@ A noir party murder-mystery game, playing a test case adapted from *The Adventur
 Open `index.html` through any static server, or turn on GitHub Pages (Settings → Pages → deploy from `main`).
 
 ## Credits
-- Boots model generated with Tripo AI; other 3D evidence is built in code.
+- Boots, dog lash and matchbox models generated with Tripo AI; the rest of the 3D evidence is built in code.
 - Portraits and scene photos generated with Google Gemini.
 
 *The Fall of Caine cold open that used to live here is in this repo's history (commit 67a7cce).*
