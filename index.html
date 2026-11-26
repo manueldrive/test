@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Red String — Prototype</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@500;700;800&family=Special+Elite&family=Cormorant+Garamond:ital,wght@0,500;0,700;1,500&family=UnifrakturMaguntia&family=Homemade+Apple&family=Mrs+Saint+Delafield&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@500;700;800&family=Special+Elite&family=Cormorant+Garamond:ital,wght@0,500;0,700;1,500&family=UnifrakturMaguntia&family=Homemade+Apple&family=Mrs+Saint+Delafield&family=Cinzel:wght@600;800&family=Old+Standard+TT:ital@0;1&display=swap">
 <style>
 /* VOICE: a noir party game, tense but playful
    IDEA: a case file passed around a table; the murder board is the shared heart
@@ -208,11 +208,36 @@ function render() {
   if (S.screen === 'game' && S.tab === 'board') drawStrings();
 }
 function title() {
-  return `<section class="scr blinds" style="justify-content:space-between">
-    <div><div class="lbl amber">A PARTY MURDER MYSTERY</div><h1 class="big" style="font-size:80px;margin-top:8px">Red<br><span>String</span></h1></div>
-    <p style="margin:0;color:#cfcfd4;max-width:30ch">Gather your detectives. Read the files, pin the clues, tie the string, and name the killer before time runs out.</p>
-    <div style="display:grid;gap:10px"><button class="btn" data-a="host">HOST A CASE</button><button class="btn ghost" data-a="host">JOIN WITH A CODE</button>
-    <p class="mono" style="margin:0;font-size:11px;color:var(--mute);text-align:center">Prototype · the other 3 detectives are simulated</p></div></section>`;
+  return `<section class="scr" style="position:relative;padding:0;min-height:780px;overflow:hidden;background:radial-gradient(ellipse at 50% 38%,#26262b 0%,#0b0b0d 62%);color:#F2EEE6;font-family:'Old Standard TT',serif">
+  <div style="position: absolute; left: -120px; top: -40px; width: 300px; height: 900px; background: linear-gradient(90deg, transparent, rgba(255,250,235,0.07), transparent); transform: rotate(24deg); transform-origin: top"></div>
+  <div style="position: absolute; right: -140px; top: -40px; width: 300px; height: 900px; background: linear-gradient(90deg, transparent, rgba(255,250,235,0.06), transparent); transform: rotate(-20deg); transform-origin: top"></div>
+  <div style="position: absolute; inset: 0; background: repeating-linear-gradient(104deg, transparent 0 22px, rgba(255,255,255,0.025) 22px 23px)"></div>
+
+  <svg aria-hidden="true" width="390" height="190" viewBox="0 0 390 190" style="position: absolute; left: 0; bottom: 0">
+    <g fill="#050506"><rect x="0" y="110" width="40" height="80"></rect><rect x="34" y="70" width="34" height="120"></rect><rect x="64" y="96" width="30" height="94"></rect><rect x="92" y="40" width="44" height="150"></rect><rect x="132" y="88" width="30" height="102"></rect><rect x="158" y="60" width="26" height="130"></rect><rect x="182" y="104" width="44" height="86"></rect><rect x="224" y="30" width="38" height="160"></rect><rect x="258" y="82" width="34" height="108"></rect><rect x="288" y="56" width="40" height="134"></rect><rect x="326" y="98" width="30" height="92"></rect><rect x="354" y="74" width="36" height="116"></rect></g>
+    <g fill="#FFC23D" opacity="0.75"><rect x="100" y="56" width="5" height="7"></rect><rect x="122" y="80" width="5" height="7"></rect><rect x="232" y="48" width="5" height="7"></rect><rect x="246" y="96" width="5" height="7"></rect><rect x="300" y="72" width="5" height="7"></rect><rect x="44" y="90" width="5" height="7"></rect><rect x="364" y="92" width="5" height="7"></rect></g>
+  </svg>
+
+  <div style="position: absolute; left: 0; right: 0; top: 92px; text-align: center; font: 600 13px 'Cinzel', serif; letter-spacing: 6px; color: #BDB8AE">A PARTY MURDER MYSTERY</div>
+
+  <div style="position: absolute; left: 0; right: 0; top: 140px; display: flex; flex-direction: column; align-items: center; transform: rotate(-5deg) skewX(-6deg)">
+    <div style="position: relative; width: 290px; height: 110px; display: flex; justify-content: center; align-items: center"><svg aria-hidden="true" width="370" height="230" viewBox="-40 -60 370 230" style="position: absolute; left: -40px; top: -60px; overflow: visible; pointer-events: none; z-index: 0"><path d="M-40.0 54.2 L-36.0 52.8 L-32.0 51.6 L-28.0 50.4 L-24.0 45.5 L-20.0 39.8 L-16.0 33.5 L-12.0 27.5 L-8.0 22.4 L-4.0 18.9 L0.0 17.6 L4.0 17.9 L8.0 18.9 L12.0 20.6 L16.0 22.8 L20.0 25.7 L24.0 29.0 L28.0 32.9 L32.0 37.2 L36.0 41.7 L40.0 46.6 L44.0 51.6 L48.0 56.8 L52.0 61.9 L56.0 67.0 L60.0 71.9 L64.0 76.5 L68.0 80.8 L72.0 84.7 L76.0 88.2 L80.0 91.1 L84.0 93.5 L88.0 95.2 L92.0 96.3 L96.0 96.8 L100.0 96.6 L104.0 95.7 L108.0 94.1 L112.0 92.0 L116.0 89.2 L120.0 85.9 L124.0 82.2 L128.0 78.0 L132.0 73.4 L136.0 68.6 L140.0 63.6 L144.0 58.5 L148.0 53.3 L152.0 48.3 L156.0 43.3 L160.0 38.7 L164.0 34.3 L168.0 30.3 L172.0 26.7 L176.0 23.7 L180.0 21.3 L184.0 19.4 L188.0 18.2 L192.0 17.6 L196.0 17.7 L200.0 18.5 L204.0 20.0 L208.0 22.0 L212.0 24.7 L216.0 27.9 L220.0 31.6 L224.0 35.7 L228.0 40.2 L232.0 45.0 L236.0 49.9 L240.0 55.1 L244.0 60.2 L248.0 65.3 L252.0 70.3 L256.0 75.0 L260.0 79.4 L264.0 83.5 L268.0 87.1 L272.0 90.2 L276.0 92.8 L280.0 94.7 L284.0 96.0 L288.0 96.7 L292.0 96.5 L296.0 94.0 L300.0 89.6 L304.0 83.9 L308.0 77.7 L312.0 71.7 L316.0 66.3 L320.0 63.5 L324.0 62.2 L328.0 60.9" fill="none" stroke="#FF3B4E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 4px rgba(255,59,78,0.85))"></path><circle cx="-36" cy="54.2" r="6" fill="#F2EEE6"></circle><circle cx="326" cy="60.9" r="6" fill="#F2EEE6"></circle></svg><span style="position: relative; z-index: 1; font: 900 128px/0.86 'Playfair Display', serif; letter-spacing: -2px; color: #F2EEE6; text-shadow: 1px 1px 0 #b4afa5, 2px 2px 0 #a19c92, 3px 3px 0 #8e8a80, 4px 4px 0 #7b776e, 5px 5px 0 #68655d, 6px 6px 0 #56534c, 7px 7px 0 #44413b, 8px 8px 0 #33312c, 14px 18px 22px rgba(0,0,0,0.85)">RED</span><svg aria-hidden="true" width="370" height="230" viewBox="-40 -60 370 230" style="position: absolute; left: -40px; top: -60px; overflow: visible; pointer-events: none; z-index: 2; filter: drop-shadow(3px 6px 4px rgba(0,0,0,0.75)) drop-shadow(0 0 4px rgba(255,59,78,0.7))"><defs><clipPath id="wvm"><rect x="-2" y="-60" width="101" height="230"></rect><rect x="191" y="-60" width="101" height="230"></rect></clipPath></defs><path d="M-40.0 54.2 L-36.0 52.8 L-32.0 51.6 L-28.0 50.4 L-24.0 45.5 L-20.0 39.8 L-16.0 33.5 L-12.0 27.5 L-8.0 22.4 L-4.0 18.9 L0.0 17.6 L4.0 17.9 L8.0 18.9 L12.0 20.6 L16.0 22.8 L20.0 25.7 L24.0 29.0 L28.0 32.9 L32.0 37.2 L36.0 41.7 L40.0 46.6 L44.0 51.6 L48.0 56.8 L52.0 61.9 L56.0 67.0 L60.0 71.9 L64.0 76.5 L68.0 80.8 L72.0 84.7 L76.0 88.2 L80.0 91.1 L84.0 93.5 L88.0 95.2 L92.0 96.3 L96.0 96.8 L100.0 96.6 L104.0 95.7 L108.0 94.1 L112.0 92.0 L116.0 89.2 L120.0 85.9 L124.0 82.2 L128.0 78.0 L132.0 73.4 L136.0 68.6 L140.0 63.6 L144.0 58.5 L148.0 53.3 L152.0 48.3 L156.0 43.3 L160.0 38.7 L164.0 34.3 L168.0 30.3 L172.0 26.7 L176.0 23.7 L180.0 21.3 L184.0 19.4 L188.0 18.2 L192.0 17.6 L196.0 17.7 L200.0 18.5 L204.0 20.0 L208.0 22.0 L212.0 24.7 L216.0 27.9 L220.0 31.6 L224.0 35.7 L228.0 40.2 L232.0 45.0 L236.0 49.9 L240.0 55.1 L244.0 60.2 L248.0 65.3 L252.0 70.3 L256.0 75.0 L260.0 79.4 L264.0 83.5 L268.0 87.1 L272.0 90.2 L276.0 92.8 L280.0 94.7 L284.0 96.0 L288.0 96.7 L292.0 96.5 L296.0 94.0 L300.0 89.6 L304.0 83.9 L308.0 77.7 L312.0 71.7 L316.0 66.3 L320.0 63.5 L324.0 62.2 L328.0 60.9" fill="none" stroke="#FF3B4E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" clip-path="url(#wvm)"></path></svg></div>
+    <span style="font: 900 74px/0.95 'Playfair Display', serif; letter-spacing: 1px; color: #FF3B4E; text-shadow: 1px 1px 0 #d22b3d, 2px 2px 0 #b72535, 3px 3px 0 #9c1f2d, 4px 4px 0 #821a26, 5px 5px 0 #69151e, 6px 6px 0 #501017, 12px 16px 20px rgba(0,0,0,0.85)">STRING</span>
+  </div>
+
+  <div style="position: absolute; left: 0; right: 0; top: 410px; display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center">
+    <span style="font: italic 17px 'Old Standard TT', serif; color: #BDB8AE">starring</span>
+    <span style="font: 800 20px 'Cinzel', serif; letter-spacing: 4px">YOU &amp; FIVE FRIENDS</span>
+    <span style="font: italic 17px 'Old Standard TT', serif; color: #BDB8AE; margin-top: 6px">in</span>
+    <span style="font: italic 900 30px 'Playfair Display', serif">The Speckled Band</span>
+  </div>
+
+  <div style="position: absolute; left: 32px; right: 32px; bottom: 28px; display: flex; flex-direction: column; gap: 12px">
+    <button data-a="host" style="display: flex; align-items: center; justify-content: center; height: 58px; width: 100%; cursor: pointer; border: 0; background: #F2EEE6; color: #0b0b0d; font: 800 17px 'Cinzel', serif; letter-spacing: 5px">HOST A CASE</button>
+    <button data-a="host" style="display: flex; align-items: center; justify-content: center; height: 58px; width: 100%; cursor: pointer; color: #F2EEE6; border: 1.5px solid #F2EEE6; background: #0b0b0d; font: 800 17px 'Cinzel', serif; letter-spacing: 5px">JOIN WITH A CODE</button>
+    <p class="mono" style="margin:0;font-size:11px;color:var(--mute);text-align:center">Prototype · the other 3 detectives are simulated</p>
+  </div>
+</section>`;
 }
 function lobby() {
   const full = S.joined.length === 4;
