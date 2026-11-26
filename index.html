@@ -127,23 +127,27 @@ h1,h2,h3{margin:0}
 .rbest{font:700 10px 'Playfair Display',serif;letter-spacing:2px;color:#0b0b0d;background:#F2EEE6;padding:3px 6px}
 .rpts{margin-left:auto;font:900 26px 'Playfair Display',serif;color:#F2EEE6}.rpts small{font-size:13px;color:#8f8f96}
 .rrow.top .rpts{color:var(--red)}
-.cases{position:relative;flex:none;margin:auto 0;padding:clamp(8px,2.5svh,40px) 0}
+.cases{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;margin-top:clamp(10px,2.5svh,30px)}
 @media (max-height:760px){.tblock{zoom:.82}}
 .ckick{display:flex;justify-content:space-between;padding:0 24px 10px;font:600 11px Cinzel,serif;letter-spacing:4px;color:#BDB8AE}
 .ckick span+span{letter-spacing:2px;color:#8f8f96}
-.ctrack{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:6px 24px 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.ctrack{flex:1;min-height:300px;display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 24px 14px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .ctrack::-webkit-scrollbar{display:none}
-.ccard{flex:none;width:min(64vw,250px);scroll-snap-align:center;background:#111114;border:1.5px solid #34343a;padding:0;text-align:left;color:#F2EEE6;display:flex;flex-direction:column;transition:transform .2s}
-.ccard[aria-pressed=true]{border-color:#F2EEE6;box-shadow:0 14px 30px rgba(0,0,0,.6)}
-.cimg{position:relative;height:clamp(78px,13svh,140px);background:linear-gradient(160deg,hsl(var(--h) 14% 20%),#0b0b0d 75%) 30% 62%/cover;overflow:hidden}
-.cghost{position:absolute;right:-6px;bottom:-18px;font:900 74px 'Playfair Display',serif;color:rgba(242,238,230,.07);letter-spacing:-2px}
-.csoon{position:absolute;left:10px;top:10px;font:600 9px Cinzel,serif;letter-spacing:3px;color:#F2EEE6;border:1px solid rgba(242,238,230,.6);padding:3px 6px 2px;background:rgba(11,11,13,.55)}
-.cpin{position:absolute;right:10px;top:10px;width:14px;height:14px;border-radius:50%;background:var(--red);box-shadow:inset -3px -3px 0 rgba(0,0,0,.3),0 3px 6px rgba(0,0,0,.6)}
-.ctext{padding:10px 12px 12px;display:flex;flex-direction:column;gap:3px}
-.cno{font:600 9px Cinzel,serif;letter-spacing:3px;color:#8f8f96}
-.ctext b{font:900 18px/1.1 'Playfair Display',serif}
-.cmeta{font:400 12px 'Playfair Display',serif;color:#8f8f96}
-.ccard.soon .ctext b{color:#8f8f96}
+.ccard{position:relative;flex:none;width:min(76vw,300px);max-height:470px;scroll-snap-align:center;border:1.5px solid #F2EEE6;color:#F2EEE6;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;box-shadow:0 18px 34px rgba(0,0,0,.65);background:linear-gradient(180deg,rgba(11,11,13,.35) 0,rgba(11,11,13,0) 30%,rgba(11,11,13,.55) 55%,#0b0b0d 92%),var(--img,linear-gradient(165deg,hsl(var(--h) 14% 22%),#0b0b0d 70%)) 38% 50%/cover}
+.ccard.soon{border-color:#34343a;box-shadow:none}
+.ctop{position:relative;display:flex;justify-content:space-between;align-items:center;padding:12px 14px}
+.cno{font:600 10px Cinzel,serif;letter-spacing:4px;color:#d8d4cc}
+.cpin{width:16px;height:16px;border-radius:50%;background:var(--red);box-shadow:inset -3px -3px 0 rgba(0,0,0,.3),0 3px 6px rgba(0,0,0,.6)}
+.csoon{font:600 9px Cinzel,serif;letter-spacing:3px;color:#F2EEE6;border:1px solid rgba(242,238,230,.6);padding:3px 6px 2px}
+.cghost{position:absolute;right:-10px;top:38%;font:900 120px 'Playfair Display',serif;color:rgba(242,238,230,.06);letter-spacing:-4px;line-height:1}
+.ctext{position:relative;padding:0 14px 14px;display:flex;flex-direction:column;gap:4px}
+.cwhere{font:600 10px Cinzel,serif;letter-spacing:3px;color:#BDB8AE}
+.ctext b{font:900 28px/1.02 'Playfair Display',serif;text-shadow:0 3px 14px rgba(0,0,0,.8)}
+.cmeta{font:400 13px 'Playfair Display',serif;color:#BDB8AE}
+.ccard.soon .ctext b{color:#9a9aa0}
+.cbtns{display:grid;gap:8px;margin-top:10px}
+.cbtns .cbtn{min-height:50px;font-size:15px}
+.cbtn.ghostc{background:rgba(11,11,13,.6);color:#F2EEE6;border:1.5px solid #F2EEE6}
 .ccard.nope{animation:nope .35s}
 @keyframes nope{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
 .sw{display:flex;gap:12px}.sw button{width:44px;height:44px;border-radius:50%;border:3px solid transparent;box-shadow:inset -3px -3px 0 rgba(0,0,0,.28)}
@@ -347,16 +351,13 @@ function title() {
   </div>
   <div class="cases" aria-label="Choose a case">
     <div class="ckick"><span>CHOOSE A CASE</span><span>${CASES.filter(c => !c.soon).length} OPEN · ${CASES.filter(c => c.soon).length} COMING</span></div>
-    <div class="ctrack" id="ctrack">${CASES.map(c => `<button class="ccard${c.soon ? ' soon' : ''}" data-a="case" data-v="${c.id}" aria-pressed="${S.case === c.id}" ${c.soon ? 'aria-disabled="true"' : ''}>
-      <div class="cimg" style="${c.img ? `background-image:url(${IMG(c.img)})` : `--h:${c.hue}`}">${c.img ? '' : `<span class="cghost">${c.no}</span>`}${c.soon ? '<span class="csoon">COMING SOON</span>' : ''}${S.case === c.id ? '<span class="cpin"></span>' : ''}</div>
-      <div class="ctext"><span class="cno">CASE ${c.no} · ${c.where}</span><b>${c.n}</b><span class="cmeta">${c.meta}</span></div></button>`).join('')}</div>
+    <div class="ctrack" id="ctrack">${CASES.map(c => `<article class="ccard${c.soon ? ' soon' : ''}" ${c.soon ? `data-a="case" data-v="${c.id}" aria-disabled="true"` : ''} style="${c.img ? `--img:url(${IMG(c.img)})` : `--h:${c.hue}`}">
+      <div class="ctop"><span class="cno">CASE ${c.no}</span>${c.soon ? '<span class="csoon">COMING SOON</span>' : '<span class="cpin"></span>'}</div>
+      ${c.img ? '' : `<span class="cghost">${c.no}</span>`}
+      <div class="ctext"><span class="cwhere">${c.where}</span><b>${c.n}</b><span class="cmeta">${c.meta}</span>
+      ${c.soon ? '' : `<div class="cbtns"><button class="cbtn" data-a="host">HOST</button><button class="cbtn ghostc" data-a="join">JOIN</button></div>`}</div></article>`).join('')}</div>
   </div>
-
-  <div style="position: relative; flex: none; margin: 0 32px; display: flex; flex-direction: column; gap: 12px">
-    <button data-a="host" style="display: flex; align-items: center; justify-content: center; height: 58px; width: 100%; cursor: pointer; border: 0; background: #F2EEE6; color: #0b0b0d; font: 800 17px 'Cinzel', serif; letter-spacing: 5px">HOST A CASE</button>
-    <button data-a="join" style="display: flex; align-items: center; justify-content: center; height: 58px; width: 100%; cursor: pointer; color: #F2EEE6; border: 1.5px solid #F2EEE6; background: #0b0b0d; font: 800 17px 'Cinzel', serif; letter-spacing: 5px">JOIN WITH A CODE</button>
-    <p class="mono" style="margin:0;font-size:11px;color:var(--mute);text-align:center">Prototype · the other 3 detectives are simulated</p>
-  </div>
+    <p class="mono" style="margin:0 0 4px;position:relative;flex:none;font-size:11px;color:var(--mute);text-align:center">Prototype · the other 3 detectives are simulated</p>
 </section>`;
 }
 const TIPS = [
