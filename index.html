@@ -68,7 +68,9 @@ h1,h2,h3{margin:0}
 .tipC{flex:none;padding:6px 0 4px;height:214px;display:flex;flex-direction:column}
 .tCrow{display:flex;align-items:center;margin-bottom:14px}
 .tCrow i{flex:1;height:2px;background:#3a3a40}
-.tCpin{width:28px;height:28px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font:900 13px 'Playfair Display',serif;color:#8f8f96;border:1.5px solid #4a4a50;background:#0b0b0d}
+.tCpin{padding:0;cursor:pointer;position:relative;width:28px;height:28px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font:900 13px 'Playfair Display',serif;color:#8f8f96;border:1.5px solid #4a4a50;background:#0b0b0d}
+.tCpin::after{content:"";position:absolute;inset:-8px}
+.tCpin:not(.on):hover{border-color:#F2EEE6;color:#F2EEE6}
 .tCpin.done{background:#3a3a40;color:#F2EEE6;border-color:#3a3a40}
 .tCpin.on{background:var(--red);color:#fff;border-color:var(--red);box-shadow:0 0 14px rgba(255,59,78,.6)}
 .tCrow .tCpin.done+i{background:var(--red);box-shadow:0 0 6px rgba(255,59,78,.6)}
@@ -440,7 +442,7 @@ function join() {
 function joined() {
   const me = P_('me');
   return `<section class="scr noir" style="gap:16px">${head('CASE 0221')}
-    <div class="tipC" aria-live="polite"><div class="tCrow">${TIPS.map((_, i) => `<span class="tCpin${i === S.tip ? ' on' : i < S.tip ? ' done' : ''}">${i + 1}</span>`).join('<i></i>')}</div>
+    <div class="tipC" aria-live="polite"><div class="tCrow">${TIPS.map((_, i) => `<button class="tCpin${i === S.tip ? ' on' : i < S.tip ? ' done' : ''}" data-a="tipgo" data-v="${i}" aria-label="Rule ${i + 1}: ${TIPS[i][0]}" aria-current="${i === S.tip}">${i + 1}</button>`).join('<i></i>')}</div>
       <h3>${TIPS[S.tip][0]}</h3><p>${TIPS[S.tip][1]}</p><button data-a="tipnext" aria-label="Next tip">${S.tip === TIPS.length - 1 ? 'Back to the first clue' : 'Next clue'} ›</button></div>
     ${seats('jess')}
     <div class="grow"></div>
@@ -635,6 +637,7 @@ app.addEventListener('click', e => {
     setTimeout(() => { if (S.screen !== 'joined') return; S.joined.push('priya'); render(); }, 2500);
     clearInterval(tipId); tipId = setInterval(() => { if (S.screen !== 'joined') return clearInterval(tipId); S.tip = (S.tip + 1) % TIPS.length; render(); }, 6000);
     setTimeout(() => { if (S.screen === 'joined') { clearInterval(tipId); S.screen = 'brief'; render(); } }, 32000); }
+  else if (a === 'tipgo') { S.tip = +v; clearInterval(tipId); tipId = setInterval(() => { if (S.screen !== 'joined') return clearInterval(tipId); S.tip = (S.tip + 1) % TIPS.length; render(); }, 6000); render(); }
   else if (a === 'tipnext') { S.tip = (S.tip + 1) % TIPS.length; clearInterval(tipId); tipId = setInterval(() => { if (S.screen !== 'joined') return clearInterval(tipId); S.tip = (S.tip + 1) % TIPS.length; render(); }, 6000); render(); }
   else if (a === 'hoststart') { clearInterval(tipId); S.screen = 'brief'; render(); }
   else if (a === 'mode') { S.mode = v; render(); }
