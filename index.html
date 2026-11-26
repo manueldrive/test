@@ -36,7 +36,6 @@ h1,h2,h3{margin:0}
 .cz{font-family:Cinzel,serif;font-weight:800;letter-spacing:4px}
 .kick{font:700 12px 'Playfair Display',serif;letter-spacing:4px;color:#BDB8AE}
 .back{width:44px;height:44px;border:1px solid #3a3a40;background:rgba(11,11,13,.6);border-radius:50%;font-size:20px;line-height:1;display:flex;align-items:center;justify-content:center;flex:none}
-.hmono{width:40px;height:40px;border-radius:10px;flex:none}
 .hhead{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;padding-top:2px}
 .hhead .back{position:absolute;left:0;top:0;z-index:3}
 .hlogo{zoom:.42;pointer-events:none}
@@ -389,7 +388,7 @@ const CASES = [
 ];
 const SWATCH = ['#FF3B4E', '#5AA9FF', '#FF8A3D', '#7CE38B', '#F2EEE6'];
 function head(k) {
-  return `<div class="row" style="gap:12px"><button class="back" data-a="home" aria-label="Back to title">‹</button><img class="hmono" src="favicon.svg" alt="Red Thread"><div class="kick hk">${k}</div></div>`;
+  return `<div class="hhead"><button class="back" data-a="home" aria-label="Back to title">‹</button><div class="hlogo">${logo()}</div><div class="kick hk">${k}</div></div>`;
 }
 function seats(host) {
   const list = S.joined.map(P_);
