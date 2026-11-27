@@ -286,6 +286,30 @@ h1,h2,h3{margin:0}
 @keyframes fade{from{opacity:0}}@keyframes up{from{transform:translateY(40%);opacity:0}}@keyframes drop{from{transform:translateY(-12px);opacity:0}}
 @keyframes stamp{from{transform:rotate(-10deg) scale(2.2);opacity:0}}
 .vote{scrollbar-width:none}
+.vtext{width:100%;resize:none;background:rgba(11,11,13,.7);border:1.5px solid #34343a;color:#F2EEE6;font:400 17px/1.4 'Playfair Display',serif;padding:10px 12px}
+.vtext:focus{outline:none;border-color:#F2EEE6}.vtext::placeholder{color:#6f6f76}
+.ck{gap:14px;scrollbar-width:none}
+.ckq{font:900 30px/1.08 'Playfair Display',serif;margin:0;color:#F2EEE6}
+.ckhint{margin:0;font:400 15px/1.45 'Playfair Display',serif;color:#BDB8AE}
+.ckopts{display:grid;gap:8px}.ckopts.two{grid-template-columns:1fr 1fr}
+.ckopts .q{min-height:52px;font-size:16px}
+.ckbar{height:4px;background:#2c2c31;position:relative;overflow:hidden;flex:none}.ckbar i{position:absolute;inset:0 auto 0 0;background:var(--red);transition:width 1s linear}
+.ckres{border:1.5px solid #34343a;background:rgba(11,11,13,.6);padding:14px 14px 12px}.ckres.ok{border-color:#5BD39A}
+.ckpts{font:900 44px/1 'Playfair Display',serif;color:#5BD39A}.ckpts.zero{color:#8f8f96}
+.ckwho{display:flex;flex-direction:column;border-top:1px solid #2c2c31}
+.ckwho div{display:flex;align-items:center;gap:10px;min-height:44px;border-bottom:1px solid #2c2c31;font:900 18px 'Playfair Display',serif;color:#F2EEE6}
+.ckwho em{margin-left:auto;font:700 11px Cinzel,serif;letter-spacing:3px;font-style:normal}
+.ckdot{width:12px;height:12px;border-radius:50%;flex:none}
+.ths{display:flex;flex-direction:column;gap:12px}
+.thcard{border:1.5px solid #34343a;background:rgba(11,11,13,.6);padding:12px;display:flex;flex-direction:column;gap:10px}
+.thcard>.row b{font:900 19px 'Playfair Display',serif;color:#F2EEE6}
+.th{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;align-items:baseline;border-left:3px solid #4a4a50;padding-left:10px}
+.th.yes{border-left-color:#5BD39A}.th.no{border-left-color:var(--red)}
+.th q{font:400 italic 16px/1.35 'Playfair Display',serif;color:#F2EEE6;quotes:"“" "”"}
+.thm{grid-column:2;font:700 10px Cinzel,serif;letter-spacing:2px}.th.yes .thm{color:#5BD39A}.th.no .thm{color:var(--red)}
+.tho{grid-column:2;justify-self:start;margin-top:4px;min-height:34px;padding:0 10px;background:transparent;border:1px solid #4a4a50;color:#BDB8AE;font:700 10px Cinzel,serif;letter-spacing:2px;cursor:pointer}
+.tho[aria-pressed=true]{border-color:#F2EEE6;color:#F2EEE6}
+.rvdone .rv{animation:none!important;opacity:1!important;transform:none!important}.rvdone .gstamp{animation:none!important;opacity:.92}
 .vh{font:900 40px/1 'Playfair Display',serif;margin:0;color:#F2EEE6}
 .vstep{display:flex;align-items:center;gap:10px;margin-top:4px}
 .vnum{width:22px;height:22px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font:900 12px 'Playfair Display',serif;border:1.5px solid #4a4a50;color:#BDB8AE}
@@ -371,9 +395,23 @@ const svgI = k => `<svg width="44" height="44" viewBox="0 0 24 24" fill="none" s
 const HOW = ['Poisoned drink', 'A snake sent through the vent', 'A hidden passage', 'Frightened by the cheetah'];
 const WHY = ['To keep the family money', 'Jealousy', 'Revenge for being reported', 'A lovers\' quarrel'];
 const ANSWER = {who:'roylott', how:1, why:0};
+const CHECKS = [
+  {q:'Could anyone have come in through the door or the window?', opts:['Yes, through the door', 'No, the room was sealed', 'Yes, through the window', 'Through the chimney'], ans:1,
+   bq:'Who can you rule out?', bopts:['Helen', 'Croft', 'Price', 'Nobody yet'], bans:2, labels:['Sealed room', 'Price ruled out'],
+   title:'The room was sealed.', why:'Locked door, barred shutters, a chimney stapled shut. Whoever killed Julia never walked in. And Price was on the train to Harrow.'},
+  {q:'What was changed in Julia’s room before she died?', opts:['New paint and wallpaper', 'A vent and a bell-rope', 'A lock on the window', 'Nothing at all'], ans:1,
+   bq:'Whose money depends on Julia never marrying?', bopts:['Helen', 'Roylott', 'Price', 'Croft'], bans:1, labels:['The vent and rope', 'Roylott’s money'],
+   title:'Someone rebuilt her room.', why:'A vent into Roylott’s room and a bell-rope that rings nothing, both fitted weeks before. And her wedding would have cost him a share of the income.'},
+  {q:'What is Roylott keeping in his room?', opts:['Stolen jewels', 'Something alive', 'A second will', 'Nothing unusual'], ans:1,
+   bq:'What was the clang Helen heard?', bopts:['A dropped poker', 'The iron safe shutting', 'The bell-rope falling', 'A window bar'], bans:1, labels:['Something alive', 'The safe’s clang'],
+   title:'Something lives in the safe.', why:'Milk on the safe, a lash tied into a loop, and an iron door that clangs shut at night.'}
+];
+const CHECK_SECS = 30;
+const KEYS = {how:/snake|serpent|adder|viper|cobra|reptile|swamp/i, why:/money|\bwill\b|inherit|income|fortune|wealth|cash|£|pound|estate|\bshare|\brich|greed|\bgain|\bpaid|\bpay|financ/i};
+const autoOk = (field, text) => KEYS[field].test(text || '');
 const ROUND_SECS = 480;
 
-const S = {screen:'title', case:'speckled', mode:'tv', joined:['me'], round:1, t:ROUND_SECS, tab:'files', seen:new Set(), pins:[], strings:[], tie:false, sel:null, ready:new Set(), vote:{who:null, how:null, why:null}, votes:{}, host:'me', phase:null, code:'', endsAt:0, sheet:null, ov:null, toast:null, tv:false};
+const S = {screen:'title', case:'speckled', mode:'tv', joined:['me'], round:1, t:ROUND_SECS, tab:'files', seen:new Set(), pins:[], strings:[], tie:false, sel:null, ready:new Set(), vote:{who:null, how:'', why:''}, ck:{a:null, b:null}, votes:{}, host:'me', phase:null, code:'', endsAt:0, sheet:null, ov:null, toast:null, tv:false};
 const P_ = id => PLAYERS.find(p => p.id === id) || {id, n:'Detective', c:'#8f8f96'};
 const unlocked = () => ITEMS.filter(i => i.r <= S.round);
 const newCount = kinds => unlocked().filter(i => kinds.includes(i.kind) && !S.seen.has(i.id)).length;
@@ -385,8 +423,8 @@ let timerId = null, toastId = null, tipId = null;
 /* ---------- renderers ---------- */
 function render() {
   pendingRender = false;
-  const f = {title, lobby, join, joined, brief, game, vote, reveal}[S.screen];
-  const ae = document.activeElement, keep = ae && ae.id && ae.tagName === 'INPUT' ? {id:ae.id, v:ae.value, s:ae.selectionStart} : null;
+  const f = {title, lobby, join, joined, brief, game, check, checkres, vote, reveal}[S.screen];
+  const ae = document.activeElement, keep = ae && ae.id && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA') ? {id:ae.id, v:ae.value, s:ae.selectionStart} : null;
   app.innerHTML = f() + overlays();
   if (keep) { const el = document.getElementById(keep.id); if (el) { el.value = keep.v; el.focus(); try { el.setSelectionRange(keep.s, keep.s); } catch (e) {} } }
   if (S.screen === 'game' && S.tab === 'board') drawStrings();
@@ -543,25 +581,59 @@ function drawStrings() {
   svg.innerHTML = S.strings.map(([a, b]) => { const A = S.pins.find(p => p.key === a), B = S.pins.find(p => p.key === b); return A && B ? `<line x1="${A.x}" y1="${A.y}" x2="${B.x}" y2="${B.y}"/>` : ''; }).join('');
 }
 function vote() {
-  const v = S.vote, done = v.who && v.how !== null && v.why !== null, locked = !!S.votes.me;
+  const v = S.vote, locked = !!S.votes.me, done = v.who && (v.how || '').trim().length > 2 && (v.why || '').trim().length > 2;
   const step = (n, label, ok) => `<div class="vstep"><span class="vnum${ok ? ' ok' : ''}">${ok ? '✓' : n}</span><span class="kick">${label}</span></div>`;
   return `<section class="scr noir vote" style="gap:14px">
     <div class="row" style="justify-content:space-between"><span class="kick">THE LINEUP</span><span class="kick" style="letter-spacing:2px">${Object.keys(S.votes).length} / ${S.joined.length} VOTED</span></div>
     <h1 class="vh">Name the killer</h1>
     ${step(1, 'WHO DID IT?', !!v.who)}
     <div class="lineup">${SUS.map((s, i) => `<button class="lu" data-a="who" data-v="${s.id}" aria-pressed="${v.who === s.id}" style="--c:${s.c}" ${locked ? 'disabled' : ''}><span class="luimg"><img src="${IMG(s.img)}" alt=""></span><span class="pl">${i + 1}</span><b>${s.s}</b></button>`).join('')}</div>
-    ${step(2, 'HOW?', v.how !== null)}
-    <div class="qs">${HOW.map((h, i) => `<button class="q" data-a="how" data-v="${i}" aria-pressed="${v.how === i}" ${locked ? 'disabled' : ''}>${h}</button>`).join('')}</div>
-    ${step(3, 'WHY?', v.why !== null)}
-    <div class="qs">${WHY.map((h, i) => `<button class="q" data-a="why" data-v="${i}" aria-pressed="${v.why === i}" ${locked ? 'disabled' : ''}>${h}</button>`).join('')}</div>
+    ${step(2, 'HOW DID THEY DO IT?', (v.how || '').trim().length > 2)}
+    <textarea id="vhow" class="vtext" maxlength="120" rows="2" placeholder="In your own words…" ${locked ? 'disabled' : ''}>${esc(v.how || '')}</textarea>
+    ${step(3, 'WHY?', (v.why || '').trim().length > 2)}
+    <textarea id="vwhy" class="vtext" maxlength="120" rows="2" placeholder="What did they have to gain?" ${locked ? 'disabled' : ''}>${esc(v.why || '')}</textarea>
     <div class="grow"></div>
-    ${locked ? `<button class="cbtn" disabled>LOCKED IN · ${S.joined.length - Object.keys(S.votes).length} TO GO</button>` : `<button class="cbtn" data-a="lock" ${done ? '' : 'disabled'}>${done ? 'ACCUSE ' + SUS.find(s => s.id === v.who).s.toUpperCase() : 'PICK WHO, HOW AND WHY'}</button>`}</section>`;
+    ${locked ? `<button class="cbtn" disabled>LOCKED IN · ${S.joined.length - Object.keys(S.votes).length} TO GO</button>` : `<button class="cbtn" id="vlock" data-a="lock" ${done ? '' : 'disabled'}>${done ? 'ACCUSE ' + SUS.find(s => s.id === v.who).s.toUpperCase() : 'NAME WHO, HOW AND WHY'}</button>`}</section>`;
 }
-function score(x) { return (x.who === ANSWER.who) + (x.how === ANSWER.how) + (x.why === ANSWER.why); }
+/* ---------- round checkpoints ---------- */
+function myCheck(r) { return ((roomData && roomData.checks) || {})['r' + r]?.[ME] || null; }
+function check() {
+  const c = CHECKS[S.round - 1], mine = myCheck(S.round), pick = mine || S.ck, left = Math.max(0, Math.round(((roomData && roomData.meta.checkEnds) || 0) - net.now()) / 1000);
+  const answered = Object.keys(((roomData && roomData.checks) || {})['r' + S.round] || {}).length;
+  const opts = (list, key) => list.map((o, i) => `<button class="q" data-a="ck" data-k="${key}" data-v="${i}" aria-pressed="${pick[key] === i}" ${mine ? 'disabled' : ''}>${o}</button>`).join('');
+  return `<section class="scr noir ck"><div class="row" style="justify-content:space-between"><span class="kick" style="color:var(--red)">END OF ROUND ${S.round} · CHECKPOINT</span><span class="kick" id="cktime" style="letter-spacing:2px">0:${String(Math.ceil(left)).padStart(2, '0')}</span></div>
+    <div class="ckbar"><i id="ckbar" style="width:${Math.min(100, left / CHECK_SECS * 100)}%"></i></div>
+    <h1 class="ckq">${c.q}</h1>
+    <p class="ckhint">Answer on your own. Each right answer scores a point before the next round opens.</p>
+    <div class="ckopts">${opts(c.opts, 'a')}</div>
+    <div class="vstep" style="margin-top:6px"><span class="vnum">+</span><span class="kick">BONUS · ${c.bq.toUpperCase()}</span></div>
+    <div class="ckopts two">${opts(c.bopts, 'b')}</div>
+    <div class="grow"></div>
+    ${mine ? `<button class="cbtn" disabled>LOCKED IN · ${S.joined.length - answered} TO GO</button>` : `<button class="cbtn" data-a="cklock" ${pick.a !== null && pick.b !== null ? '' : 'disabled'}>LOCK IN</button>`}</section>`;
+}
+function ckPoints(pid, r) { const c = CHECKS[r - 1], x = ((roomData && roomData.checks) || {})['r' + r]?.[pid]; return x ? (x.a === c.ans) + (x.b === c.bans) : 0; }
+function checkres() {
+  const r = S.round, c = CHECKS[r - 1], mine = myCheck(r) || {}, pts = ckPoints(ME, r);
+  const rows = Object.entries(roomData.players || {}).map(([pid]) => ({pid, got:ckPoints(pid, r), total:[1, 2, 3].filter(n => n <= r).reduce((t, n) => t + ckPoints(pid, n), 0)})).sort((a, b) => b.total - a.total);
+  const last = r === 3;
+  return `<section class="scr noir ck"><div class="row" style="justify-content:space-between"><span class="kick" style="color:var(--red)">CHECKPOINT · ROUND ${r}</span><span class="kick" style="letter-spacing:2px">RESULTS</span></div>
+    <h1 class="ckq">${c.title}</h1><p class="ckhint">${c.why}</p>
+    <div class="ckres${pts ? ' ok' : ''}"><div class="row" style="justify-content:space-between;align-items:flex-end"><div><div class="kick">YOU SCORED</div><div class="ckpts${pts ? '' : ' zero'}">+${pts}</div></div>
+      <div class="kick" style="text-align:right;letter-spacing:2px;line-height:1.8">${c.labels[0].toUpperCase()} ${mine.a === c.ans ? '✓' : '✗'}<br>${c.labels[1].toUpperCase()} ${mine.b === c.bans ? '✓' : '✗'}</div></div></div>
+    <div class="kick" style="margin-top:4px">THE ROOM</div>
+    <div class="ckwho">${rows.map(x => { const p = P_(toLocal(x.pid)); return `<div><span class="ckdot" style="background:${p.c}"></span>${esc(p.n)}${x.pid === ME ? ' <span style="font:700 11px Cinzel;letter-spacing:2px;color:#8f8f96">(YOU)</span>' : ''}<em style="color:${x.got ? '#5BD39A' : '#8f8f96'}">+${x.got} · ${x.total} PT${x.total === 1 ? '' : 'S'}</em></div>`; }).join('')}</div>
+    <div class="grow"></div>
+    ${inCharge() ? `<button class="cbtn" data-a="nextround">${last ? 'TO THE LINEUP' : 'ON TO ROUND ' + (r + 1)}</button>` : `<p class="bfrules" style="margin:0">Waiting for ${esc(P_(S.host).n)} to open ${last ? 'the lineup' : 'round ' + (r + 1)}…</p>`}</section>`;
+}
+function flips(pid, field) { return Object.keys(((roomData && roomData.overrides) || {})[pid]?.[field] || {}); }
+function judged(pid, field, text) { const others = Math.max(1, Object.keys((roomData && roomData.players) || {}).length - 1); const flipped = flips(pid, field).length >= Math.floor(others / 2) + 1; return autoOk(field, text) !== flipped; }
+function score(x) { return 2 * ((x.who === ANSWER.who) + judged(x.pid, 'how', x.how) + judged(x.pid, 'why', x.why)) + [1, 2, 3].reduce((t, n) => t + ckPoints(x.pid, n), 0); }
 function reveal() {
-  const all = Object.entries(S.votes).map(([p, x]) => ({p, ...x})).map(x => ({...x, pts:score(x)})).sort((a, b) => b.pts - a.pts);
-  const pins = key => all.map(x => `<span class="rpin${x[key] === ANSWER[key] ? '' : ' miss'}" style="--c:${P_(x.p).c}" title="${esc(P_(x.p).n)}"></span>`).join('');
-  const got = key => all.filter(x => x[key] === ANSWER[key]).length;
+  const all = Object.entries((roomData && roomData.votes) || {}).map(([pid, x]) => ({pid, p:toLocal(pid), ...x})).map(x => ({...x, ok:{who:x.who === ANSWER.who, how:judged(x.pid, 'how', x.how), why:judged(x.pid, 'why', x.why)}, ck:[1, 2, 3].reduce((t, n) => t + ckPoints(x.pid, n), 0)})).map(x => ({...x, pts:score(x)})).sort((a, b) => b.pts - a.pts);
+  const others = Math.max(1, all.length - 1), need = Math.floor(others / 2) + 1;
+  const theory = x => ['how', 'why'].map(f => { const n = flips(x.pid, f).length, mine = flips(x.pid, f).includes(ME); return `<div class="th ${x.ok[f] ? 'yes' : 'no'}"><span class="kick">${f.toUpperCase()}</span><q>${esc(x[f] || '…')}</q><span class="thm">${x.ok[f] ? '✓ COUNTS' : '✗ MISSES'}</span>${x.p === 'me' ? '' : `<button class="tho" data-a="overturn" data-v="${x.pid}" data-k="${f}" aria-pressed="${mine}">${mine ? 'UNDO' : 'OVERTURN'} · ${n}/${need}</button>`}</div>`; }).join('');
+  const pins = key => all.map(x => `<span class="rpin${x.ok[key] ? '' : ' miss'}" style="--c:${P_(x.p).c}" title="${esc(P_(x.p).n)}"></span>`).join('');
+  const got = key => all.filter(x => x.ok[key]).length;
   const beat = (n, k, ans, note) => `<div class="beat rv" style="--d:${n * 0.12 + 0.5}s"><div class="bk">${k}</div><div class="ba">${ans}</div><div class="bn">${note}</div><div class="row" style="gap:6px;margin-top:10px">${pins(k.toLowerCase())}<span class="rcount">${got(k.toLowerCase())} of ${all.length} detectives</span></div></div>`;
   const chain = [
     ['A-1', 'A-1-ventilator', 'A vent cut through to his room', 'Fitted weeks before she died. It lets in no air, only a way between the rooms.'],
@@ -571,7 +643,7 @@ function reveal() {
     ['A-5', '3d-lash', 'A lash tied into a loop', 'Not for a dog. For catching something by the neck.'],
     ['A-6', 'A-6-iron-safe', 'The clang in the night', 'Helen heard a whistle, then metal shutting: the safe closing on it.']
   ];
-  return `<section class="scr noir rvl" style="padding:0;gap:0">
+  return `<section class="scr noir rvl${S.revealShown ? ' rvdone' : ''}" style="padding:0;gap:0">
     <div class="rhero"><img src="${IMG('suspect-roylott')}" alt="Dr. Grimesby Roylott">
       <div class="rtop rv" style="--d:.1s"><span class="kick">THE SEALED ENVELOPE</span><span class="kick" style="letter-spacing:2px">CASE 0221</span></div>
       <span class="gstamp">GUILTY</span>
@@ -580,13 +652,15 @@ function reveal() {
       ${beat(1, 'WHO', 'Dr. Grimesby Roylott', 'Her stepfather, in the room next door.')}
       ${beat(2, 'HOW', 'A snake through the vent', 'A swamp adder, sent down the bell-rope onto her bed.')}
       ${beat(3, 'WHY', 'To keep the family money', 'Her wedding would cut into the income he controlled.')}
+      <h2 class="rh">Your theories</h2><p class="ckhint" style="margin:-6px 0 0">The game marks each answer. Think it got one wrong? Overturn it: a majority of the room flips the call.</p>
+      <div class="ths">${all.map(x => `<div class="thcard"><div class="row" style="gap:10px"><span class="pin" style="background:${P_(x.p).c};width:12px;height:12px;border-radius:50%"></span><b>${esc(P_(x.p).n)}</b><span class="kick" style="margin-left:auto;letter-spacing:2px">ACCUSED ${esc((SUS.find(s => s.id === x.who) || {}).s || '?').toUpperCase()} ${x.ok.who ? '✓' : '✗'}</span></div>${theory(x)}</div>`).join('')}</div>
       <figure class="rsnake rv" style="--d:.2s"><img src="${IMG('reveal-snake')}" onerror="this.onerror=null;this.src='${IMG('A-2-bell-rope')}'" alt="A speckled snake coiled on the bell-rope under the vent">
         <figcaption><span class="kick" style="color:var(--red)">THE SPECKLED BAND</span><q>It was the band! The speckled band!</q><p>Julia wasn’t describing a ribbon. She saw the snake: a swamp adder, the deadliest in India, trained to come back to his whistle.</p></figcaption></figure>
       <h2 class="rh">How he did it</h2>
       <ol class="rchain">${chain.map(([t, im, h, d], i) => `<li class="rv" style="--d:${0.1 + i * 0.06}s"><img src="${IMG(im)}" onerror="this.onerror=null;this.style.visibility='hidden'" alt=""><div><span class="kick" style="letter-spacing:2px">${t}</span><b>${h}</b><p>${d}</p></div></li>`).join('')}</ol>
       <p class="rnext">Helen was next. The same whistle had started outside her new room.</p>
       <h2 class="rh">The detectives</h2>
-      <div class="rboard">${all.map((x, i) => `<div class="rrow${i === 0 ? ' top' : ''}"><span class="rrank">${i + 1}</span><span class="pin" style="background:${P_(x.p).c}"></span><b>${esc(P_(x.p).n)}</b>${i === 0 ? '<span class="rbest">BEST DETECTIVE</span>' : ''}<span class="rpts">${x.pts}<small>/3</small></span></div>`).join('')}</div>
+      <div class="rboard">${all.map((x, i) => `<div class="rrow${i === 0 ? ' top' : ''}"><span class="rrank">${i + 1}</span><span class="pin" style="background:${P_(x.p).c}"></span><b>${esc(P_(x.p).n)}</b>${i === 0 ? '<span class="rbest">BEST DETECTIVE</span>' : ''}<span class="rpts">${x.pts}<small>/12</small></span></div>`).join('')}</div>
       ${S.host === 'me' ? '<button class="cbtn" data-a="again" style="margin-top:22px">PLAY AGAIN</button>' : `<p class="bfrules" style="margin:22px 0 0">${esc(P_(S.host).n)} can start another round.</p>`}<button class="cbtn" data-a="leave" style="margin-top:10px;border:1.5px solid #F2EEE6;background:transparent;color:#F2EEE6">LEAVE THE ROOM</button>
     </div></section>`;
 }
@@ -634,23 +708,25 @@ function makeNet() {
       onConnect: cb => db.ref('.info/connected').on('value', s => { if (s.val()) cb(); })
     };
   }
-  /* No Firebase (offline / file preview): same API over localStorage, synced across tabs on this device. */
+  /* No Firebase (offline / file preview): same API kept in memory per tab; every write is broadcast as an
+     operation so tabs on this device stay in step, and saved to localStorage so a reload can rejoin. */
   const ch = 'BroadcastChannel' in window ? new BroadcastChannel('redthread') : null, subs = [];
-  const load = () => { try { return JSON.parse(localStorage.rtLocalDB || '{}'); } catch (e) { return {}; } };
-  const at = (o, path) => path.split('/').reduce((x, k) => x == null ? null : x[k], o);
-  const write = (path, fn) => { const db = load(), ks = path.split('/'); let o = db; ks.slice(0, -1).forEach(k => { if (typeof o[k] !== 'object' || o[k] === null) o[k] = {}; o = o[k]; }); fn(o, ks[ks.length - 1]); const json = JSON.stringify(db); localStorage.rtLocalDB = json; fire(db); if (ch) ch.postMessage(json); return Promise.resolve(); };
-  const fire = given => { const db = given || load(); subs.forEach(([p, cb]) => cb(JSON.parse(JSON.stringify(at(db, p) ?? null)))); };
-  if (ch) ch.onmessage = e => { try { fire(JSON.parse(e.data)); } catch (err) { fire(); } };
-  window.addEventListener('storage', e => { if (e.key === 'rtLocalDB') fire(); });
+  let db; try { db = JSON.parse(localStorage.rtLocalDB || '{}'); } catch (e) { db = {}; }
+  const at = path => path.split('/').filter(Boolean).reduce((x, k) => x == null ? null : x[k], db);
+  const put = (path, v) => { const ks = path.split('/').filter(Boolean); let o = db; ks.slice(0, -1).forEach(k => { if (typeof o[k] !== 'object' || o[k] === null) o[k] = {}; o = o[k]; }); if (v == null) delete o[ks[ks.length - 1]]; else o[ks[ks.length - 1]] = JSON.parse(JSON.stringify(v)); };
+  const applyOp = op => { if (op.t === 'update') Object.entries(op.v).forEach(([k, x]) => put(op.p + '/' + k, x)); else put(op.p, op.v); };
+  const fire = () => { try { localStorage.rtLocalDB = JSON.stringify(db); } catch (e) {} subs.forEach(([p, cb]) => cb(JSON.parse(JSON.stringify(at(p) ?? null)))); };
+  const op = o => { applyOp(o); fire(); if (ch) ch.postMessage(o); return Promise.resolve(); };
+  if (ch) ch.onmessage = e => { applyOp(e.data); fire(); };
   let n = 0;
   return {
     now: () => Date.now(),
-    get: path => Promise.resolve(at(load(), path) ?? null),
-    watch: (path, cb) => { const e = [path, cb]; subs.push(e); setTimeout(() => cb(at(load(), path) ?? null)); return () => subs.splice(subs.indexOf(e), 1); },
-    set: (path, v) => write(path, (o, k) => { if (v == null) delete o[k]; else o[k] = v; }),
-    update: (path, v) => { const db = load(); Object.entries(v).forEach(([k, x]) => { const ks = (path + '/' + k).split('/').filter(Boolean); let o = db; ks.slice(0, -1).forEach(q => { if (typeof o[q] !== 'object' || o[q] === null) o[q] = {}; o = o[q]; }); if (x == null) delete o[ks[ks.length - 1]]; else o[ks[ks.length - 1]] = x; }); const json = JSON.stringify(db); localStorage.rtLocalDB = json; fire(db); if (ch) ch.postMessage(json); return Promise.resolve(); },
-    remove: path => write(path, (o, k) => { delete o[k]; }),
-    push: (path, v) => { const k = 'k' + Date.now().toString(36) + (n++) + rid(3); return write(path + '/' + k, (o, kk) => { o[kk] = v; }); },
+    get: path => Promise.resolve(JSON.parse(JSON.stringify(at(path) ?? null))),
+    watch: (path, cb) => { const e = [path, cb]; subs.push(e); setTimeout(() => cb(JSON.parse(JSON.stringify(at(path) ?? null)))); return () => subs.splice(subs.indexOf(e), 1); },
+    set: (path, v) => op({t:'set', p:path, v}),
+    update: (path, v) => op({t:'update', p:path, v}),
+    remove: path => op({t:'set', p:path, v:null}),
+    push: (path, v) => op({t:'set', p:path + '/k' + Date.now().toString(36) + (n++) + rid(3), v}),
     key: () => 'k' + Date.now().toString(36) + (n++) + rid(3),
     onLeave: () => {}, onConnect: cb => cb()
   };
@@ -707,11 +783,14 @@ function applyRoom(d) {
   const round = m.round || 1;
   if (m.phase !== S.phase) {
     const was = S.phase; S.phase = m.phase;
-    if (m.phase === 'lobby') { S.screen = S.host === 'me' ? 'lobby' : 'joined'; S.vote = {who:null, how:null, why:null}; S.seen = new Set(); S.tab = 'files'; S.sheet = null; S.ov = null; if (S.screen === 'joined') startTips(); }
+    if (m.phase === 'lobby') { S.screen = S.host === 'me' ? 'lobby' : 'joined'; S.vote = {who:null, how:'', why:''}; S.seen = new Set(); S.tab = 'files'; S.sheet = null; S.ov = null; if (S.screen === 'joined') startTips(); }
     else if (m.phase === 'brief') { S.screen = 'brief'; S.sheet = null; }
-    else if (m.phase === 'game') { S.screen = 'game'; S.sheet = null; S.ov = null; lastRound = round; }
+    else if (m.phase === 'game') { S.screen = 'game'; S.sheet = null; S.ov = null; lastRound = round;
+      if (was === 'checkres') { const n = ITEMS.filter(i => i.r === round).length; S.ov = `<div class="kick" style="color:var(--red)">ROUND ${round} OF 3</div><h2 style="font:900 42px/1 'Playfair Display';margin:0;color:#F2EEE6">${ROUNDS[round - 1].n}</h2><p style="margin:0;font:400 16px 'Playfair Display';color:#BDB8AE">${n} new files unsealed</p><button class="cbtn" data-a="ovclose" style="max-width:260px;margin-top:6px">OPEN THEM</button>`; } }
+    else if (m.phase === 'check') { S.screen = 'check'; S.sheet = null; S.ov = null; S.tv = false; S.ck = {a:null, b:null}; }
+    else if (m.phase === 'checkres') { S.screen = 'checkres'; S.sheet = null; S.ov = null; }
     else if (m.phase === 'vote') { S.screen = 'vote'; S.sheet = null; S.ov = null; }
-    else if (m.phase === 'reveal') { S.screen = 'reveal'; S.sheet = null; if (was === 'vote') { S.ov = `<span class="stamp" style="font-size:28px">THE VERDICT</span><p style="margin:0;font:400 16px 'Playfair Display';color:#BDB8AE">Opening the sealed envelope…</p>`; setTimeout(() => { S.ov = null; render(); }, 1800); } }
+    else if (m.phase === 'reveal') { S.screen = 'reveal'; S.sheet = null; S.revealShown = false; setTimeout(() => { S.revealShown = true; }, 4000); if (was === 'vote') { S.ov = `<span class="stamp" style="font-size:28px">THE VERDICT</span><p style="margin:0;font:400 16px 'Playfair Display';color:#BDB8AE">Opening the sealed envelope…</p>`; setTimeout(() => { S.ov = null; render(); }, 1800); } }
   } else if (m.phase === 'game' && round !== lastRound) {
     lastRound = round; S.sheet = null;
     const n = ITEMS.filter(i => i.r === round).length;
@@ -724,7 +803,7 @@ function applyRoom(d) {
 /* Re-render for remote changes, but never yank a drag, a 3D viewer or a half-typed note. */
 function softRender(force) {
   if (force) { if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); render(); return; }
-  const typing = document.activeElement && document.activeElement.tagName === 'INPUT';
+  const typing = document.activeElement && /INPUT|TEXTAREA/.test(document.activeElement.tagName);
   if (drag || typing || (S.sheet && S.sheet.includes('<iframe'))) { pendingRender = true; return; }
   render();
 }
@@ -743,6 +822,9 @@ function hostDuties() {
   if (m.phase === 'game') {
     const ready = Object.keys((roomData.ready || {})['r' + m.round] || {}).length;
     if ((m.endsAt && net.now() >= m.endsAt) || ready >= active) advance();
+  } else if (m.phase === 'check') {
+    const n = Object.keys((roomData.checks || {})['r' + m.round] || {}).length;
+    if ((m.checkEnds && net.now() >= m.checkEnds) || n >= active) netUpdate('meta', {phase:'checkres'});
   } else if (m.phase === 'vote') {
     if (Object.keys(roomData.votes || {}).length >= active) netUpdate('meta', {phase:'reveal'});
   }
@@ -750,15 +832,16 @@ function hostDuties() {
 let advancing = 0;
 function advance() {
   const m = roomData.meta; if (advancing === m.round) return; advancing = m.round;
-  if (m.round >= 3) netUpdate('meta', {phase:'vote'});
-  else netUpdate('meta', {round:m.round + 1, endsAt:net.now() + ROUND_SECS * 1000});
+  netUpdate('meta', {phase:'check', checkEnds:net.now() + CHECK_SECS * 1000});
 }
 function startTips() {
   S.tip = 0; clearInterval(tipId);
   tipId = setInterval(() => { if (S.screen !== 'joined') return clearInterval(tipId); S.tip = (S.tip + 1) % TIPS.length; softRender(); }, 6000);
 }
 function tick() {
-  if (!roomData || S.phase !== 'game') return;
+  if (!roomData) return;
+  if (S.phase === 'check') { const left = Math.max(0, ((roomData.meta.checkEnds || 0) - net.now()) / 1000); const t = $('#cktime'), b = $('#ckbar'); if (t) t.textContent = '0:' + String(Math.ceil(left)).padStart(2, '0'); if (b) b.style.width = Math.min(100, left / CHECK_SECS * 100) + '%'; hostDuties(); return; }
+  if (S.phase !== 'game') return;
   S.t = Math.max(0, Math.round((S.endsAt - net.now()) / 1000));
   const el = $('.timer'); if (el && S.screen === 'game') { el.textContent = Math.floor(S.t / 60) + ':' + String(S.t % 60).padStart(2, '0'); el.classList.toggle('low', S.t < 60); }
   hostDuties();
@@ -854,15 +937,18 @@ app.addEventListener('click', async e => {
   else if (a === 'tvclose') { S.tv = false; render(); }
   else if (a === 'undo') { for (let i = S.strings.length - 1; i >= 0; i--) if (S.strings[i][2] === 'me') { netRemove('strings/' + S.strings[i][3]); break; } }
   else if (a === 'who') { if (S.votes.me) return; S.vote.who = v; render(); }
-  else if (a === 'how') { if (S.votes.me) return; S.vote.how = +v; render(); }
-  else if (a === 'why') { if (S.votes.me) return; S.vote.why = +v; render(); }
-  else if (a === 'lock') { const x = S.vote; if (x.who && x.how !== null && x.why !== null) netSet('votes/' + ME, {who:x.who, how:x.how, why:x.why}); }
-  else if (a === 'again') { if (S.host !== 'me') return; netUpdate('', {pins:null, strings:null, ready:null, votes:null, 'meta/phase':'lobby', 'meta/round':1, 'meta/endsAt':0}); }
+  else if (a === 'lock') { const x = S.vote; if (x.who && x.how.trim().length > 2 && x.why.trim().length > 2) netSet('votes/' + ME, {who:x.who, how:x.how.trim().slice(0, 120), why:x.why.trim().slice(0, 120)}); }
+  else if (a === 'ck') { if (myCheck(S.round)) return; S.ck[t.dataset.k] = +v; render(); }
+  else if (a === 'cklock') { if (S.ck.a !== null && S.ck.b !== null) netSet('checks/r' + S.round + '/' + ME, {a:S.ck.a, b:S.ck.b}); }
+  else if (a === 'nextround') { if (!inCharge()) return; const m = roomData.meta; if (m.round >= 3) netUpdate('meta', {phase:'vote'}); else netUpdate('meta', {phase:'game', round:m.round + 1, endsAt:net.now() + ROUND_SECS * 1000}); }
+  else if (a === 'overturn') { if (v === ME) return; const path = 'overrides/' + v + '/' + t.dataset.k + '/' + ME; if (flips(v, t.dataset.k).includes(ME)) netRemove(path); else netSet(path, true); }
+  else if (a === 'again') { if (S.host !== 'me') return; netUpdate('', {pins:null, strings:null, ready:null, votes:null, checks:null, overrides:null, 'meta/phase':'lobby', 'meta/round':1, 'meta/endsAt':0}); }
 });
 /* closing a sheet or finishing a drag catches up on anything that arrived meanwhile */
-app.addEventListener('focusout', () => setTimeout(() => { if (pendingRender && !(document.activeElement && document.activeElement.tagName === 'INPUT')) softRender(); }, 0));
+app.addEventListener('focusout', () => setTimeout(() => { if (pendingRender && !(document.activeElement && /INPUT|TEXTAREA/.test(document.activeElement.tagName))) softRender(); }, 0));
 
 app.addEventListener('input', e => {
+  if (e.target.id === 'vhow' || e.target.id === 'vwhy') { S.vote[e.target.id === 'vhow' ? 'how' : 'why'] = e.target.value; const v = S.vote, done = v.who && v.how.trim().length > 2 && v.why.trim().length > 2, b = $('#vlock'); if (b) { b.disabled = !done; b.textContent = done ? 'ACCUSE ' + SUS.find(s => s.id === v.who).s.toUpperCase() : 'NAME WHO, HOW AND WHY'; } return; }
   if (e.target.id === 'jc') { const v = e.target.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 4); e.target.value = v; S.code = v; S.joinErr = false;
     document.querySelectorAll('.boxes span').forEach((b, i) => { b.textContent = v[i] || ''; b.className = i === v.length ? 'on' : ''; });
     const er = $('#jerr'); if (er) { er.style.color = '#8f8f96'; er.textContent = 'It’s on the TV or the host’s phone.'; } if (v.length === 4) $('#jn').focus(); }
