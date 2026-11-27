@@ -555,7 +555,7 @@ function vote() {
     ${step(3, 'WHY?', v.why !== null)}
     <div class="qs">${WHY.map((h, i) => `<button class="q" data-a="why" data-v="${i}" aria-pressed="${v.why === i}" ${locked ? 'disabled' : ''}>${h}</button>`).join('')}</div>
     <div class="grow"></div>
-    ${locked ? `<button class="cbtn" disabled>LOCKED IN · WAITING FOR ${S.joined.length - Object.keys(S.votes).length} MORE</button>` : `<button class="cbtn" data-a="lock" ${done ? '' : 'disabled'}>${done ? 'ACCUSE ' + SUS.find(s => s.id === v.who).s.toUpperCase() : 'PICK WHO, HOW AND WHY'}</button>`}</section>`;
+    ${locked ? `<button class="cbtn" disabled>LOCKED IN · ${S.joined.length - Object.keys(S.votes).length} TO GO</button>` : `<button class="cbtn" data-a="lock" ${done ? '' : 'disabled'}>${done ? 'ACCUSE ' + SUS.find(s => s.id === v.who).s.toUpperCase() : 'PICK WHO, HOW AND WHY'}</button>`}</section>`;
 }
 function score(x) { return (x.who === ANSWER.who) + (x.how === ANSWER.how) + (x.why === ANSWER.why); }
 function reveal() {
@@ -587,7 +587,7 @@ function reveal() {
       <p class="rnext">Helen was next. The same whistle had started outside her new room.</p>
       <h2 class="rh">The detectives</h2>
       <div class="rboard">${all.map((x, i) => `<div class="rrow${i === 0 ? ' top' : ''}"><span class="rrank">${i + 1}</span><span class="pin" style="background:${P_(x.p).c}"></span><b>${esc(P_(x.p).n)}</b>${i === 0 ? '<span class="rbest">BEST DETECTIVE</span>' : ''}<span class="rpts">${x.pts}<small>/3</small></span></div>`).join('')}</div>
-      ${S.host === 'me' ? '<button class="cbtn" data-a="again" style="margin-top:22px">PLAY AGAIN WITH THIS GROUP</button>' : `<p class="bfrules" style="margin:22px 0 0">${esc(P_(S.host).n)} can start another round.</p>`}<button class="cbtn" data-a="leave" style="margin-top:10px;border:1.5px solid #F2EEE6;background:transparent;color:#F2EEE6">LEAVE THE ROOM</button>
+      ${S.host === 'me' ? '<button class="cbtn" data-a="again" style="margin-top:22px">PLAY AGAIN</button>' : `<p class="bfrules" style="margin:22px 0 0">${esc(P_(S.host).n)} can start another round.</p>`}<button class="cbtn" data-a="leave" style="margin-top:10px;border:1.5px solid #F2EEE6;background:transparent;color:#F2EEE6">LEAVE THE ROOM</button>
     </div></section>`;
 }
 function overlays() {
@@ -711,11 +711,11 @@ function applyRoom(d) {
     else if (m.phase === 'brief') { S.screen = 'brief'; S.sheet = null; }
     else if (m.phase === 'game') { S.screen = 'game'; S.sheet = null; S.ov = null; lastRound = round; }
     else if (m.phase === 'vote') { S.screen = 'vote'; S.sheet = null; S.ov = null; }
-    else if (m.phase === 'reveal') { S.screen = 'reveal'; S.sheet = null; if (was === 'vote') { S.ov = `<span class="stamp" style="font-size:28px">THE VERDICT</span><p class="mono" style="color:var(--mute);margin:0">Opening the sealed envelope…</p>`; setTimeout(() => { S.ov = null; render(); }, 1800); } }
+    else if (m.phase === 'reveal') { S.screen = 'reveal'; S.sheet = null; if (was === 'vote') { S.ov = `<span class="stamp" style="font-size:28px">THE VERDICT</span><p style="margin:0;font:400 16px 'Playfair Display';color:#BDB8AE">Opening the sealed envelope…</p>`; setTimeout(() => { S.ov = null; render(); }, 1800); } }
   } else if (m.phase === 'game' && round !== lastRound) {
     lastRound = round; S.sheet = null;
     const n = ITEMS.filter(i => i.r === round).length;
-    S.ov = `<div class="lbl amber">ROUND ${round} OF 3</div><h2 class="serif" style="font:italic 900 40px/1 'Playfair Display'">${ROUNDS[round - 1].n}</h2><p class="mono" style="margin:0;color:var(--mute)">${n} new files unsealed</p><button class="btn" data-a="ovclose" style="max-width:260px">OPEN THEM</button>`;
+    S.ov = `<div class="kick" style="color:var(--red)">ROUND ${round} OF 3</div><h2 style="font:900 42px/1 'Playfair Display';margin:0;color:#F2EEE6">${ROUNDS[round - 1].n}</h2><p style="margin:0;font:400 16px 'Playfair Display';color:#BDB8AE">${n} new files unsealed</p><button class="cbtn" data-a="ovclose" style="max-width:260px;margin-top:6px">OPEN THEM</button>`;
   }
   S.round = round;
   hostDuties();
