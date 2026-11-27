@@ -285,16 +285,25 @@ h1,h2,h3{margin:0}
 .toast{position:absolute;left:12px;right:12px;top:64px;z-index:12;background:rgba(21,21,24,.96);border:1px solid var(--line);border-radius:6px;padding:10px 12px;font-size:13px;display:flex;gap:8px;align-items:center;animation:drop .25s}
 @keyframes fade{from{opacity:0}}@keyframes up{from{transform:translateY(40%);opacity:0}}@keyframes drop{from{transform:translateY(-12px);opacity:0}}
 @keyframes stamp{from{transform:rotate(-10deg) scale(2.2);opacity:0}}
-.lineup{position:relative;height:300px;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:repeating-linear-gradient(180deg,transparent 0 37px,#34343A 37px 38px),#151518;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;padding:0 4px;align-items:end}
-.lu{border:0;background:none;padding:0 0 8px;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end;border-radius:4px}
-.lu img{width:100%;object-fit:cover;object-position:top;border-radius:3px;filter:grayscale(1) brightness(.5);transition:filter .2s}
-.lu .pl{background:var(--paper);color:#141414;font:600 14px 'IBM Plex Mono',monospace;padding:1px 9px;margin-top:-16px;position:relative}
-.lu b{font:900 15px 'Playfair Display',serif}
-.lu[aria-pressed=true] img{filter:none}
-.lu[aria-pressed=true]{background:radial-gradient(ellipse at 50% 30%,rgba(255,255,255,.18),transparent 65%)}
-.qs{display:flex;flex-wrap:wrap;gap:8px}
-.q{border:1px solid var(--line);background:var(--panel);border-radius:999px;min-height:44px;padding:0 14px;font-size:14px;font-weight:700}
-.q[aria-pressed=true]{border-color:var(--amber);color:var(--amber)}
+.vote{scrollbar-width:none}
+.vh{font:900 40px/1 'Playfair Display',serif;margin:0;color:#F2EEE6}
+.vstep{display:flex;align-items:center;gap:10px;margin-top:4px}
+.vnum{width:22px;height:22px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font:900 12px 'Playfair Display',serif;border:1.5px solid #4a4a50;color:#BDB8AE}
+.vnum.ok{background:var(--red);border-color:var(--red);color:#fff}
+.lineup{position:relative;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:12px 10px 12px;border:1px solid #2c2c31;background:repeating-linear-gradient(180deg,transparent 0 23px,rgba(242,238,230,.09) 23px 24px),#111114}
+.lu{border:0;background:none;padding:0;display:flex;flex-direction:column;align-items:center;gap:6px;color:#BDB8AE;cursor:pointer}
+.luimg{position:relative;display:block;width:100%;aspect-ratio:3/5.2;overflow:hidden;border:1.5px solid #34343a;background:#0b0b0d}
+.luimg img{width:100%;height:100%;object-fit:cover;object-position:50% 12%;filter:grayscale(1) brightness(.62) contrast(1.05);transition:filter .2s}
+.lu .pl{margin-top:-18px;position:relative;min-width:24px;height:22px;display:flex;align-items:center;justify-content:center;background:#F2EEE6;color:#0b0b0d;font:900 13px 'Playfair Display',serif;box-shadow:0 4px 10px rgba(0,0,0,.5)}
+.lu b{font:900 15px 'Playfair Display',serif;line-height:1.1;text-align:center}
+.lu[aria-pressed=true] .luimg{border-color:var(--c);box-shadow:0 0 0 1px var(--c),0 0 18px color-mix(in srgb,var(--c) 45%,transparent)}
+.lu[aria-pressed=true] .luimg img{filter:grayscale(.15) brightness(1)}
+.lu[aria-pressed=true] .pl{background:var(--c);color:#0b0b0d}
+.lu[aria-pressed=true] b{color:#F2EEE6}
+.qs{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.q{border:1.5px solid #34343a;background:rgba(11,11,13,.6);min-height:52px;padding:8px 12px;font:400 15px/1.25 'Playfair Display',serif;color:#d8d4cc;text-align:left;cursor:pointer}
+.q[aria-pressed=true]{border-color:#F2EEE6;background:#F2EEE6;color:#0b0b0d;font-weight:900}
+.q:disabled,.lu:disabled{cursor:default}
 table{width:100%;border-collapse:collapse;font-size:13px}td,th{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line)}th{font:11px 'IBM Plex Mono',monospace;color:var(--mute);letter-spacing:1px}
 .ok{color:#5BD39A}.no{color:var(--red)}
 .tvwrap{position:absolute;inset:0;z-index:25;background:#000;display:flex;flex-direction:column;justify-content:center;padding:12px;gap:10px}
@@ -534,13 +543,19 @@ function drawStrings() {
   svg.innerHTML = S.strings.map(([a, b]) => { const A = S.pins.find(p => p.key === a), B = S.pins.find(p => p.key === b); return A && B ? `<line x1="${A.x}" y1="${A.y}" x2="${B.x}" y2="${B.y}"/>` : ''; }).join('');
 }
 function vote() {
-  const v = S.vote, done = v.who && v.how !== null && v.why !== null;
-  return `<section class="scr"><div class="row"><div class="lbl">THE LINEUP · EVERYONE VOTES</div><span class="timer" style="font-size:18px">${Object.keys(S.votes).length}/${S.joined.length} voted</span></div>
-    <h1 class="serif" style="font:italic 900 48px/1 'Playfair Display'">Who did it?</h1>
-    <div class="lineup">${SUS.map((s, i) => `<button class="lu" data-a="who" data-v="${s.id}" aria-pressed="${v.who === s.id}" style="${v.who === s.id ? `box-shadow:inset 0 -4px 0 ${s.c}` : ''}"><img src="${IMG(s.img)}" alt="${s.s}" style="height:${[220, 190, 205, 212][i]}px;${v.who === s.id ? `outline:2px solid ${s.c}` : ''}"><span class="pl" style="${v.who === s.id ? `background:${s.c}` : ''}">${i + 1}</span><b>${s.s}</b></button>`).join('')}</div>
-    <div class="lbl">HOW?</div><div class="qs">${HOW.map((h, i) => `<button class="q" data-a="how" data-v="${i}" aria-pressed="${v.how === i}">${h}</button>`).join('')}</div>
-    <div class="lbl">WHY?</div><div class="qs">${WHY.map((h, i) => `<button class="q" data-a="why" data-v="${i}" aria-pressed="${v.why === i}">${h}</button>`).join('')}</div>
-    ${S.votes.me ? `<button class="btn ghost" disabled>LOCKED IN · WAITING FOR ${S.joined.length - Object.keys(S.votes).length} MORE</button>` : `<button class="btn" data-a="lock" ${done ? '' : 'disabled'}>${done ? 'ACCUSE ' + SUS.find(s => s.id === v.who).s.toUpperCase() : 'PICK WHO, HOW AND WHY'}</button>`}</section>`;
+  const v = S.vote, done = v.who && v.how !== null && v.why !== null, locked = !!S.votes.me;
+  const step = (n, label, ok) => `<div class="vstep"><span class="vnum${ok ? ' ok' : ''}">${ok ? '✓' : n}</span><span class="kick">${label}</span></div>`;
+  return `<section class="scr noir vote" style="gap:14px">
+    <div class="row" style="justify-content:space-between"><span class="kick">THE LINEUP</span><span class="kick" style="letter-spacing:2px">${Object.keys(S.votes).length} / ${S.joined.length} VOTED</span></div>
+    <h1 class="vh">Name the killer</h1>
+    ${step(1, 'WHO DID IT?', !!v.who)}
+    <div class="lineup">${SUS.map((s, i) => `<button class="lu" data-a="who" data-v="${s.id}" aria-pressed="${v.who === s.id}" style="--c:${s.c}" ${locked ? 'disabled' : ''}><span class="luimg"><img src="${IMG(s.img)}" alt=""></span><span class="pl">${i + 1}</span><b>${s.s}</b></button>`).join('')}</div>
+    ${step(2, 'HOW?', v.how !== null)}
+    <div class="qs">${HOW.map((h, i) => `<button class="q" data-a="how" data-v="${i}" aria-pressed="${v.how === i}" ${locked ? 'disabled' : ''}>${h}</button>`).join('')}</div>
+    ${step(3, 'WHY?', v.why !== null)}
+    <div class="qs">${WHY.map((h, i) => `<button class="q" data-a="why" data-v="${i}" aria-pressed="${v.why === i}" ${locked ? 'disabled' : ''}>${h}</button>`).join('')}</div>
+    <div class="grow"></div>
+    ${locked ? `<button class="cbtn" disabled>LOCKED IN · WAITING FOR ${S.joined.length - Object.keys(S.votes).length} MORE</button>` : `<button class="cbtn" data-a="lock" ${done ? '' : 'disabled'}>${done ? 'ACCUSE ' + SUS.find(s => s.id === v.who).s.toUpperCase() : 'PICK WHO, HOW AND WHY'}</button>`}</section>`;
 }
 function score(x) { return (x.who === ANSWER.who) + (x.how === ANSWER.how) + (x.why === ANSWER.why); }
 function reveal() {
