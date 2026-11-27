@@ -302,16 +302,23 @@ table{width:100%;border-collapse:collapse;font-size:13px}td,th{text-align:left;p
 </head>
 <body>
 <main id="app" aria-live="polite"></main>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+/* Red Thread lives under its own branch of the shared bao-buddy database: redthread/rooms/<CODE> */
+window.RT_FIREBASE = {
+  apiKey: "AIzaSyDMxcuNZmdic9AZIL5uQwvGdxKnGW2Uq_c",
+  authDomain: "bao-buddy.firebaseapp.com",
+  databaseURL: "https://bao-buddy-default-rtdb.firebaseio.com",
+  projectId: "bao-buddy",
+  appId: "1:167816448505:web:35d57633f3caea0ba71528"
+};
+</script>
 <script>
 {
 const IMG = n => 'img/' + n + '.jpg';
 const VIEWER = 'evidence/';
-const PLAYERS = [
-  {id:'me', n:'You', c:'#FF3B4E'},
-  {id:'jess', n:'Jess', c:'#3FD0C9'},
-  {id:'marcus', n:'Marcus', c:'#B48CFF'},
-  {id:'priya', n:'Priya', c:'#FFC23D'}
-];
+const PLAYERS = [{id:'me', n:'You', c:'#FF3B4E'}];
 const SUS = [
   {id:'roylott', n:'Dr. Grimesby Roylott', s:'Roylott', img:'suspect-roylott', c:'#FF3B4E', who:'Julia\'s stepfather. Ex-doctor back from India. Violent temper; keeps Indian animals loose on the grounds.', alibi:'"Asleep in my room all night." (The room next to Julia\'s.)'},
   {id:'helen', n:'Helen Stoner', s:'Helen', img:'suspect-helen', c:'#B48CFF', who:'Julia\'s twin sister. Brought the case to you.', alibi:'Woke to Julia\'s scream and found her in the hall.'},
@@ -355,19 +362,22 @@ const WHY = ['To keep the family money', 'Jealousy', 'Revenge for being reported
 const ANSWER = {who:'roylott', how:1, why:0};
 const ROUND_SECS = 480;
 
-const S = {screen:'title', case:'speckled', mode:'tv', joined:['me'], round:1, t:ROUND_SECS, tab:'files', seen:new Set(), pins:[], strings:[], tie:false, sel:null, ready:new Set(), vote:{who:null, how:null, why:null}, bots:{}, sheet:null, ov:null, toast:null, tv:false};
-const P_ = id => PLAYERS.find(p => p.id === id);
+const S = {screen:'title', case:'speckled', mode:'tv', joined:['me'], round:1, t:ROUND_SECS, tab:'files', seen:new Set(), pins:[], strings:[], tie:false, sel:null, ready:new Set(), vote:{who:null, how:null, why:null}, votes:{}, host:'me', phase:null, code:'', endsAt:0, sheet:null, ov:null, toast:null, tv:false};
+const P_ = id => PLAYERS.find(p => p.id === id) || {id, n:'Detective', c:'#8f8f96'};
 const unlocked = () => ITEMS.filter(i => i.r <= S.round);
 const newCount = kinds => unlocked().filter(i => kinds.includes(i.kind) && !S.seen.has(i.id)).length;
 const $ = s => document.querySelector(s);
 const esc = x => String(x).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const app = $('#app');
-let timerId = null, botId = null, toastId = null, tipId = null;
+let timerId = null, toastId = null, tipId = null;
 
 /* ---------- renderers ---------- */
 function render() {
+  pendingRender = false;
   const f = {title, lobby, join, joined, brief, game, vote, reveal}[S.screen];
+  const ae = document.activeElement, keep = ae && ae.id && ae.tagName === 'INPUT' ? {id:ae.id, v:ae.value, s:ae.selectionStart} : null;
   app.innerHTML = f() + overlays();
+  if (keep) { const el = document.getElementById(keep.id); if (el) { el.value = keep.v; el.focus(); try { el.setSelectionRange(keep.s, keep.s); } catch (e) {} } }
   if (S.screen === 'game' && S.tab === 'board') drawStrings();
 }
 function logo() {
@@ -413,41 +423,41 @@ function head(k) {
 }
 function seats(host) {
   const list = S.joined.map(P_);
-  const rows = list.map(p => `<div class="det"><span class="pin" style="background:${p.c}"></span><b>${esc(p.n)}${p.id === 'me' && host !== 'me' ? ' <span style="font:700 11px Playfair Display;letter-spacing:2px;color:#8f8f96">(YOU)</span>' : ''}</b><em>${p.id === host ? 'HOST' : 'READY'}</em></div>`);
-  for (let i = list.length; i < 6; i++) rows.push(`<div class="det open"><span class="pin"></span><span style="font:400 16px 'Playfair Display'">${i < 4 ? 'waiting for a detective…' : 'open seat'}</span></div>`);
+  const rows = list.map(p => `<div class="det"><span class="pin" style="background:${p.c}"></span><b>${esc(p.n)}${p.id === 'me' && host !== 'me' ? ' <span style="font:700 11px Playfair Display;letter-spacing:2px;color:#8f8f96">(YOU)</span>' : ''}</b><em>${p.id === host ? 'HOST' : p.on === false ? 'AWAY' : 'READY'}</em></div>`);
+  for (let i = list.length; i < 6; i++) rows.push(`<div class="det open"><span class="pin"></span><span style="font:400 16px 'Playfair Display'">${i < 2 ? 'waiting for a detective…' : 'open seat'}</span></div>`);
   return `<div class="row" style="justify-content:space-between;margin-top:2px"><span class="kick">DETECTIVES</span><span class="kick" style="letter-spacing:2px">${list.length} / 6</span></div><div style="border-top:1px solid #2c2c31;margin-top:-6px">${rows.join('')}</div>`;
 }
 function lobby() {
-  const ok = S.joined.length >= 4;
+  const ok = S.joined.length >= 2;
   return `<section class="scr noir" style="gap:16px">${head('HOSTING · CASE 0221')}
-    <div class="ticket"><div class="kick" style="color:#4A4740">ROOM CODE</div><div class="rc">KXQZ</div><small>Friends tap <b style="font:900 12px 'Playfair Display';letter-spacing:1px">JOIN WITH A CODE</b> and enter this</small></div>
+    <div class="ticket"><div class="kick" style="color:#4A4740">ROOM CODE</div><div class="rc">${esc(S.code)}</div><small>Friends tap <b style="font:900 12px 'Playfair Display';letter-spacing:1px">JOIN WITH A CODE</b> and enter this</small></div>
     <div><div class="kick" style="margin-bottom:8px">WHERE DOES THE BOARD LIVE?</div>
     <div class="seg">${[['tv', 'ON THE TV', 'board on the big screen'], ['phones', 'PHONES ONLY', 'everyone holds the board']].map(([k, a, b]) => `<button data-a="mode" data-v="${k}" aria-pressed="${S.mode === k}"><b>${a}</b><small>${b}</small></button>`).join('')}</div></div>
     ${seats('me')}
     <div class="grow"></div>
-    <button class="cbtn" data-a="start" ${ok ? '' : 'disabled'}>${ok ? 'OPEN THE CASE' : 'WAITING FOR DETECTIVES…'}</button>
-    <p style="margin:-6px 0 0;text-align:center;font:400 13px 'Playfair Display';color:#8f8f96">4 to 6 detectives · about 30 minutes</p></section>`;
+    <button class="cbtn" data-a="start" ${ok ? '' : 'disabled'}>${ok ? 'OPEN THE CASE' : 'WAITING FOR A DETECTIVE…'}</button>
+    <p style="margin:-6px 0 0;text-align:center;font:400 13px 'Playfair Display';color:#8f8f96">Best with 4 to 6 detectives · about 30 minutes</p></section>`;
 }
 function join() {
   const me = P_('me'), code = S.code || '';
-  return `<section class="scr noir" style="gap:18px">${head('JOIN A CASE')}
-    <div><label class="kick" for="jc" style="display:block;margin-bottom:10px">ROOM CODE</label>
+  return `<section class="scr noir" style="gap:18px">${head(S.hosting ? 'HOST A CASE' : 'JOIN A CASE')}
+    ${S.hosting ? '' : `<div><label class="kick" for="jc" style="display:block;margin-bottom:10px">ROOM CODE</label>
     <div class="boxes">${[0, 1, 2, 3].map(i => `<span class="${i === code.length ? 'on' : ''}">${esc(code[i] || '')}</span>`).join('')}<input id="jc" maxlength="4" autocomplete="off" autocapitalize="characters" spellcheck="false" value="${esc(code)}" aria-label="Room code, 4 letters"></div>
-    <p id="jerr" style="margin:8px 0 0;font:400 14px 'Playfair Display';color:${S.joinErr ? 'var(--red)' : '#8f8f96'}">${S.joinErr ? 'No case with that code. Check the TV or the host’s phone.' : 'It’s on the TV or the host’s phone. Try KXQZ.'}</p></div>
+    <p id="jerr" style="margin:8px 0 0;font:400 14px 'Playfair Display';color:${S.joinErr ? 'var(--red)' : '#8f8f96'}">${S.joinErr ? 'No case with that code. Check the TV or the host’s phone.' : 'It’s on the TV or the host’s phone.'}</p></div>`}
     <div><label class="kick" for="jn" style="display:block;margin-bottom:10px">YOUR DETECTIVE NAME</label><input id="jn" class="field" maxlength="14" placeholder="e.g. Jess" value="${esc(S.name || '')}"></div>
     <div><div class="kick" style="margin-bottom:10px">YOUR THREAD</div><div class="sw">${SWATCH.map(c => `<button data-a="swatch" data-v="${c}" style="background:${c}" aria-pressed="${me.c === c}" aria-label="Thread colour"></button>`).join('')}</div></div>
     <div class="grow"></div>
-    <button class="cbtn" id="jgo" data-a="dojoin" ${code.length === 4 && (S.name || '').trim() ? '' : 'disabled'}>JOIN THE CASE</button></section>`;
+    <button class="cbtn" id="jgo" data-a="dojoin" ${(S.hosting || code.length === 4) && (S.name || '').trim() ? '' : 'disabled'}>${S.busy ? 'CONNECTING…' : S.hosting ? 'OPEN A ROOM' : 'JOIN THE CASE'}</button></section>`;
 }
 function joined() {
   const me = P_('me');
   return `<section class="scr noir" style="gap:16px">${head('CASE 0221')}
     <div class="tipC" aria-live="polite"><div class="tCrow">${TIPS.map((_, i) => `<button class="tCpin${i === S.tip ? ' on' : i < S.tip ? ' done' : ''}" data-a="tipgo" data-v="${i}" aria-label="Rule ${i + 1}: ${TIPS[i][0]}" aria-current="${i === S.tip}">${i + 1}</button>`).join('<i></i>')}</div>
       <h3>${TIPS[S.tip][0]}</h3><p>${TIPS[S.tip][1]}</p><button data-a="tipnext" aria-label="Next tip">${S.tip === TIPS.length - 1 ? 'Back to the first clue' : 'Next clue'} ›</button></div>
-    ${seats('jess')}
+    ${seats(S.host)}
     <div class="grow"></div>
 
-    <p style="margin:0;text-align:center;font:400 15px 'Playfair Display';color:#BDB8AE">${S.joined.length >= 4 ? 'Everyone’s here. Waiting for Jess to open the case…' : 'Waiting for more detectives…'} <button data-a="hoststart" style="background:none;border:0;font:700 11px 'Playfair Display';letter-spacing:2px;color:#8f8f96;text-decoration:underline;padding:8px">SKIP ▸</button></p></section>`;
+    <p style="margin:0;text-align:center;font:400 15px 'Playfair Display';color:#BDB8AE">Waiting for ${esc(P_(S.host).n)} to open the case…</p></section>`;
 }
 function brief(inSheet) {
   return `<section class="scr noir bf${inSheet === 'tab' ? ' bftab' : inSheet ? ' bfsheet' : ''}" style="padding:0;gap:0">
@@ -468,7 +478,7 @@ function brief(inSheet) {
       <div class="rv" style="--d:1.05s"><div class="kick" style="margin-bottom:10px">YOUR JOB: FIND OUT</div>
         <div class="bfask"><span>WHO</span><span>HOW</span><span>WHY</span></div></div>
       <p class="bfrules rv" style="--d:1.15s">Three rounds of eight minutes. New files open each round. Then the lineup.</p>
-      ${inSheet === 'tab' ? '' : inSheet ? '<button class="cbtn" data-a="close">BACK TO THE CASE</button>' : '<button class="cbtn rv" style="--d:1.25s" data-a="begin">OPEN THE CASE FILE</button>'}
+      ${inSheet === 'tab' ? '' : inSheet ? '<button class="cbtn" data-a="close">BACK TO THE CASE</button>' : S.host === 'me' ? '<button class="cbtn rv" style="--d:1.25s" data-a="begin">START THE CLOCK</button>' : `<p class="bfrules" style="margin:0">Waiting for ${esc(P_(S.host).n)} to start the clock…</p>`}
     </div></section>`;
 }
 function game() {
@@ -476,13 +486,13 @@ function game() {
   const tab = (k, label, ic, n) => `<button role="tab" aria-selected="${S.tab === k}" data-a="tab" data-v="${k}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ic}</svg>${label}${n ? `<span class="n">${n}</span>` : ''}</button>`;
   const mm = String(Math.floor(S.t / 60)), ss = String(S.t % 60).padStart(2, '0');
   return `<div class="top"><h2>Round ${S.round}</h2><span class="mono" style="font-size:11px;color:var(--mute)">${ROUNDS[S.round - 1].n.toUpperCase()}</span>
-    <span class="timer ${S.t < 60 ? 'low' : ''}">${mm}:${ss}</span><button class="skip" data-a="skip" title="Prototype only">SKIP ▸</button></div>
+    <span class="timer ${S.t < 60 ? 'low' : ''}">${mm}:${ss}</span>${S.host === 'me' ? '<button class="skip" data-a="skip" title="Host only">SKIP ▸</button>' : ''}</div>
     ${S.tab === 'brief' ? `<section class="scr" style="padding:0;gap:0">${brief('tab')}</section>` : `<section class="scr" style="padding-top:14px">${{files, evidence, board, suspects}[S.tab]()}</section>`}
     <nav class="tabs" role="tablist">${tab('brief', 'Briefing', '<rect x="4" y="3" width="16" height="18" rx="1"/><path d="M8 8h8M8 12h8M8 16h5"/>', 0)}${tab('files', 'Files', '<path d="M3 7h6l2 2h10v10H3z"/>', nf)}${tab('evidence', 'Evidence', '<circle cx="11" cy="11" r="6"/><path d="M20 20l-4-4"/>', ne)}${tab('suspects', 'Suspects', '<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/>', 0)}${tab('board', 'Board', '<path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/>', 0)}</nav>`;
 }
 function readyBar() {
   const n = S.ready.size, last = S.round === 3;
-  return `<button class="btn ghost" data-a="ready" ${S.ready.has('me') ? 'disabled' : ''}>${S.ready.has('me') ? `WAITING FOR OTHERS · ${n}/4 READY` : (last ? 'READY FOR THE LINEUP' : 'READY FOR NEXT ROUND')}${!S.ready.has('me') && n ? ` · ${n}/4` : ''}</button>`;
+  return `<button class="btn ghost" data-a="ready" ${S.ready.has('me') ? 'disabled' : ''}>${S.ready.has('me') ? `WAITING FOR OTHERS · ${n}/${S.joined.length} READY` : (last ? 'READY FOR THE LINEUP' : 'READY FOR NEXT ROUND')}${!S.ready.has('me') && n ? ` · ${n}/${S.joined.length}` : ''}</button>`;
 }
 function files() {
   const docs = ITEMS.filter(i => i.kind === 'doc');
@@ -523,16 +533,16 @@ function drawStrings() {
 }
 function vote() {
   const v = S.vote, done = v.who && v.how !== null && v.why !== null;
-  return `<section class="scr"><div class="row"><div class="lbl">THE LINEUP · EVERYONE VOTES</div><span class="timer" style="font-size:18px">${Object.keys(S.bots).length}/3 voted</span></div>
+  return `<section class="scr"><div class="row"><div class="lbl">THE LINEUP · EVERYONE VOTES</div><span class="timer" style="font-size:18px">${Object.keys(S.votes).length}/${S.joined.length} voted</span></div>
     <h1 class="serif" style="font:italic 900 48px/1 'Playfair Display'">Who did it?</h1>
     <div class="lineup">${SUS.map((s, i) => `<button class="lu" data-a="who" data-v="${s.id}" aria-pressed="${v.who === s.id}" style="${v.who === s.id ? `box-shadow:inset 0 -4px 0 ${s.c}` : ''}"><img src="${IMG(s.img)}" alt="${s.s}" style="height:${[220, 190, 205, 212][i]}px;${v.who === s.id ? `outline:2px solid ${s.c}` : ''}"><span class="pl" style="${v.who === s.id ? `background:${s.c}` : ''}">${i + 1}</span><b>${s.s}</b></button>`).join('')}</div>
     <div class="lbl">HOW?</div><div class="qs">${HOW.map((h, i) => `<button class="q" data-a="how" data-v="${i}" aria-pressed="${v.how === i}">${h}</button>`).join('')}</div>
     <div class="lbl">WHY?</div><div class="qs">${WHY.map((h, i) => `<button class="q" data-a="why" data-v="${i}" aria-pressed="${v.why === i}">${h}</button>`).join('')}</div>
-    <button class="btn" data-a="lock" ${done ? '' : 'disabled'}>${done ? 'ACCUSE ' + SUS.find(s => s.id === v.who).s.toUpperCase() : 'PICK WHO, HOW AND WHY'}</button></section>`;
+    ${S.votes.me ? `<button class="btn ghost" disabled>LOCKED IN · WAITING FOR ${S.joined.length - Object.keys(S.votes).length} MORE</button>` : `<button class="btn" data-a="lock" ${done ? '' : 'disabled'}>${done ? 'ACCUSE ' + SUS.find(s => s.id === v.who).s.toUpperCase() : 'PICK WHO, HOW AND WHY'}</button>`}</section>`;
 }
 function score(x) { return (x.who === ANSWER.who) + (x.how === ANSWER.how) + (x.why === ANSWER.why); }
 function reveal() {
-  const all = [{p:'me', ...S.vote}, ...Object.entries(S.bots).map(([p, x]) => ({p, ...x}))].map(x => ({...x, pts:score(x)})).sort((a, b) => b.pts - a.pts);
+  const all = Object.entries(S.votes).map(([p, x]) => ({p, ...x})).map(x => ({...x, pts:score(x)})).sort((a, b) => b.pts - a.pts);
   const pins = key => all.map(x => `<span class="rpin${x[key] === ANSWER[key] ? '' : ' miss'}" style="--c:${P_(x.p).c}" title="${esc(P_(x.p).n)}"></span>`).join('');
   const got = key => all.filter(x => x[key] === ANSWER[key]).length;
   const beat = (n, k, ans, note) => `<div class="beat rv" style="--d:${n * 0.12 + 0.5}s"><div class="bk">${k}</div><div class="ba">${ans}</div><div class="bn">${note}</div><div class="row" style="gap:6px;margin-top:10px">${pins(k.toLowerCase())}<span class="rcount">${got(k.toLowerCase())} of ${all.length} detectives</span></div></div>`;
@@ -560,7 +570,7 @@ function reveal() {
       <p class="rnext">Helen was next. The same whistle had started outside her new room.</p>
       <h2 class="rh">The detectives</h2>
       <div class="rboard">${all.map((x, i) => `<div class="rrow${i === 0 ? ' top' : ''}"><span class="rrank">${i + 1}</span><span class="pin" style="background:${P_(x.p).c}"></span><b>${esc(P_(x.p).n)}</b>${i === 0 ? '<span class="rbest">BEST DETECTIVE</span>' : ''}<span class="rpts">${x.pts}<small>/3</small></span></div>`).join('')}</div>
-      <button class="cbtn" data-a="again" style="margin-top:22px">PLAY ANOTHER CASE</button>
+      ${S.host === 'me' ? '<button class="cbtn" data-a="again" style="margin-top:22px">PLAY AGAIN WITH THIS GROUP</button>' : `<p class="bfrules" style="margin:22px 0 0">${esc(P_(S.host).n)} can start another round.</p>`}<button class="cbtn" data-a="leave" style="margin-top:10px;border:1.5px solid #F2EEE6;background:transparent;color:#F2EEE6">LEAVE THE ROOM</button>
     </div></section>`;
 }
 function overlays() {
@@ -581,15 +591,190 @@ function tvView() {
     <button class="btn ghost" data-a="tvclose">BACK TO MY PHONE</button></div>`;
 }
 
-/* ---------- actions ---------- */
-let K = 0;
-function addPin(id, by, note) {
-  if (!note && pinned(id)) return false;
-  const k = 'p' + (++K);
-  S.pins.push({key:k, id, by, note, x:12 + Math.random() * 76, y:14 + Math.random() * 72, r:Math.round(Math.random() * 8 - 4)});
-  return k;
+/* ---------- multiplayer ---------- */
+/* Every phone listens to one room under redthread/rooms/<CODE>. Player ids are random per device;
+   locally the current player is always called 'me', so the screens above stay simple. */
+const rid = n => Array.from({length:n}, () => 'abcdefghjkmnpqrstuvwxyz23456789'[Math.floor(Math.random() * 31)]).join('');
+const ME = (() => { try { return localStorage.rtPid || (localStorage.rtPid = rid(10)); } catch (e) { return rid(10); } })();
+const toLocal = id => id === ME ? 'me' : id;
+let net = null, roomRef = null, roomData = null, pendingRender = false, lastRound = 0;
+
+function makeNet() {
+  if (window.firebase && window.RT_FIREBASE) {
+    if (!firebase.apps.length) firebase.initializeApp(window.RT_FIREBASE);
+    const db = firebase.database(); let offset = 0;
+    db.ref('.info/serverTimeOffset').on('value', s => { offset = s.val() || 0; });
+    return {
+      now: () => Date.now() + offset,
+      get: path => db.ref(path).once('value').then(s => s.val()),
+      watch: (path, cb) => { const r = db.ref(path); r.on('value', s => cb(s.val())); return () => r.off(); },
+      set: (path, v) => db.ref(path).set(v),
+      update: (path, v) => db.ref(path).update(v),
+      remove: path => db.ref(path).remove(),
+      push: (path, v) => db.ref(path).push(v),
+      key: () => db.ref().push().key,
+      onLeave: (path, v) => db.ref(path).onDisconnect().set(v),
+      onConnect: cb => db.ref('.info/connected').on('value', s => { if (s.val()) cb(); })
+    };
+  }
+  /* No Firebase (offline / file preview): same API over localStorage, synced across tabs on this device. */
+  const ch = 'BroadcastChannel' in window ? new BroadcastChannel('redthread') : null, subs = [];
+  const load = () => { try { return JSON.parse(localStorage.rtLocalDB || '{}'); } catch (e) { return {}; } };
+  const at = (o, path) => path.split('/').reduce((x, k) => x == null ? null : x[k], o);
+  const write = (path, fn) => { const db = load(), ks = path.split('/'); let o = db; ks.slice(0, -1).forEach(k => { if (typeof o[k] !== 'object' || o[k] === null) o[k] = {}; o = o[k]; }); fn(o, ks[ks.length - 1]); const json = JSON.stringify(db); localStorage.rtLocalDB = json; fire(db); if (ch) ch.postMessage(json); return Promise.resolve(); };
+  const fire = given => { const db = given || load(); subs.forEach(([p, cb]) => cb(JSON.parse(JSON.stringify(at(db, p) ?? null)))); };
+  if (ch) ch.onmessage = e => { try { fire(JSON.parse(e.data)); } catch (err) { fire(); } };
+  window.addEventListener('storage', e => { if (e.key === 'rtLocalDB') fire(); });
+  let n = 0;
+  return {
+    now: () => Date.now(),
+    get: path => Promise.resolve(at(load(), path) ?? null),
+    watch: (path, cb) => { const e = [path, cb]; subs.push(e); setTimeout(() => cb(at(load(), path) ?? null)); return () => subs.splice(subs.indexOf(e), 1); },
+    set: (path, v) => write(path, (o, k) => { if (v == null) delete o[k]; else o[k] = v; }),
+    update: (path, v) => { const db = load(); Object.entries(v).forEach(([k, x]) => { const ks = (path + '/' + k).split('/').filter(Boolean); let o = db; ks.slice(0, -1).forEach(q => { if (typeof o[q] !== 'object' || o[q] === null) o[q] = {}; o = o[q]; }); if (x == null) delete o[ks[ks.length - 1]]; else o[ks[ks.length - 1]] = x; }); const json = JSON.stringify(db); localStorage.rtLocalDB = json; fire(db); if (ch) ch.postMessage(json); return Promise.resolve(); },
+    remove: path => write(path, (o, k) => { delete o[k]; }),
+    push: (path, v) => { const k = 'k' + Date.now().toString(36) + (n++) + rid(3); return write(path + '/' + k, (o, kk) => { o[kk] = v; }); },
+    key: () => 'k' + Date.now().toString(36) + (n++) + rid(3),
+    onLeave: () => {}, onConnect: cb => cb()
+  };
 }
+const R = p => 'redthread/rooms/' + S.code + (p ? '/' + p : '');
+const netSet = (p, v) => net.set(R(p), v);
+const netUpdate = (p, v) => net.update(R(p), v);
+const netPush = (p, v) => net.push(R(p), v);
+const netRemove = p => net.remove(R(p));
+const remember = code => { try { if (code) localStorage.rtRoom = code; else delete localStorage.rtRoom; } catch (e) {} };
+
+function freshRoom() {
+  return {pins:null, strings:null, ready:null, votes:null};
+}
+function enterRoom(code) {
+  S.code = code; remember(code);
+  if (roomRef) roomRef();
+  net.onLeave(R('players/' + ME + '/on'), false);
+  net.onConnect(() => { if (S.code === code) netUpdate('players/' + ME, {on:true}); net.onLeave(R('players/' + ME + '/on'), false); });
+  roomRef = net.watch(R(), applyRoom);
+}
+function leaveRoom(notice) {
+  if (roomRef) roomRef(); roomRef = null;
+  if (S.code && net) { if (S.host === 'me') netRemove(); else netRemove('players/' + ME); }
+  remember(null); roomData = null; S.code = ''; S.phase = null; S.screen = 'title'; S.sheet = null; S.ov = null; S.tv = false;
+  PLAYERS.length = 0; PLAYERS.push({id:'me', n:S.name || 'You', c:P_('me').c});
+  render(); if (notice) toastMsg(notice);
+}
+function toastMsg(t) { S.toast = {by:'me', t}; clearTimeout(toastId); toastId = setTimeout(() => { S.toast = null; render(); }, 3200); render(); }
 function toast(by, t) { S.toast = {by, t}; clearTimeout(toastId); toastId = setTimeout(() => { S.toast = null; render(); }, 2600); }
+const pinName = p => p.id === 'victim' ? 'Julia' : (SUS.find(s => s.id === p.id) || {}).s || (p.note ? esc(p.note) : (ITEMS.find(i => i.id === p.id) || {}).n || 'a card');
+
+/* Turn the shared room into local state, and move screens when the host changes phase. */
+function applyRoom(d) {
+  if (!d || !d.meta) { if (S.code) leaveRoom('The room was closed.'); return; }
+  const prev = roomData; roomData = d; const m = d.meta; const screenWas = S.screen, ovWas = S.ov;
+  if (!d.players || !d.players[ME]) { leaveRoom('You left the room.'); return; }
+  PLAYERS.length = 0;
+  Object.entries(d.players).sort((a, b) => (a[1].j || 0) - (b[1].j || 0)).forEach(([id, p]) => PLAYERS.push({id:toLocal(id), n:p.n || 'Detective', c:p.c || '#8f8f96', on:p.on !== false}));
+  S.joined = PLAYERS.map(p => p.id); S.host = toLocal(m.host); S.mode = m.mode || 'tv'; S.case = m.case || S.case;
+  const live = new Map(S.pins.map(p => [p.key, p]));
+  S.pins = Object.entries(d.pins || {}).map(([k, p]) => { const l = live.get(k); const dragging = drag && drag.k === k && l; return {key:k, id:p.id, note:p.note || '', by:toLocal(p.by), x:dragging ? l.x : p.x, y:dragging ? l.y : p.y, r:p.r || 0}; });
+  S.strings = Object.entries(d.strings || {}).map(([k, x]) => [x.a, x.b, toLocal(x.by), k]);
+  S.votes = Object.fromEntries(Object.entries(d.votes || {}).map(([k, v]) => [toLocal(k), v]));
+  S.endsAt = m.endsAt || 0; S.t = Math.max(0, Math.round((S.endsAt - net.now()) / 1000));
+  S.ready = new Set(Object.keys((d.ready || {})['r' + (m.round || 1)] || {}).map(toLocal));
+  /* toasts for what other detectives just did */
+  if (prev && S.screen === 'game') {
+    const op = prev.pins || {}, os = prev.strings || {};
+    Object.entries(d.pins || {}).forEach(([k, p]) => { if (!op[k] && p.by !== ME) toast(toLocal(p.by), `<b>${esc(P_(toLocal(p.by)).n)}</b> pinned ${pinName(p)}`); });
+    Object.entries(d.strings || {}).forEach(([k, x]) => { if (!os[k] && x.by !== ME) { const A = S.pins.find(p => p.key === x.a), B = S.pins.find(p => p.key === x.b); if (A && B) toast(toLocal(x.by), `<b>${esc(P_(toLocal(x.by)).n)}</b> tied ${pinName(A)} to ${pinName(B)}`); } });
+  }
+  /* phase → screen */
+  const round = m.round || 1;
+  if (m.phase !== S.phase) {
+    const was = S.phase; S.phase = m.phase;
+    if (m.phase === 'lobby') { S.screen = S.host === 'me' ? 'lobby' : 'joined'; S.vote = {who:null, how:null, why:null}; S.seen = new Set(); S.tab = 'files'; S.sheet = null; S.ov = null; if (S.screen === 'joined') startTips(); }
+    else if (m.phase === 'brief') { S.screen = 'brief'; S.sheet = null; }
+    else if (m.phase === 'game') { S.screen = 'game'; S.sheet = null; S.ov = null; lastRound = round; }
+    else if (m.phase === 'vote') { S.screen = 'vote'; S.sheet = null; S.ov = null; }
+    else if (m.phase === 'reveal') { S.screen = 'reveal'; S.sheet = null; if (was === 'vote') { S.ov = `<span class="stamp" style="font-size:28px">THE VERDICT</span><p class="mono" style="color:var(--mute);margin:0">Opening the sealed envelope…</p>`; setTimeout(() => { S.ov = null; render(); }, 1800); } }
+  } else if (m.phase === 'game' && round !== lastRound) {
+    lastRound = round; S.sheet = null;
+    const n = ITEMS.filter(i => i.r === round).length;
+    S.ov = `<div class="lbl amber">ROUND ${round} OF 3</div><h2 class="serif" style="font:italic 900 40px/1 'Playfair Display'">${ROUNDS[round - 1].n}</h2><p class="mono" style="margin:0;color:var(--mute)">${n} new files unsealed</p><button class="btn" data-a="ovclose" style="max-width:260px">OPEN THEM</button>`;
+  }
+  S.round = round;
+  hostDuties();
+  softRender(screenWas !== S.screen || ovWas !== S.ov);
+}
+/* Re-render for remote changes, but never yank a drag, a 3D viewer or a half-typed note. */
+function softRender(force) {
+  if (force) { if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); render(); return; }
+  const typing = document.activeElement && document.activeElement.tagName === 'INPUT';
+  if (drag || typing || (S.sheet && S.sheet.includes('<iframe'))) { pendingRender = true; return; }
+  render();
+}
+/* Whoever is in charge (the host, or the first detective still connected if the host drops) moves the game on. */
+function inCharge() {
+  if (!roomData) return false;
+  const ps = Object.entries(roomData.players || {}), host = roomData.meta.host;
+  const hostOn = ps.some(([id, p]) => id === host && p.on !== false);
+  if (hostOn) return host === ME;
+  const first = ps.filter(([, p]) => p.on !== false).sort((a, b) => (a[1].j || 0) - (b[1].j || 0))[0];
+  return !!first && first[0] === ME;
+}
+function hostDuties() {
+  if (!inCharge()) return;
+  const m = roomData.meta, active = Object.values(roomData.players || {}).filter(p => p.on !== false).length || 1;
+  if (m.phase === 'game') {
+    const ready = Object.keys((roomData.ready || {})['r' + m.round] || {}).length;
+    if ((m.endsAt && net.now() >= m.endsAt) || ready >= active) advance();
+  } else if (m.phase === 'vote') {
+    if (Object.keys(roomData.votes || {}).length >= active) netUpdate('meta', {phase:'reveal'});
+  }
+}
+let advancing = 0;
+function advance() {
+  const m = roomData.meta; if (advancing === m.round) return; advancing = m.round;
+  if (m.round >= 3) netUpdate('meta', {phase:'vote'});
+  else netUpdate('meta', {round:m.round + 1, endsAt:net.now() + ROUND_SECS * 1000});
+}
+function startTips() {
+  S.tip = 0; clearInterval(tipId);
+  tipId = setInterval(() => { if (S.screen !== 'joined') return clearInterval(tipId); S.tip = (S.tip + 1) % TIPS.length; softRender(); }, 6000);
+}
+function tick() {
+  if (!roomData || S.phase !== 'game') return;
+  S.t = Math.max(0, Math.round((S.endsAt - net.now()) / 1000));
+  const el = $('.timer'); if (el && S.screen === 'game') { el.textContent = Math.floor(S.t / 60) + ':' + String(S.t % 60).padStart(2, '0'); el.classList.toggle('low', S.t < 60); }
+  hostDuties();
+}
+async function createRoom() {
+  let code = '';
+  for (let i = 0; i < 6; i++) { const c = rid(4).toUpperCase().replace(/[0-9]/g, () => 'ABCDEFGHJKMNPQRSTUVWXYZ'[Math.floor(Math.random() * 23)]); if (!(await net.get('redthread/rooms/' + c + '/meta'))) { code = c; break; } }
+  if (!code) throw new Error('no code');
+  const now = net.now();
+  await net.set('redthread/rooms/' + code, {meta:{host:ME, case:S.case, mode:'tv', phase:'lobby', round:1, created:now}, players:{[ME]:{n:S.name, c:P_('me').c, j:now, on:true}}});
+  enterRoom(code);
+}
+async function joinRoom(code) {
+  const room = await net.get('redthread/rooms/' + code);
+  if (!room || !room.meta) return false;
+  const taken = Object.values(room.players || {}).map(p => p.c);
+  if (taken.includes(P_('me').c) && !(room.players || {})[ME]) { const free = SWATCH.find(c => !taken.includes(c)); if (free) PLAYERS[0].c = free; }
+  await net.set('redthread/rooms/' + code + '/players/' + ME, {n:S.name, c:P_('me').c, j:(room.players && room.players[ME] && room.players[ME].j) || net.now(), on:true});
+  enterRoom(code);
+  return true;
+}
+async function boot() {
+  try { net = makeNet(); } catch (e) { console.error(e); }
+  try { S.name = localStorage.rtName || ''; if (localStorage.rtColor) PLAYERS[0].c = localStorage.rtColor; } catch (e) {}
+  setInterval(tick, 1000);
+  render();
+  let code = null; try { code = localStorage.rtRoom; } catch (e) {}
+  if (net && code) {
+    const room = await net.get('redthread/rooms/' + code).catch(() => null);
+    if (room && room.meta && room.players && room.players[ME]) { S.name = room.players[ME].n; enterRoom(code); }
+    else remember(null);
+  }
+}
 function pinMoment(name) { S.sheet = null; S.ov = `<div class="lbl amber">YOU FOUND SOMETHING</div><span class="stamp">PINNED</span><h2 class="serif" style="font:italic 900 34px/1.05 'Playfair Display'">${name}</h2><p class="mono" style="margin:0;color:var(--mute);font-size:12px">${S.mode === 'tv' ? 'Now on the TV board' : 'Now on everyone\'s board'}</p>`; render(); setTimeout(() => { S.ov = null; render(); }, 1300); }
 function openItem(id) {
   const it = ITEMS.find(i => i.id === id); S.seen.add(id);
@@ -601,79 +786,72 @@ function openItem(id) {
     ${it.v3d ? `<a class="btn ghost" href="${VIEWER}" style="text-decoration:none">INSPECT IN 3D</a>` : ''}${pinBtn}<button class="btn ghost" data-a="close">CLOSE</button>`;
   render();
 }
-function nextRound() {
-  S.ready.clear();
-  if (S.round === 3) { S.screen = 'vote'; clearInterval(timerId); clearInterval(botId); botsVote(); render(); return; }
-  S.round++; S.t = ROUND_SECS;
-  const n = ITEMS.filter(i => i.r === S.round).length;
-  S.ov = `<div class="lbl amber">ROUND ${S.round} OF 3</div><h2 class="serif" style="font:italic 900 40px/1 'Playfair Display'">${ROUNDS[S.round - 1].n}</h2><p class="mono" style="margin:0;color:var(--mute)">${n} new files unsealed</p><button class="btn" data-a="ovclose" style="max-width:260px">OPEN THEM</button>`;
-  render();
-}
-function botsVote() {
-  const plan = {jess:{who:'roylott', how:1, why:0}, marcus:{who:'croft', how:3, why:2}, priya:{who:'roylott', how:0, why:0}};
-  Object.keys(plan).forEach((b, i) => setTimeout(() => { S.bots[b] = plan[b]; S.ready.add(b); if (S.screen === 'vote') render(); }, 1800 + i * 2200));
-}
-function botTick() {
-  const bots = ['jess', 'marcus', 'priya'], b = bots[Math.floor(Math.random() * 3)];
-  const pool = [...unlocked().filter(i => !pinned(i.id)), ...SUS.filter(s => !pinned(s.id))];
-  if (Math.random() < 0.35 && S.pins.length > 2) {
-    const a = S.pins[Math.floor(Math.random() * S.pins.length)], c = S.pins[Math.floor(Math.random() * S.pins.length)];
-    if (a !== c && !S.strings.some(([x, y]) => (x === a.key && y === c.key) || (x === c.key && y === a.key))) { S.strings.push([a.key, c.key, b]); const nm = p => p.id === 'victim' ? 'Julia' : (SUS.find(s => s.id === p.id) || {}).s || (p.note ? esc(p.note) : ITEMS.find(i => i.id === p.id).n); toast(b, `<b>${P_(b).n}</b> tied ${nm(a)} → ${nm(c)}`); }
-  } else if (pool.length) { const pick = pool[Math.floor(Math.random() * pool.length)]; addPin(pick.id, b); toast(b, `<b>${P_(b).n}</b> pinned ${pick.s || pick.n}`); }
-  if (Math.random() < 0.25 && S.t < ROUND_SECS - 30) S.ready.add(b);
-  if (S.ready.size === 4) nextRound(); else render();
+function addPin(id, by, note) {
+  if (!note && pinned(id)) return false;
+  return netPush('pins', {id, by:ME, note:note || '', x:Math.round(12 + Math.random() * 76), y:Math.round(14 + Math.random() * 72), r:Math.round(Math.random() * 8 - 4)});
 }
 
-app.addEventListener('click', e => {
+app.addEventListener('click', async e => {
   const t = e.target.closest('[data-a]'); if (!t) return;
   const a = t.dataset.a, v = t.dataset.v;
-  if (a === 'host') { S.screen = 'lobby'; S.joined = ['me']; P_('me').n = 'You'; render(); ['jess', 'marcus', 'priya'].forEach((b, i) => setTimeout(() => { if (S.screen !== 'lobby' || S.joined.includes(b)) return; S.joined.push(b); render(); }, 900 + i * 1100)); }
+  if (a === 'host' || a === 'join') { S.hosting = a === 'host'; S.screen = 'join'; S.joinErr = false; render(); const f = $(S.hosting ? '#jn' : '#jc'); if (f) f.focus(); }
   else if (a === 'case') { const c = CASES.find(x => x.id === v); if (c.soon) { t.classList.remove('nope'); void t.offsetWidth; t.classList.add('nope'); return; } S.case = v; render(); }
-  else if (a === 'join') { S.screen = 'join'; S.joinErr = false; render(); $('#jc').focus(); }
-  else if (a === 'home') { S.screen = 'title'; render(); }
-  else if (a === 'swatch') { P_('me').c = v; S.name = $('#jn').value; S.code = $('#jc').value.toUpperCase(); render(); }
-  else if (a === 'dojoin') { S.code = $('#jc').value.toUpperCase(); S.name = $('#jn').value.trim(); if (S.code !== 'KXQZ') { S.joinErr = true; render(); return; }
-    P_('me').n = S.name; S.screen = 'joined'; S.joined = ['jess', 'marcus', 'me']; S.tip = 0; render();
-    setTimeout(() => { if (S.screen !== 'joined') return; S.joined.push('priya'); render(); }, 2500);
-    clearInterval(tipId); tipId = setInterval(() => { if (S.screen !== 'joined') return clearInterval(tipId); S.tip = (S.tip + 1) % TIPS.length; render(); }, 6000);
-    setTimeout(() => { if (S.screen === 'joined') { clearInterval(tipId); S.screen = 'brief'; render(); } }, 32000); }
-  else if (a === 'tipgo') { S.tip = +v; clearInterval(tipId); tipId = setInterval(() => { if (S.screen !== 'joined') return clearInterval(tipId); S.tip = (S.tip + 1) % TIPS.length; render(); }, 6000); render(); }
-  else if (a === 'tipnext') { S.tip = (S.tip + 1) % TIPS.length; clearInterval(tipId); tipId = setInterval(() => { if (S.screen !== 'joined') return clearInterval(tipId); S.tip = (S.tip + 1) % TIPS.length; render(); }, 6000); render(); }
-  else if (a === 'hoststart') { clearInterval(tipId); S.screen = 'brief'; render(); }
-  else if (a === 'mode') { S.mode = v; render(); }
-  else if (a === 'start') { S.screen = 'brief'; render(); }
-  else if (a === 'begin') { S.screen = 'game'; addPin('victim', 'me'); S.pins[0].x = 50; S.pins[0].y = 16; render();
-    timerId = setInterval(() => { if (S.ov || S.tv) return; S.t--; if (S.t <= 0) nextRound(); else { const el = $('.timer'); if (el && S.screen === 'game') { el.textContent = Math.floor(S.t / 60) + ':' + String(S.t % 60).padStart(2, '0'); el.classList.toggle('low', S.t < 60); } } }, 1000);
-    botId = setInterval(() => { if (!S.ov && !S.sheet && !drag) botTick(); }, 9000); }
+  else if (a === 'home') { if (S.code) leaveRoom(); else { S.screen = 'title'; render(); } }
+  else if (a === 'leave') leaveRoom();
+  else if (a === 'swatch') { PLAYERS[0].c = v; try { localStorage.rtColor = v; } catch (e) {} const jn = $('#jn'), jc = $('#jc'); if (jn) S.name = jn.value; if (jc) S.code = jc.value.toUpperCase(); render(); }
+  else if (a === 'dojoin') {
+    if (S.busy) return;
+    const jc = $('#jc'); S.name = $('#jn').value.trim().slice(0, 14); if (!S.name) return;
+    try { localStorage.rtName = S.name; } catch (e) {}
+    if (!net) { toastMsg('Can’t reach the game server. Check your connection.'); return; }
+    S.busy = true; if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); render();
+    try {
+      if (S.hosting) await createRoom();
+      else { const code = (jc ? jc.value : S.code).toUpperCase(); S.code = code; if (!(await joinRoom(code))) { S.code = code; S.joinErr = true; } }
+    } catch (err) { console.error(err); toastMsg('Couldn’t connect. Try again in a moment.'); }
+    S.busy = false; render();
+  }
+  else if (a === 'tipgo') { S.tip = +v; startTips(); S.tip = +v; render(); }
+  else if (a === 'tipnext') { const n = (S.tip + 1) % TIPS.length; startTips(); S.tip = n; render(); }
+  else if (a === 'mode') { if (S.host === 'me') netUpdate('meta', {mode:v}); }
+  else if (a === 'start') { if (S.host === 'me' && S.joined.length >= 2) netUpdate('meta', {phase:'brief'}); }
+  else if (a === 'begin') {
+    if (S.host !== 'me') return;
+    await netPush('pins', {id:'victim', by:ME, note:'', x:50, y:16, r:0});
+    netUpdate('meta', {phase:'game', round:1, endsAt:net.now() + ROUND_SECS * 1000});
+  }
   else if (a === 'tab') { S.tab = v; S.sel = null; S.tie = false; render(); }
   else if (a === 'open') openItem(v);
   else if (a === 'opensus') { const s = SUS.find(x => x.id === v); S.sheet = `<img src="${IMG(s.img)}" alt="${s.n}" style="width:100%;aspect-ratio:1;object-fit:cover;object-position:top;filter:grayscale(1);border-radius:4px"><div><div class="row"><span class="dot" style="background:${s.c}"></span><span class="lbl">SUSPECT</span></div><h2 class="serif" style="font:900 28px/1.1 'Playfair Display';margin-top:4px">${s.n}</h2><p style="margin:6px 0;color:#d8d8dc">${s.who}</p><p class="mono" style="margin:0;font-size:12px;color:var(--mute)">ALIBI: ${s.alibi}</p></div>${pinned(v) ? `<button class="btn ghost" disabled>PINNED BY ${P_(pinned(v).by).n.toUpperCase()}</button>` : `<button class="btn" data-a="pin" data-v="${v}">PIN TO BOARD</button>`}<button class="btn ghost" data-a="close">CLOSE</button>`; render(); }
-  else if (a === 'pin') { addPin(v, 'me'); const s = SUS.find(x => x.id === v); pinMoment(s ? s.s : ITEMS.find(i => i.id === v).n); }
+  else if (a === 'pin') { if (pinned(v)) return; addPin(v, 'me'); const s = SUS.find(x => x.id === v); pinMoment(s ? s.s : ITEMS.find(i => i.id === v).n); }
   else if (a === 'openbrief') { S.sheet = brief(true); render(); }
   else if (a === 'close') { S.sheet = null; render(); }
   else if (a === 'flip') { const im = $('#pimg'); if (!im) return; const back = im.dataset.side !== 'b'; im.style.transform = 'rotateX(90deg)'; setTimeout(() => { im.src = back ? im.dataset.b : im.dataset.f; im.dataset.side = back ? 'b' : 'f'; im.alt = im.alt.replace(/(front|back)$/, back ? 'back' : 'front'); im.style.transform = 'none'; }, 180); t.textContent = back ? 'TURN IT BACK' : 'TURN IT OVER'; }
   else if (a === 'ovclose') { S.ov = null; render(); }
-  else if (a === 'skip') { if (S.t > 20) S.t = 15; else nextRound(); render(); }
-  else if (a === 'ready') { S.ready.add('me'); const rnd = S.round; ['jess', 'marcus', 'priya'].forEach((b, i) => setTimeout(() => { if (S.screen !== 'game' || S.round !== rnd) return; S.ready.add(b); if (S.ready.size === 4) nextRound(); else render(); }, 1200 + i * 1300)); render(); }
+  else if (a === 'skip') { if (S.host !== 'me') return; if (S.t > 20) netUpdate('meta', {endsAt:net.now() + 15000}); else advance(); }
+  else if (a === 'ready') { netSet('ready/r' + S.round + '/' + ME, true); }
   else if (a === 'tie') { S.tie = !S.tie; S.sel = null; render(); }
   else if (a === 'note') { S.sheet = `<h2 class="serif" style="font:italic 900 26px 'Playfair Display'">Add a note</h2><label for="nt" class="lbl">WHAT ARE YOU THINKING?</label><input id="nt" maxlength="40" placeholder="e.g. 3 a.m. whistle" style="min-height:52px;font-size:16px;padding:0 14px;background:#1c1c20;border:1px solid var(--line);border-radius:4px;color:var(--ink)"><button class="btn" data-a="addnote">PIN THE NOTE</button><button class="btn ghost" data-a="close">CANCEL</button>`; render(); setTimeout(() => $('#nt') && $('#nt').focus(), 50); }
-  else if (a === 'addnote') { const txt = ($('#nt').value || '').trim(); if (!txt) return; addPin('note', 'me', txt); S.sheet = null; render(); }
+  else if (a === 'addnote') { const txt = ($('#nt').value || '').trim().slice(0, 40); if (!txt) return; addPin('note', 'me', txt); S.sheet = null; render(); }
   else if (a === 'tvview') { S.tv = true; render(); }
   else if (a === 'tvclose') { S.tv = false; render(); }
-  else if (a === 'undo') { for (let i = S.strings.length - 1; i >= 0; i--) if (S.strings[i][2] === 'me') { S.strings.splice(i, 1); break; } render(); }
-  else if (a === 'who') { S.vote.who = v; render(); }
-  else if (a === 'how') { S.vote.how = +v; render(); }
-  else if (a === 'why') { S.vote.why = +v; render(); }
-  else if (a === 'lock') { S.ready.add('me'); const go = () => { if (Object.keys(S.bots).length === 3) { S.screen = 'reveal'; S.ov = `<span class="stamp" style="font-size:28px">THE VERDICT</span><p class="mono" style="color:var(--mute);margin:0">Opening the sealed envelope…</p>`; render(); setTimeout(() => { S.ov = null; render(); }, 1600); } else setTimeout(go, 500); }; S.ov = `<div class="lbl amber">VOTE LOCKED</div><h2 class="serif" style="font:italic 900 34px 'Playfair Display'">Waiting for the others…</h2>`; render(); go(); }
-  else if (a === 'again') location.reload();
+  else if (a === 'undo') { for (let i = S.strings.length - 1; i >= 0; i--) if (S.strings[i][2] === 'me') { netRemove('strings/' + S.strings[i][3]); break; } }
+  else if (a === 'who') { if (S.votes.me) return; S.vote.who = v; render(); }
+  else if (a === 'how') { if (S.votes.me) return; S.vote.how = +v; render(); }
+  else if (a === 'why') { if (S.votes.me) return; S.vote.why = +v; render(); }
+  else if (a === 'lock') { const x = S.vote; if (x.who && x.how !== null && x.why !== null) netSet('votes/' + ME, {who:x.who, how:x.how, why:x.why}); }
+  else if (a === 'again') { if (S.host !== 'me') return; netUpdate('', {pins:null, strings:null, ready:null, votes:null, 'meta/phase':'lobby', 'meta/round':1, 'meta/endsAt':0}); }
 });
+/* closing a sheet or finishing a drag catches up on anything that arrived meanwhile */
+app.addEventListener('focusout', () => setTimeout(() => { if (pendingRender && !(document.activeElement && document.activeElement.tagName === 'INPUT')) softRender(); }, 0));
 
 app.addEventListener('input', e => {
   if (e.target.id === 'jc') { const v = e.target.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 4); e.target.value = v; S.code = v; S.joinErr = false;
     document.querySelectorAll('.boxes span').forEach((b, i) => { b.textContent = v[i] || ''; b.className = i === v.length ? 'on' : ''; });
-    const er = $('#jerr'); er.style.color = '#8f8f96'; er.textContent = 'It’s on the TV or the host’s phone. Try KXQZ.'; if (v.length === 4) $('#jn').focus(); }
-  if (e.target.id === 'jc' || e.target.id === 'jn') { if (e.target.id === 'jn') S.name = e.target.value; $('#jgo').disabled = !((S.code || '').length === 4 && (S.name || '').trim()); }
+    const er = $('#jerr'); if (er) { er.style.color = '#8f8f96'; er.textContent = 'It’s on the TV or the host’s phone.'; } if (v.length === 4) $('#jn').focus(); }
+  if (e.target.id === 'jc' || e.target.id === 'jn') { if (e.target.id === 'jn') S.name = e.target.value; const g = $('#jgo'); if (g) g.disabled = !((S.hosting || (S.code || '').length === 4) && (S.name || '').trim()); }
 });
+
 /* board: drag cards, tap to tie strings */
 let drag = null;
 app.addEventListener('pointerdown', e => {
@@ -687,11 +865,12 @@ app.addEventListener('pointermove', e => {
 });
 app.addEventListener('pointerup', () => {
   if (!drag) return; const k = drag.k, moved = drag.moved; drag = null;
-  if (moved && !S.tie) return;
-  if (S.tie) { if (!S.sel) { S.sel = k; } else if (S.sel !== k) { if (!S.strings.some(([x, y]) => (x === S.sel && y === k) || (x === k && y === S.sel))) S.strings.push([S.sel, k, 'me']); S.sel = null; S.tie = false; } render(); }
+  if (moved && !S.tie) { const p = S.pins.find(x => x.key === k); if (p) netUpdate('pins/' + k, {x:Math.round(p.x * 10) / 10, y:Math.round(p.y * 10) / 10}); if (pendingRender) render(); return; }
+  if (S.tie) { if (!S.sel) { S.sel = k; } else if (S.sel !== k) { if (!S.strings.some(([x, y]) => (x === S.sel && y === k) || (x === k && y === S.sel))) netPush('strings', {a:S.sel, b:k, by:ME}); S.sel = null; S.tie = false; } render(); }
 });
 
-render();
+window.RT = {get S() { return S; }, render, get net() { return net; }};
+boot();
 }
 </script>
 </body>
