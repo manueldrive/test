@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<base href="../">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Red Thread — Prototype · Simulate</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#0b0b0d">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@500;700;800&family=Special+Elite&family=Cormorant+Garamond:ital,wght@0,500;0,700;1,500&family=UnifrakturMaguntia&family=Homemade+Apple&family=Mrs+Saint+Delafield&family=Cinzel:wght@600;800&family=Old+Standard+TT:ital@0;1&display=swap">
+<style>
+/* VOICE: a noir party game, tense but playful
+   IDEA: a case file passed around a table; the murder board is the shared heart
+   PICTURE: each screen is the working game itself (lobby, files, board, lineup)
+   COLOUR and TYPE: black, smoke, paper white; red string, amber lamp light, one colour per player; Playfair italic, Plex Mono, Inter
+   LAYOUT: phone column with a bottom tab bar during play */
+:root{color-scheme:dark;--bg:#0B0B0D;--panel:#151518;--line:#34343A;--ink:#ECE8DF;--mute:#A3A3AA;--red:#FF3B4E;--btn:#E3263A;--amber:#FFC23D;--paper:#ECE8DF;--pink:#141414}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0;height:100%;background:#050506}
+body{color:var(--ink);font:15px/1.5 Inter,system-ui,sans-serif;display:flex;justify-content:center;overflow:hidden}
+button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+a{color:inherit}
+#app{position:relative;width:100%;max-width:440px;height:100svh;background:var(--bg);display:flex;flex-direction:column;overflow:hidden}
+.scr{flex:1;display:flex;flex-direction:column;gap:14px;padding:18px 16px 16px;overflow-y:auto;min-height:0}
+.serif{font-family:'Playfair Display',serif}.mono{font-family:'IBM Plex Mono',monospace}
+h1,h2,h3{margin:0}
+.big{font:italic 900 64px/.92 'Playfair Display',serif;letter-spacing:-2px}
+.big span{color:var(--red)}
+.lbl{font:12px 'IBM Plex Mono',monospace;letter-spacing:3px;color:var(--mute)}
+.amber{color:var(--amber)}
+.noir{position:relative;background:radial-gradient(ellipse at 50% 38%,#26262b 0%,#0b0b0d 62%)}
+.noir::before{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(-22deg,rgba(0,0,0,.25) 0 16px,transparent 16px 34px),radial-gradient(ellipse at 78% 8%,rgba(235,235,240,.08),transparent 55%)}
+.noir>*{position:relative}
+.cz{font-family:Cinzel,serif;font-weight:800;letter-spacing:4px}
+.kick{font:700 12px 'Playfair Display',serif;letter-spacing:4px;color:#BDB8AE}
+.back{width:44px;height:44px;border:1px solid #3a3a40;background:rgba(11,11,13,.6);border-radius:50%;font-size:20px;line-height:1;display:flex;align-items:center;justify-content:center;flex:none}
+.hhead{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;padding-top:2px}
+.hhead .back{position:absolute;left:0;top:0;z-index:3}
+.hlogo{zoom:.42;pointer-events:none}
+.hlogo .tblock{margin-top:0!important}
+.hhead .kick.hk{text-align:center}
+.mini{display:flex;flex-direction:column;align-items:flex-start;font:900 19px/.92 'Playfair Display',serif;letter-spacing:.5px;margin-top:3px}.mini span{color:#F2EEE6;text-shadow:1px 1px 0 #a19c92,2px 2px 0 #68655d,3px 3px 0 #33312c,4px 6px 8px rgba(0,0,0,.8)}.mini span+span{color:var(--red);font-size:15px;margin-top:3px;letter-spacing:1px;text-shadow:1px 1px 0 #b72535,2px 2px 0 #821a26,3px 3px 0 #501017,4px 6px 8px rgba(0,0,0,.8)}
+.kick.hk{font:600 11px Cinzel,serif;letter-spacing:5px}
+.cbtn{min-height:58px;width:100%;border:0;background:#F2EEE6;color:#0b0b0d;font:900 17px 'Playfair Display',serif;letter-spacing:4px;display:flex;align-items:center;justify-content:center}
+.cbtn:disabled{background:#2a2a2e;color:#8a8a90;cursor:default}
+.ticket{position:relative;background:#F2EEE6;color:#0b0b0d;padding:16px 18px 14px;text-align:center;box-shadow:0 18px 36px rgba(0,0,0,.7);transform:rotate(-1.2deg);-webkit-mask:radial-gradient(circle 10px at 0 50%,#0000 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 10px at 100% 50%,#0000 98%,#000) right/51% 100% no-repeat;mask:radial-gradient(circle 10px at 0 50%,#0000 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 10px at 100% 50%,#0000 98%,#000) right/51% 100% no-repeat}
+.ticket .rc{font:900 64px/1.15 'Playfair Display',serif;margin-bottom:2px;letter-spacing:14px;margin-right:-14px}
+.ticket small{display:block;font:400 14px 'Playfair Display',serif;color:#4A4740}
+.seg{display:grid;grid-template-columns:1fr 1fr;border:1px solid #4a4a50}
+.seg button{background:none;border:0;min-height:64px;padding:8px 10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:#BDB8AE}
+.seg button+button{border-left:1px solid #4a4a50}
+.seg button b{font:900 15px 'Playfair Display',serif;letter-spacing:2px;color:inherit}
+.seg button small{font:400 12px 'Playfair Display',serif}
+.seg button[aria-pressed=true]{background:#F2EEE6;color:#0b0b0d}
+.det{display:flex;align-items:center;gap:12px;min-height:50px;border-bottom:1px solid #2c2c31}
+.det .pin{width:14px;height:14px;border-radius:50%;flex:none;box-shadow:inset -2px -2px 0 rgba(0,0,0,.3),0 2px 4px rgba(0,0,0,.6)}
+.det b{font:900 21px 'Playfair Display',serif}
+.det em{margin-left:auto;font:700 11px 'Playfair Display',serif;letter-spacing:3px;font-style:normal;color:#8f8f96}
+.det.open{color:#6f6f76}.det.open .pin{background:none;border:1.5px dashed #5a5a60;box-shadow:none}
+.boxes{position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.boxes span{height:82px;border:1.5px solid #6b6b72;background:rgba(11,11,13,.7);display:flex;align-items:center;justify-content:center;font:900 52px 'Playfair Display',serif;color:#F2EEE6}
+.boxes span.on{border-color:#F2EEE6;box-shadow:0 0 0 1px #F2EEE6}
+.boxes input{position:absolute;inset:0;width:100%;opacity:0;font-size:16px;text-transform:uppercase}
+.field{width:100%;min-height:56px;background:rgba(11,11,13,.7);border:1.5px solid #6b6b72;color:#F2EEE6;font:900 24px 'Playfair Display',serif;padding:0 14px}
+.field:focus{outline:none;border-color:#F2EEE6}
+.tipC{flex:none;padding:6px 0 4px;height:214px;display:flex;flex-direction:column}
+.tCrow{display:flex;align-items:center;margin-bottom:14px}
+.tCrow i{flex:1;height:2px;background:#3a3a40}
+.tCpin{padding:0;cursor:pointer;position:relative;width:28px;height:28px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font:900 13px 'Playfair Display',serif;color:#F2EEE6;border:1.5px solid #3a3a40;background:#3a3a40}
+.tCpin::after{content:"";position:absolute;inset:-8px}
+.tCpin:not(.on):hover{border-color:#F2EEE6;color:#F2EEE6}
+.tCpin.done{}
+.tCpin.on{background:var(--red);color:#fff;border-color:var(--red);box-shadow:0 0 14px rgba(255,59,78,.6)}
+.tCrow .tCpin.done+i{background:var(--red);box-shadow:0 0 6px rgba(255,59,78,.6)}
+.tipC h3{font:900 30px/1.02 'Playfair Display',serif;margin:0 0 6px;color:#F2EEE6}
+.tipC p{margin:0;font:400 16px/1.45 'Playfair Display',serif;color:#BDB8AE;flex:1}
+.tipC button{align-self:flex-start;margin-top:8px;background:none;border:0;padding:8px 0;font:600 12px Cinzel,serif;letter-spacing:3px;color:var(--red);text-transform:uppercase;cursor:pointer}
+.tipA{position:relative;flex:none;margin-top:8px;height:232px;display:flex;flex-direction:column;background:#F2EEE6;color:#0b0b0d;padding:22px 18px 16px;transform:rotate(-1.2deg);box-shadow:0 16px 30px rgba(0,0,0,.65);background-image:repeating-linear-gradient(180deg,transparent 0 25px,rgba(90,140,200,.25) 25px 26px),linear-gradient(180deg,transparent 0 40px,rgba(255,59,78,.5) 40px 41.5px,transparent 41.5px);font-family:'Special Elite',monospace}
+.tpin{position:absolute;left:50%;top:-8px;margin-left:-8px;width:16px;height:16px;border-radius:50%;background:var(--red);box-shadow:inset -3px -3px 0 rgba(0,0,0,.3),0 3px 6px rgba(0,0,0,.6)}
+.tAhead{display:flex;justify-content:space-between;align-items:center;font:13px 'Special Elite',monospace;letter-spacing:2px;color:#4A4740}
+.tAhead button{background:none;border:0;font:13px 'Special Elite',monospace;letter-spacing:2px;color:#b3202e;padding:10px 0 10px 16px;margin:-10px 0}
+.tipA h3{font:24px/1.1 'Special Elite',monospace;margin:12px 0 4px;text-decoration:underline;text-decoration-color:var(--red);text-underline-offset:4px}
+.tipA p{margin:0;font:15px/26px 'Special Elite',monospace;color:#2e2c28;flex:1;overflow:hidden}
+.tdots{display:flex;gap:5px}.tdots i{width:7px;height:7px;border-radius:50%;background:#cfc8b8}.tdots i.on{background:var(--red)}
+.tnext{align-self:flex-end;display:flex;align-items:center;gap:8px;min-height:40px;margin-top:6px;padding:0 14px;border:1.5px solid #0b0b0d;background:#0b0b0d;color:#F2EEE6;font:13px 'Special Elite',monospace;letter-spacing:2px;cursor:pointer}
+.tnext b{font:16px monospace;color:var(--red)}
+.tip{background:rgba(11,11,13,.72);color:#F2EEE6;padding:16px 18px;border:1px solid #3a3a40;border-left:3px solid var(--red)}
+.bf{scrollbar-width:none}
+.bftab{flex:none;overflow:visible;min-height:auto}.bftab .rv{animation:none;opacity:1;transform:none}.bftab .bfhero{height:230px}
+.bfsheet{margin:-18px -16px -18px;flex:none;overflow:visible;border-radius:12px 12px 0 0}.bfsheet .rv{animation:none;opacity:1;transform:none}.bfsheet .bfhero{height:240px}
+.bfhero{position:relative;height:min(46svh,380px);flex:none;overflow:hidden}
+.bfhero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:40% 40%;filter:grayscale(1) contrast(1.1) brightness(.85);-webkit-mask-image:linear-gradient(180deg,#000 45%,transparent 100%);mask-image:linear-gradient(180deg,#000 45%,transparent 100%)}
+.bfhero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,11,13,.7) 0,transparent 25%,transparent 50%,rgba(11,11,13,.55) 80%,rgba(11,11,13,0) 100%)}
+.bftop{position:absolute;z-index:2;left:20px;right:20px;top:18px;display:flex;justify-content:space-between}
+.bftitle{position:absolute;z-index:2;left:20px;right:20px;bottom:10px}
+.bftitle h1{font:900 50px/.92 'Playfair Display',serif;letter-spacing:-1px;color:#F2EEE6;margin:6px 0 0;text-shadow:0 4px 22px rgba(0,0,0,.85)}
+.bfbody{position:relative;padding:14px 20px 24px;display:flex;flex-direction:column;gap:20px}
+.bfvic{display:flex;gap:18px;align-items:center}
+.polaroid{position:relative;margin:4px 0 0;flex:none;width:108px;background:#F2EEE6;padding:7px 7px 0;transform:rotate(-4deg);box-shadow:0 14px 26px rgba(0,0,0,.7)}
+.polaroid img{display:block;width:100%;aspect-ratio:4/5;object-fit:cover;object-position:top;filter:grayscale(1)}
+.polaroid figcaption{font:700 12px 'Playfair Display',serif;color:#0b0b0d;text-align:center;padding:6px 0 7px}
+.ppin{position:absolute;z-index:1;left:50%;top:-7px;width:15px;height:15px;margin-left:-7px;border-radius:50%;background:var(--red);box-shadow:inset -3px -3px 0 rgba(0,0,0,.3),0 3px 6px rgba(0,0,0,.6)}
+.bfvic h2{font:900 26px/1.05 'Playfair Display',serif;color:#F2EEE6;margin:4px 0 6px}
+.bfvic p{margin:0;font:400 15px/1.45 'Playfair Display',serif;color:#BDB8AE}
+.bffacts{list-style:none;margin:0;padding:0;border-top:1px solid #2c2c31}
+.bffacts li{display:flex;align-items:baseline;gap:12px;min-height:46px;border-bottom:1px solid #2c2c31;padding-top:12px}
+.bffacts b{width:76px;flex:none;font:700 11px 'Playfair Display',serif;letter-spacing:3px;color:#8f8f96;text-transform:uppercase}
+.bffacts span{font:900 19px 'Playfair Display',serif;color:#F2EEE6}
+.bfquote{margin:0;border-left:3px solid var(--red);padding:2px 0 2px 16px}
+.bfquote q{display:block;margin-top:6px;font:italic 900 30px/1.08 'Playfair Display',serif;color:#F2EEE6;quotes:"“" "”"}
+.bfnext{display:flex;gap:14px;align-items:center;background:rgba(11,11,13,.72);border:1px solid #3a3a40;padding:12px}
+.bfnext img{width:58px;height:58px;flex:none;object-fit:cover;object-position:top;filter:grayscale(1);border-radius:50%;border:2px solid #B48CFF}
+.bfnext p{margin:0;font:400 15px/1.45 'Playfair Display',serif;color:#BDB8AE}.bfnext b{color:#F2EEE6}.bfnext em{color:#F2EEE6;font-style:italic;font-weight:700}
+.bfask{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.bfask span{min-height:58px;display:flex;align-items:center;justify-content:center;border:1.5px solid #F2EEE6;font:900 20px 'Playfair Display',serif;letter-spacing:4px;color:#F2EEE6}
+.bfrules{margin:-6px 0 0;font:400 14px/1.45 'Playfair Display',serif;color:#8f8f96;text-align:center}
+.rvl{scrollbar-width:none}
+.rv{opacity:0;transform:translateY(14px);animation:rvIn .7s cubic-bezier(.2,.7,.2,1) var(--d,0s) forwards}
+@keyframes rvIn{to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.rv{animation:none;opacity:1;transform:none}.gstamp{animation:none!important;opacity:.92}}
+.rhero{position:relative;height:min(78svh,620px);flex:none;overflow:hidden}
+.rhero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 18%;filter:grayscale(1) contrast(1.15) brightness(.82);-webkit-mask-image:linear-gradient(180deg,#000 50%,transparent 100%);mask-image:linear-gradient(180deg,#000 50%,transparent 100%)}
+.rhero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,11,13,.75) 0,transparent 22%,transparent 50%,rgba(11,11,13,.55) 80%,rgba(11,11,13,0) 100%),repeating-linear-gradient(-22deg,rgba(0,0,0,.25) 0 16px,transparent 16px 34px)}
+.rtop{position:absolute;z-index:2;left:20px;right:20px;top:18px;display:flex;justify-content:space-between}
+.rname{position:absolute;z-index:2;left:20px;right:20px;bottom:18px}
+.rname h1{font:900 46px/.95 'Playfair Display',serif;letter-spacing:-1px;margin:6px 0 8px;color:#F2EEE6;text-shadow:0 4px 20px rgba(0,0,0,.8)}
+.rname p{margin:0;font:400 16px 'Playfair Display',serif;color:#d8d4cc}
+.gstamp{position:absolute;z-index:3;right:16px;top:36%;font:900 64px 'Playfair Display',serif;letter-spacing:6px;color:var(--red);border:5px solid var(--red);padding:4px 16px 0;transform:rotate(-12deg);opacity:0;background:rgba(11,11,13,.25);text-shadow:0 0 18px rgba(255,59,78,.5);animation:gStamp .45s cubic-bezier(.3,1.6,.5,1) 1.1s forwards;box-shadow:inset 0 0 0 2px rgba(255,59,78,.35)}
+@keyframes gStamp{0%{opacity:0;transform:rotate(-12deg) scale(2.4)}100%{opacity:.92;transform:rotate(-12deg) scale(1)}}
+.rbody{position:relative;padding:8px 18px 28px;display:flex;flex-direction:column;gap:14px}
+.beat{border-left:3px solid var(--red);padding:4px 0 4px 14px}
+.beat .bk{font:700 12px 'Playfair Display',serif;letter-spacing:4px;color:#8f8f96}
+.beat .ba{font:900 28px/1.05 'Playfair Display',serif;color:#F2EEE6;margin-top:2px}
+.beat .bn{font:400 15px/1.4 'Playfair Display',serif;color:#BDB8AE;margin-top:4px}
+.rpin{width:12px;height:12px;border-radius:50%;background:var(--c);box-shadow:inset -2px -2px 0 rgba(0,0,0,.3)}
+.rpin.miss{background:none;border:1.5px solid var(--c);box-shadow:none;opacity:.6}
+.rcount{font:400 13px 'Playfair Display',serif;color:#8f8f96;margin-left:4px}
+.rsnake{margin:12px -18px 0;position:relative}
+.rsnake img{display:block;width:100%;aspect-ratio:1;object-fit:cover;filter:grayscale(1) contrast(1.1)}
+.rsnake figcaption{position:relative;margin:-90px 18px 0;background:rgba(11,11,13,.86);border:1px solid #3a3a40;padding:16px 16px 14px;display:flex;flex-direction:column;gap:6px}
+.rsnake q{font:italic 900 26px/1.1 'Playfair Display',serif;color:#F2EEE6;quotes:"“" "”"}
+.rsnake p{margin:0;font:400 15px/1.45 'Playfair Display',serif;color:#BDB8AE}
+.rh{font:900 26px 'Playfair Display',serif;color:#F2EEE6;margin:18px 0 0}
+.rchain{list-style:none;margin:0;padding:0 0 0 0;position:relative;display:flex;flex-direction:column;gap:14px}
+.rchain::before{content:"";position:absolute;left:31px;top:20px;bottom:20px;width:3px;background:var(--red);box-shadow:0 0 8px rgba(255,59,78,.6)}
+.rchain li{position:relative;display:flex;gap:14px;align-items:center}
+.rchain img{width:64px;height:64px;flex:none;object-fit:cover;border:2px solid #F2EEE6;filter:grayscale(.4);box-shadow:0 8px 16px rgba(0,0,0,.6);background:#1c1c20}
+.rchain li>div{display:flex;flex-direction:column;gap:1px}
+.rchain b{font:900 18px/1.15 'Playfair Display',serif;color:#F2EEE6}
+.rchain p{margin:0;font:400 14px/1.4 'Playfair Display',serif;color:#BDB8AE}
+.rnext{margin:6px 0 0;font:italic 700 17px/1.4 'Playfair Display',serif;color:#F2EEE6;border-top:1px solid #2c2c31;padding-top:14px}
+.rboard{border-top:1px solid #2c2c31}
+.rrow{display:flex;align-items:center;gap:12px;min-height:56px;border-bottom:1px solid #2c2c31}
+.rrow .pin{width:14px;height:14px;border-radius:50%;flex:none;box-shadow:inset -2px -2px 0 rgba(0,0,0,.3)}
+.rrow b{font:900 20px 'Playfair Display',serif;color:#F2EEE6}
+.rrank{width:18px;font:700 14px 'Playfair Display',serif;color:#8f8f96}
+.rbest{font:700 10px 'Playfair Display',serif;letter-spacing:2px;color:#0b0b0d;background:#F2EEE6;padding:3px 6px}
+.rpts{margin-left:auto;font:900 26px 'Playfair Display',serif;color:#F2EEE6}.rpts small{font-size:13px;color:#8f8f96}
+.rrow.top .rpts{color:var(--red)}
+.cases{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;margin-top:clamp(28px,6svh,64px)}
+@media (max-height:760px){.tblock{zoom:.82}}
+.ckick{display:flex;justify-content:space-between;padding:0 24px 10px;font:600 11px Cinzel,serif;letter-spacing:4px;color:#BDB8AE}
+.ckick span+span{letter-spacing:2px;color:#8f8f96}
+.ctrack{flex:1;min-height:300px;display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 24px 14px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.ctrack::-webkit-scrollbar{display:none}
+.ccard{position:relative;flex:none;width:min(76vw,300px);max-height:470px;scroll-snap-align:center;border:1.5px solid #F2EEE6;color:#F2EEE6;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;box-shadow:0 18px 34px rgba(0,0,0,.65);background:linear-gradient(180deg,rgba(11,11,13,.35) 0,rgba(11,11,13,0) 30%,rgba(11,11,13,.55) 55%,#0b0b0d 92%),var(--img,linear-gradient(165deg,hsl(var(--h) 14% 22%),#0b0b0d 70%)) 38% 50%/cover}
+.ccard.soon{border-color:#34343a;box-shadow:none}
+.ctop{position:relative;display:flex;justify-content:space-between;align-items:center;padding:12px 14px}
+.cno{font:600 10px Cinzel,serif;letter-spacing:4px;color:#d8d4cc}
+.cpin{width:16px;height:16px;border-radius:50%;background:var(--red);box-shadow:inset -3px -3px 0 rgba(0,0,0,.3),0 3px 6px rgba(0,0,0,.6)}
+.csoon{font:600 9px Cinzel,serif;letter-spacing:3px;color:#F2EEE6;border:1px solid rgba(242,238,230,.6);padding:3px 6px 2px}
+.cghost{position:absolute;right:-10px;top:38%;font:900 120px 'Playfair Display',serif;color:rgba(242,238,230,.06);letter-spacing:-4px;line-height:1}
+.ctext{position:relative;padding:0 14px 14px;display:flex;flex-direction:column;gap:4px}
+.cwhere{font:600 10px Cinzel,serif;letter-spacing:3px;color:#BDB8AE}
+.ctext b{font:900 28px/1.02 'Playfair Display',serif;text-shadow:0 3px 14px rgba(0,0,0,.8)}
+.cmeta{font:400 13px 'Playfair Display',serif;color:#BDB8AE}
+.ccard.soon .ctext b{color:#9a9aa0}
+.cbtns{display:grid;gap:8px;margin-top:10px}
+.cbtns .cbtn{min-height:50px;font-size:15px}
+.cbtn.ghostc{background:rgba(11,11,13,.6);color:#F2EEE6;border:1.5px solid #F2EEE6}
+.ccard.nope{animation:nope .35s}
+@keyframes nope{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.sw{display:flex;gap:12px}.sw button{width:44px;height:44px;border-radius:50%;border:3px solid transparent;box-shadow:inset -3px -3px 0 rgba(0,0,0,.28)}
+.sw button[aria-pressed=true]{border-color:#F2EEE6;outline:2px solid #0b0b0d;outline-offset:-5px}
+.blinds{background:repeating-linear-gradient(-22deg,rgba(0,0,0,.6) 0 16px,transparent 16px 34px),radial-gradient(ellipse at 78% 8%,rgba(255,194,61,.28),transparent 55%),var(--bg)}
+.tag{position:relative;background:var(--paper);color:#141414;border-radius:6px;padding:14px 18px 14px 54px;transform:rotate(-1.5deg);box-shadow:0 14px 30px rgba(0,0,0,.6)}
+.tag::before{content:"";position:absolute;left:18px;top:50%;width:18px;height:18px;margin-top:-9px;border-radius:50%;background:var(--bg);box-shadow:inset 0 0 0 4px #CFC9BC}
+.code{font:800 64px/1 Inter;letter-spacing:10px}
+.btn{min-height:60px;border:0;border-radius:4px;background:var(--btn);color:#fff;font-weight:800;letter-spacing:3px;font-size:16px;padding:0 18px;display:flex;align-items:center;justify-content:center;gap:10px;width:100%}
+.btn.ghost{background:none;border:1px solid #6B6B72;color:var(--ink);letter-spacing:2px;font-weight:700}
+.btn:disabled{opacity:.45;cursor:default}
+.row{display:flex;gap:10px;align-items:center}
+.grow{flex:1}
+.list{border-top:1px solid var(--line)}
+.li{display:flex;align-items:center;gap:12px;padding:12px 4px;border-bottom:1px solid var(--line);background:none;border-left:0;border-right:0;border-top:0;width:100%;text-align:left;min-height:56px}
+.dot{width:10px;height:10px;border-radius:50%;flex:none}
+.choice{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.opt{background:var(--panel);border:2px solid var(--line);border-radius:6px;padding:12px;text-align:left;min-height:84px;display:flex;flex-direction:column;gap:4px}
+.opt[aria-pressed=true]{border-color:var(--amber);box-shadow:0 0 24px rgba(255,194,61,.15)}
+.opt b{font:italic 700 20px/1.05 'Playfair Display',serif}
+.opt small{color:var(--mute);font-size:12px;line-height:1.35}
+/* game shell */
+.top{display:flex;align-items:center;gap:10px;padding:14px 16px 10px;border-bottom:1px solid var(--line)}
+.top h2{font:italic 900 22px/1 'Playfair Display',serif}
+.timer{margin-left:auto;font:600 22px 'IBM Plex Mono',monospace;color:var(--amber);text-shadow:0 0 14px rgba(255,194,61,.45)}
+.timer.low{color:var(--red);text-shadow:0 0 14px rgba(255,59,78,.5)}
+.skip{border:1px solid var(--line);background:none;border-radius:4px;height:32px;padding:0 8px;font:11px 'IBM Plex Mono',monospace;color:var(--mute)}
+.tabs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));border-top:1px solid var(--line);background:#0e0e10}
+.tabs button{background:none;border:0;padding:8px 0 10px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:700;color:var(--mute);min-height:58px;position:relative}
+.tabs button[aria-selected=true]{color:var(--ink)}
+.tabs button[aria-selected=true]::before{content:"";position:absolute;top:0;left:25%;right:25%;height:3px;background:var(--red)}
+.tabs .n{position:absolute;top:6px;right:22%;background:var(--amber);color:#141414;border-radius:999px;font:600 10px 'IBM Plex Mono',monospace;padding:0 5px}
+.lock{opacity:.45}
+.paper{background:var(--paper);color:#141414;padding:18px;font:12.5px/1.6 'IBM Plex Mono',monospace;box-shadow:0 14px 30px rgba(0,0,0,.6)}
+.paper h3{font:900 24px/1.1 'Playfair Display',serif;margin:4px 0 8px}
+.paper p{margin:0 0 10px}
+.paper .hdr{display:flex;justify-content:space-between;border-bottom:2px solid #141414;padding-bottom:6px;font-weight:600;font-size:11px;letter-spacing:2px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.ev{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:0;overflow:hidden;text-align:left;display:flex;flex-direction:column}
+.ev .im{aspect-ratio:1;background:#1c1c20 center/cover;display:grid;place-items:center;filter:grayscale(.35)}
+.ev .cap{padding:8px 10px 10px;line-height:1.2}
+.ev .cap small{display:block;font:11px 'IBM Plex Mono',monospace;color:var(--mute)}
+.ev .cap b{font:700 16px 'Playfair Display',serif}
+.ev .d3{position:absolute;z-index:1;right:0;margin:8px;background:rgba(11,11,13,.8);border:1px solid #6b6b72;color:#ECE8DF;font:600 10px 'IBM Plex Mono',monospace;letter-spacing:2px;padding:1px 6px}
+.evh{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-top:4px}
+.evlater{margin:-4px 0 4px;font-size:11px;color:var(--mute)}
+.ev .new{position:absolute;z-index:1;margin:8px;background:var(--amber);color:#141414;font:600 10px 'IBM Plex Mono',monospace;letter-spacing:2px;padding:2px 6px}
+.sus{display:grid;grid-template-columns:84px minmax(0,1fr);gap:12px;padding:10px;background:var(--panel);border:1px solid var(--line);border-radius:6px;text-align:left;width:100%}
+.sus img{width:84px;height:104px;object-fit:cover;object-position:top;filter:grayscale(1)}
+.sus b{font:900 20px 'Playfair Display',serif}
+.sus p{margin:2px 0 0;font-size:13px;color:#cfcfd4;line-height:1.4}
+/* documents: each one its own physical object */
+.paper.form{background:repeating-linear-gradient(180deg,transparent 0 25px,#c3cee0 25px 26px),#f3f1e8;background-position:0 6px;font:13px/26px 'Special Elite',monospace;padding:16px 16px 44px 44px;position:relative}
+.paper.form::before{content:"";position:absolute;left:32px;top:0;bottom:0;width:1.5px;background:#d9898f}
+.paper.form .fhead{border:1.5px solid #2b2b2b;margin:0 0 6px;font:11px/1.4 Inter,sans-serif;display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+.paper.form .fhead div{padding:4px 6px;border-bottom:1px solid #2b2b2b}.paper.form .fhead div:nth-child(odd){border-right:1px solid #2b2b2b}
+.paper.form .fhead b{display:block;font-size:9px;letter-spacing:1px;color:#555}
+.paper.form .ftitle{font:700 12px Inter,sans-serif;letter-spacing:3px;text-align:center;line-height:26px}
+.paper.form p{margin:0}
+.sig{font:34px/1 'Mrs Saint Delafield',cursive;color:#1f3a7a}
+.bstamp{position:absolute;right:12px;bottom:8px;border:3px double #2c4fa3;color:#2c4fa3;border-radius:50%;width:80px;height:80px;display:grid;place-items:center;text-align:center;font:700 8.5px/1.3 Inter,sans-serif;letter-spacing:.5px;transform:rotate(-14deg);opacity:.75}
+.paper.official{background:#ebe6d8;font:15px/1.5 'Cormorant Garamond',serif;color:#1d1a14;padding:18px 18px 16px;position:relative;border-top:6px solid #1d1a14}
+.paper.official .crest{display:flex;flex-direction:column;align-items:center;gap:2px;margin-bottom:8px;text-align:center}
+.paper.official .crest b{font:700 13px 'Cormorant Garamond',serif;letter-spacing:2px}
+.paper.official .crest small{font:italic 13px 'Cormorant Garamond',serif}
+.paper.official table{font:14px 'Cormorant Garamond',serif;margin:6px 0 10px}.paper.official td{border-bottom:1px solid #b9b19c;padding:3px 4px}.paper.official td:first-child{font-variant:small-caps;letter-spacing:1px;width:38%;color:#5a5240}
+.paper.official p{margin:0 0 8px}
+.rstamp{display:inline-block;border:3px solid #b3202e;color:#b3202e;font:700 15px Inter,sans-serif;letter-spacing:4px;padding:3px 10px;transform:rotate(-5deg);opacity:.85}
+.paper.will{background:radial-gradient(ellipse at 50% 40%,#f2e5c2 30%,#dcc38c 100%);font:15px/1.55 'Cormorant Garamond',serif;color:#2a1d0e;padding:22px 22px 18px;position:relative;box-shadow:inset 0 0 0 6px #f0e2bd,inset 0 0 0 7px #8a6a3a,inset 0 0 0 10px #f0e2bd,inset 0 0 0 11px #8a6a3a,0 14px 30px rgba(0,0,0,.6)}
+.paper.will h3{font:32px/1.1 'UnifrakturMaguntia',serif;text-align:center;margin:6px 0 2px}
+.paper.will .of{text-align:center;font:italic 14px 'Cormorant Garamond',serif;margin-bottom:10px}
+.paper.will p{text-align:justify;margin:0 0 8px}
+.paper.will p.first::first-letter{float:left;font:700 50px/.8 'Cormorant Garamond',serif;padding:4px 6px 0 0;color:#7a1414}
+.paper.will .wit{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:10px;font:12px 'Cormorant Garamond',serif}
+.paper.will .wit div{border-top:1px solid #6a5030;padding-top:2px}
+.seal{position:absolute;right:18px;bottom:14px;width:64px;height:64px;border-radius:50%;background:radial-gradient(circle at 38% 34%,#d2453f,#8a1411 70%);box-shadow:0 3px 6px rgba(0,0,0,.4),inset 0 0 0 6px rgba(0,0,0,.15);display:grid;place-items:center;font:italic 700 26px 'Cormorant Garamond',serif;color:#f1c7a8}
+.paper.letter{background:linear-gradient(180deg,transparent 49.6%,rgba(120,100,70,.18) 50%,transparent 50.6%),radial-gradient(circle at 88% 10%,transparent 26px,rgba(140,95,40,.22) 28px,rgba(140,95,40,.08) 33px,transparent 35px),#f7f1e3;font:14px/2 'Homemade Apple',cursive;color:#253463;padding:20px 20px 18px;transform:rotate(.8deg)}
+.paper.letter p{margin:0 0 6px}
+.paper.letter .date{text-align:right;font-size:12px;margin-bottom:6px}
+.paper.letter h3{font:16px/2 'Homemade Apple',cursive;margin:0}
+/* board */
+.board{position:relative;flex:1;min-height:380px;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:repeating-linear-gradient(-22deg,rgba(0,0,0,.45) 0 14px,transparent 14px 30px),radial-gradient(ellipse at 70% 10%,rgba(255,194,61,.16),transparent 60%),#1A1A1E;touch-action:none}
+.board svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.board line{stroke:var(--red);stroke-width:2.4;stroke-linecap:round;vector-effect:non-scaling-stroke;filter:drop-shadow(0 0 3px rgba(255,59,78,.9))}
+.bc{position:absolute;transform:translate(-50%,-50%) rotate(var(--r,0deg));width:92px;background:var(--paper);color:#141414;padding:5px 5px 6px;box-shadow:0 8px 16px rgba(0,0,0,.6);border:0;text-align:left;cursor:grab;touch-action:none;user-select:none}
+.bc img{display:block;width:100%;height:58px;object-fit:cover;object-position:top;filter:grayscale(1);pointer-events:none}
+.bc b{display:block;font:900 13px/1.15 'Playfair Display',serif;margin-top:4px}
+.bc small{font:10px 'IBM Plex Mono',monospace}
+.bc .pin{position:absolute;left:50%;top:-6px;width:12px;height:12px;margin-left:-6px;border-radius:50%;box-shadow:0 0 0 2px #141414}
+.bc.sel{outline:3px solid var(--amber);outline-offset:2px}
+.bc.note{background:var(--amber)}
+.bc.doc{background:#e3dccb}
+.btools{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) 64px;gap:8px}
+.chip{border:1px solid var(--line);background:var(--panel);border-radius:4px;min-height:48px;font-weight:700;font-size:13px}
+.chip[aria-pressed=true]{border-color:var(--red);color:#fff;background:#2a1418}
+/* overlays */
+.ov{position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center;background:radial-gradient(circle at 50% 40%,#3a3a42 0%,#141418 45%,#08080a 80%);animation:fade .25s}
+.stamp{border:4px solid var(--red);color:var(--red);font:600 34px 'IBM Plex Mono',monospace;letter-spacing:6px;padding:2px 14px;transform:rotate(-10deg);animation:stamp .35s cubic-bezier(.2,1.6,.5,1)}
+.sheet{position:absolute;left:0;right:0;bottom:0;z-index:15;background:#111114;border-top:1px solid var(--line);border-radius:12px 12px 0 0;padding:18px 16px 18px;max-height:88%;overflow-y:auto;display:flex;flex-direction:column;gap:12px;animation:up .25s;box-shadow:0 -20px 40px rgba(0,0,0,.6)}
+.scrim{position:absolute;inset:0;z-index:14;background:rgba(0,0,0,.55)}
+.toast{position:absolute;left:12px;right:12px;top:64px;z-index:12;background:rgba(21,21,24,.96);border:1px solid var(--line);border-radius:6px;padding:10px 12px;font-size:13px;display:flex;gap:8px;align-items:center;animation:drop .25s}
+@keyframes fade{from{opacity:0}}@keyframes up{from{transform:translateY(40%);opacity:0}}@keyframes drop{from{transform:translateY(-12px);opacity:0}}
+@keyframes stamp{from{transform:rotate(-10deg) scale(2.2);opacity:0}}
+.lineup{position:relative;height:300px;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:repeating-linear-gradient(180deg,transparent 0 37px,#34343A 37px 38px),#151518;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;padding:0 4px;align-items:end}
+.lu{border:0;background:none;padding:0 0 8px;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end;border-radius:4px}
+.lu img{width:100%;object-fit:cover;object-position:top;border-radius:3px;filter:grayscale(1) brightness(.5);transition:filter .2s}
+.lu .pl{background:var(--paper);color:#141414;font:600 14px 'IBM Plex Mono',monospace;padding:1px 9px;margin-top:-16px;position:relative}
+.lu b{font:900 15px 'Playfair Display',serif}
+.lu[aria-pressed=true] img{filter:none}
+.lu[aria-pressed=true]{background:radial-gradient(ellipse at 50% 30%,rgba(255,255,255,.18),transparent 65%)}
+.qs{display:flex;flex-wrap:wrap;gap:8px}
+.q{border:1px solid var(--line);background:var(--panel);border-radius:999px;min-height:44px;padding:0 14px;font-size:14px;font-weight:700}
+.q[aria-pressed=true]{border-color:var(--amber);color:var(--amber)}
+table{width:100%;border-collapse:collapse;font-size:13px}td,th{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line)}th{font:11px 'IBM Plex Mono',monospace;color:var(--mute);letter-spacing:1px}
+.ok{color:#5BD39A}.no{color:var(--red)}
+.tvwrap{position:absolute;inset:0;z-index:25;background:#000;display:flex;flex-direction:column;justify-content:center;padding:12px;gap:10px}
+.tv{aspect-ratio:16/9;width:100%;border:6px solid #222;border-radius:8px;position:relative;overflow:hidden}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<main id="app" aria-live="polite"></main>
+<script>
+{
+const IMG = n => 'img/' + n + '.jpg';
+const VIEWER = 'evidence/';
+const PLAYERS = [
+  {id:'me', n:'You', c:'#FF3B4E'},
+  {id:'jess', n:'Jess', c:'#3FD0C9'},
+  {id:'marcus', n:'Marcus', c:'#B48CFF'},
+  {id:'priya', n:'Priya', c:'#FFC23D'}
+];
+const SUS = [
+  {id:'roylott', n:'Dr. Grimesby Roylott', s:'Roylott', img:'suspect-roylott', c:'#FF3B4E', who:'Julia\'s stepfather. Ex-doctor back from India. Violent temper; keeps Indian animals loose on the grounds.', alibi:'"Asleep in my room all night." (The room next to Julia\'s.)'},
+  {id:'helen', n:'Helen Stoner', s:'Helen', img:'suspect-helen', c:'#B48CFF', who:'Julia\'s twin sister. Brought the case to you.', alibi:'Woke to Julia\'s scream and found her in the hall.'},
+  {id:'croft', n:'Silas Croft', s:'Croft', img:'suspect-croft', c:'#3FD0C9', who:'Groundskeeper. Julia reported him for selling the estate\'s firewood.', alibi:'"In my cottage all night." Muddy boots by the back door.'},
+  {id:'price', n:'Major Edmund Price', s:'Price', img:'suspect-price', c:'#FFC23D', who:'Julia\'s fiancé. Overheard arguing with her the week before.', alibi:'Took the evening train home to Harrow.'}
+];
+const ROUNDS = [
+  {n:'The locked room', q:'How did anyone get in? Was it Croft, or Price?'},
+  {n:'Something in the walls', q:'The room was changed on purpose. And who gains from the will?'},
+  {n:'The room next door', q:'What is Roylott keeping in his room?'}
+];
+const P = (a) => a.map(x => `<p>${x}</p>`).join('');
+const ITEMS = [
+  {id:'D1', kind:'doc', r:1, tag:'D-1', n:'Helen\'s statement', sub:'Witness statement', style:'form', body:`<div class="ftitle">SURREY CONSTABULARY<br>STATEMENT OF WITNESS</div><div class="fhead"><div><b>NAME</b>Helen Stoner</div><div><b>AGE</b>30</div><div><b>ADDRESS</b>Stoke Moran Manor</div><div><b>TAKEN BY</b>Sgt. W. Hale</div></div><p>On the night Julia died, a storm was blowing. Julia came to my room before bed and asked if I ever heard a low, clear whistle in the night, around three. I said no. She said she had heard it for several nights.</p><p>Later I woke to a terrible scream. I opened my door and heard a soft whistle, then a clanging sound, like metal falling. Julia staggered out of her room. She cried, "It was the band! The speckled band!" and pointed toward the doctor's room. She died within minutes.</p><p>Julia always locked her door and barred her shutters at night. My stepfather keeps a cheetah and a baboon loose on the grounds.</p><p style="margin-top:6px">Signed: <span class="sig">Helen Stoner</span></p><div class="bstamp">RECEIVED<br>SURREY<br>CONSTABULARY</div>`},
+  {id:'D2', kind:'doc', r:1, tag:'D-2', n:'Inquest summary', sub:'Coroner', style:'official', body:`<div class="crest"><svg width="38" height="42" viewBox="0 0 38 42" aria-hidden="true"><path d="M19 2l15 6v12c0 10-7 17-15 20C11 37 4 30 4 20V8z" fill="none" stroke="#1d1a14" stroke-width="1.5"/><path d="M19 10v22M11 18h16" stroke="#1d1a14" stroke-width="1.5"/></svg><b>CORONER'S COURT · COUNTY OF SURREY</b><small>Summary of Inquest held at Leatherhead</small></div><table><tr><td>Deceased</td><td>Julia Stoner, spinster, aged 30</td></tr><tr><td>Place of death</td><td>Stoke Moran Manor, west wing</td></tr><tr><td>Finding</td><td><span class="rstamp">OPEN VERDICT</span></td></tr></table><p>No marks of violence upon the body. No poison found in tests. The bedroom door was locked from within; the window shutters barred with iron bars, checked each night. Walls and floor found solid. The chimney is wide, but barred with four large staples.</p><p>The deceased was found in her nightdress. In her right hand, the charred stump of a match; in her left, a matchbox.</p><p>The Court is unable to name a cause of death. Death from fright is possible.</p><p style="text-align:right;margin:0">J. Whitmore, <i>H.M. Coroner</i> <span class="sig" style="font-size:28px;color:#1d1a14">J Whitmore</span></p>`},
+  {id:'D3', kind:'doc', r:2, tag:'D-3', n:'Mrs. Stoner\'s will', sub:'Extract', style:'will', body:`<h3>Last Will &amp; Testament</h3><div class="of">of Mrs. Margaret Stoner, widow, of Stoke Moran</div><p class="first">I give and bequeath my whole income of one thousand pounds a year unto my husband, Doctor Grimesby Roylott, <b>so long as my daughters shall reside with him</b>.</p><p>Upon the marriage of either daughter, the said daughter shall receive a yearly portion of the said income for her own sole use and benefit.</p><div class="wit"><div><span class="sig" style="font-size:24px;color:#2a1d0e">E. Farrow</span><br>Witness</div><div><span class="sig" style="font-size:24px;color:#2a1d0e">T. Lyle</span><br>Witness</div></div><div class="seal">S</div>`},
+  {id:'D4', kind:'doc', r:2, tag:'D-4', n:'Julia\'s letter', sub:'Found in her desk', style:'letter', body:`<div class="date">Stoke Moran, Tuesday</div><h3>Dearest Helen,</h3><p>Strange things this week. Workmen came and fitted a new ventilator high in my wall, and a bell-rope beside my bed, though I never asked for either. The ventilator opens into the doctor's room, not outside. Some nights I smell his cigars through it.</p><p>And that whistle again, at three in the morning. You must hear it too?</p><p style="text-align:right">Your loving sister,<br>Julia</p>`},
+  {id:'P1', kind:'photo', r:1, tag:'Photo 1', n:'Julia\'s bedroom', img:'photo-1-bedroom', d:'The bolted bed, the bell-rope dangling to the pillow, the vent high above.'},
+  {id:'P2', kind:'photo', r:1, tag:'Photo 2', n:'The window', img:'photo-2-window', d:'Heavy shutters, barred with iron from the inside. Checked every night.'},
+  {id:'P3', kind:'photo', r:3, tag:'Photo 3', n:'Roylott\'s room', img:'photo-3-roylott-room', d:'The room next door: the iron safe, the vent high in the wall, the lash on the bedpost.'},
+  {id:'R1', kind:'ev', k3d:'boots', r:1, tag:'R-1', n:'Muddy boots', img:'R-1-muddy-boots', d:'Croft\'s work boots by the back door, caked in wet mud.', v3d:1},
+  {id:'R2', kind:'ev', k3d:'ticket', r:1, tag:'R-2', n:'Train ticket', img:'ticket-front', back:'ticket-back', paper:1, d:'Found in Price\'s coat. Third class, Leatherhead to Waterloo, punched by the guard.', v3d:1},
+  {id:'A7', kind:'ev', k3d:'matchbox', r:1, tag:'A-7', n:'Matchbox', icon:'box', d:'Found in Julia\'s left hand, with one burnt match.', v3d:1},
+  {id:'R3', kind:'ev', k3d:'will', r:2, tag:'R-3', n:'Helen\'s copy of the will', img:'will-front', back:'will-back', paper:1, d:'Her copy of her mother\'s will, stamped by the solicitors, with her own pencil marks.', v3d:1},
+  {id:'A2', kind:'photo', r:2, tag:'A-2', n:'Bell-rope', img:'A-2-bell-rope', d:'Hangs to the pillow. Pulled, it rings nothing: the wire isn\'t attached. Hooked just under the ventilator.'},
+  {id:'A3', kind:'photo', r:2, tag:'A-3', n:'Bolted bed', img:'A-3-bolted-bed', d:'Bolted to the floor, so it can\'t be moved away from the rope.'},
+  {id:'A1', kind:'photo', r:2, tag:'A-1', n:'Ventilator', img:'A-1-ventilator', d:'A small vent high in Julia\'s wall. It opens into Roylott\'s room, not outside.'},
+  {id:'A4', kind:'ev', k3d:'saucer', r:3, tag:'A-4', n:'Saucer of milk', img:'A-4-saucer', d:'On top of the iron safe in Roylott\'s room. He keeps no cat.', v3d:1},
+  {id:'A5', kind:'ev', k3d:'lash', r:3, tag:'A-5', n:'Looped dog lash', img:'A-5-dog-lash', d:'By Roylott\'s bed, its end tied into a small loop.', v3d:1},
+  {id:'A6', kind:'photo', r:3, tag:'A-6', n:'Iron safe', img:'A-6-iron-safe', d:'A heavy safe in Roylott\'s room. Its door clangs shut.'}
+];
+const ICON = {
+  ticket:'<path d="M3 7h12l-2 3 2 3-2 3H3z"/><path d="M7 7v9" stroke-dasharray="2 2"/>',
+  box:'<rect x="3" y="7" width="18" height="10" rx="1"/><path d="M14 7v10"/>',
+  doc:'<path d="M6 3h9l4 4v14H6z"/><path d="M9 10h7M9 13h7M9 16h4"/>',
+  vent:'<rect x="5" y="5" width="14" height="14"/><path d="M5 9h14M5 13h14M5 17h14"/>'
+};
+const svgI = k => `<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#ECE8DF" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[k]}</svg>`;
+const HOW = ['Poisoned drink', 'A snake sent through the vent', 'A hidden passage', 'Frightened by the cheetah'];
+const WHY = ['To keep the family money', 'Jealousy', 'Revenge for being reported', 'A lovers\' quarrel'];
+const ANSWER = {who:'roylott', how:1, why:0};
+const ROUND_SECS = 480;
+
+const S = {screen:'title', case:'speckled', mode:'tv', joined:['me'], round:1, t:ROUND_SECS, tab:'files', seen:new Set(), pins:[], strings:[], tie:false, sel:null, ready:new Set(), vote:{who:null, how:null, why:null}, bots:{}, sheet:null, ov:null, toast:null, tv:false};
+const P_ = id => PLAYERS.find(p => p.id === id);
+const unlocked = () => ITEMS.filter(i => i.r <= S.round);
+const newCount = kinds => unlocked().filter(i => kinds.includes(i.kind) && !S.seen.has(i.id)).length;
+const $ = s => document.querySelector(s);
+const esc = x => String(x).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const app = $('#app');
+let timerId = null, botId = null, toastId = null, tipId = null;
+
+/* ---------- renderers ---------- */
+function render() {
+  const f = {title, lobby, join, joined, brief, game, vote, reveal}[S.screen];
+  app.innerHTML = f() + overlays();
+  if (S.screen === 'game' && S.tab === 'board') drawStrings();
+}
+function logo() {
+  return `<div class="tblock" style="position: relative; margin-top: clamp(26px,6svh,72px); flex: none; display: flex; flex-direction: column; align-items: center; transform: rotate(-5deg) skewX(-6deg)">
+    <div style="position: relative; width: 290px; height: 110px; display: flex; justify-content: center; align-items: center"><svg aria-hidden="true" width="370" height="230" viewBox="-40 -60 370 230" style="position: absolute; left: -40px; top: -60px; overflow: visible; pointer-events: none; z-index: 0"><path d="M-40.0 54.2 L-36.0 52.8 L-32.0 51.6 L-28.0 50.4 L-24.0 45.5 L-20.0 39.8 L-16.0 33.5 L-12.0 27.5 L-8.0 22.4 L-4.0 18.9 L0.0 17.6 L4.0 17.9 L8.0 18.9 L12.0 20.6 L16.0 22.8 L20.0 25.7 L24.0 29.0 L28.0 32.9 L32.0 37.2 L36.0 41.7 L40.0 46.6 L44.0 51.6 L48.0 56.8 L52.0 61.9 L56.0 67.0 L60.0 71.9 L64.0 76.5 L68.0 80.8 L72.0 84.7 L76.0 88.2 L80.0 91.1 L84.0 93.5 L88.0 95.2 L92.0 96.3 L96.0 96.8 L100.0 96.6 L104.0 95.7 L108.0 94.1 L112.0 92.0 L116.0 89.2 L120.0 85.9 L124.0 82.2 L128.0 78.0 L132.0 73.4 L136.0 68.6 L140.0 63.6 L144.0 58.5 L148.0 53.3 L152.0 48.3 L156.0 43.3 L160.0 38.7 L164.0 34.3 L168.0 30.3 L172.0 26.7 L176.0 23.7 L180.0 21.3 L184.0 19.4 L188.0 18.2 L192.0 17.6 L196.0 17.7 L200.0 18.5 L204.0 20.0 L208.0 22.0 L212.0 24.7 L216.0 27.9 L220.0 31.6 L224.0 35.7 L228.0 40.2 L232.0 45.0 L236.0 49.9 L240.0 55.1 L244.0 60.2 L248.0 65.3 L252.0 70.3 L256.0 75.0 L260.0 79.4 L264.0 83.5 L268.0 87.1 L272.0 90.2 L276.0 92.8 L280.0 94.7 L284.0 96.0 L288.0 96.7 L292.0 96.5 L296.0 94.0 L300.0 89.6 L304.0 83.9 L308.0 77.7 L312.0 71.7 L316.0 66.3 L320.0 63.5 L324.0 62.2 L328.0 60.9" fill="none" stroke="#FF3B4E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 4px rgba(255,59,78,0.85))"></path><circle cx="-36" cy="54.2" r="6" fill="#F2EEE6"></circle><circle cx="326" cy="60.9" r="6" fill="#F2EEE6"></circle></svg><span style="position: relative; z-index: 1; font: 900 128px/0.86 'Playfair Display', serif; letter-spacing: -2px; color: #F2EEE6; text-shadow: 1px 1px 0 #b4afa5, 2px 2px 0 #a19c92, 3px 3px 0 #8e8a80, 4px 4px 0 #7b776e, 5px 5px 0 #68655d, 6px 6px 0 #56534c, 7px 7px 0 #44413b, 8px 8px 0 #33312c, 14px 18px 22px rgba(0,0,0,0.85)">RED</span><svg aria-hidden="true" width="370" height="230" viewBox="-40 -60 370 230" style="position: absolute; left: -40px; top: -60px; overflow: visible; pointer-events: none; z-index: 2; filter: drop-shadow(3px 6px 4px rgba(0,0,0,0.75)) drop-shadow(0 0 4px rgba(255,59,78,0.7))"><defs><clipPath id="wvm"><rect x="-60" y="-60" width="159" height="230"></rect><rect x="191" y="-60" width="200" height="230"></rect></clipPath></defs><path d="M-40.0 54.2 L-36.0 52.8 L-32.0 51.6 L-28.0 50.4 L-24.0 45.5 L-20.0 39.8 L-16.0 33.5 L-12.0 27.5 L-8.0 22.4 L-4.0 18.9 L0.0 17.6 L4.0 17.9 L8.0 18.9 L12.0 20.6 L16.0 22.8 L20.0 25.7 L24.0 29.0 L28.0 32.9 L32.0 37.2 L36.0 41.7 L40.0 46.6 L44.0 51.6 L48.0 56.8 L52.0 61.9 L56.0 67.0 L60.0 71.9 L64.0 76.5 L68.0 80.8 L72.0 84.7 L76.0 88.2 L80.0 91.1 L84.0 93.5 L88.0 95.2 L92.0 96.3 L96.0 96.8 L100.0 96.6 L104.0 95.7 L108.0 94.1 L112.0 92.0 L116.0 89.2 L120.0 85.9 L124.0 82.2 L128.0 78.0 L132.0 73.4 L136.0 68.6 L140.0 63.6 L144.0 58.5 L148.0 53.3 L152.0 48.3 L156.0 43.3 L160.0 38.7 L164.0 34.3 L168.0 30.3 L172.0 26.7 L176.0 23.7 L180.0 21.3 L184.0 19.4 L188.0 18.2 L192.0 17.6 L196.0 17.7 L200.0 18.5 L204.0 20.0 L208.0 22.0 L212.0 24.7 L216.0 27.9 L220.0 31.6 L224.0 35.7 L228.0 40.2 L232.0 45.0 L236.0 49.9 L240.0 55.1 L244.0 60.2 L248.0 65.3 L252.0 70.3 L256.0 75.0 L260.0 79.4 L264.0 83.5 L268.0 87.1 L272.0 90.2 L276.0 92.8 L280.0 94.7 L284.0 96.0 L288.0 96.7 L292.0 96.5 L296.0 94.0 L300.0 89.6 L304.0 83.9 L308.0 77.7 L312.0 71.7 L316.0 66.3 L320.0 63.5 L324.0 62.2 L328.0 60.9" fill="none" stroke="#FF3B4E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" clip-path="url(#wvm)"></path></svg></div>
+    <span style="font: 900 66px/0.95 'Playfair Display', serif; letter-spacing: 1px; color: #FF3B4E; margin-top: 10px; text-shadow: 1px 1px 0 #d22b3d, 2px 2px 0 #c02838, 3px 3px 0 #ad2333, 4px 4px 0 #961e2c, 5px 5px 0 #801a26, 6px 6px 0 #6b1620, 7px 7px 0 #57121a, 8px 8px 0 #440e15, 14px 18px 22px rgba(0,0,0,0.85)">THREAD</span>
+  </div>`;
+}
+function title() {
+  return `<section class="scr" style="position:relative;padding:clamp(20px,6svh,92px) 0 clamp(12px,2.5svh,28px);scrollbar-width:none;gap:0;align-items:stretch;overflow-x:hidden;overflow-y:auto;background:radial-gradient(ellipse at 50% 38%,#26262b 0%,#0b0b0d 62%);color:#F2EEE6;font-family:'Old Standard TT',serif"><div style="position:absolute;inset:0;background:repeating-linear-gradient(-22deg,rgba(0,0,0,.25) 0 16px,transparent 16px 34px),radial-gradient(ellipse at 78% 8%,rgba(235,235,240,.08),transparent 55%)"></div>
+  <div style="position: absolute; left: -120px; top: -40px; width: 300px; height: 900px; background: linear-gradient(90deg, transparent, rgba(255,250,235,0.07), transparent); transform: rotate(24deg); transform-origin: top"></div>
+  <div style="position: absolute; right: -140px; top: -40px; width: 300px; height: 900px; background: linear-gradient(90deg, transparent, rgba(255,250,235,0.06), transparent); transform: rotate(-20deg); transform-origin: top"></div>
+
+  <div style="position: relative; text-align: center; flex: none; font: 600 13px 'Cinzel', serif; letter-spacing: 6px; color: #BDB8AE">A PARTY MURDER MYSTERY</div>
+
+  ${logo()}
+  <div class="cases" aria-label="Choose a case">
+    <div class="ctrack" id="ctrack">${CASES.map(c => `<article class="ccard${c.soon ? ' soon' : ''}" ${c.soon ? `data-a="case" data-v="${c.id}" aria-disabled="true"` : ''} style="${c.img ? `--img:url(${IMG(c.img)})` : `--h:${c.hue}`}">
+      <div class="ctop"><span class="cno">CASE ${c.no}</span>${c.soon ? '<span class="csoon">COMING SOON</span>' : '<span class="cpin"></span>'}</div>
+      ${c.img ? '' : `<span class="cghost">${c.no}</span>`}
+      <div class="ctext"><span class="cwhere">${c.where}</span><b>${c.n}</b><span class="cmeta">${c.meta}</span>
+      ${c.soon ? '' : `<div class="cbtns"><button class="cbtn" data-a="host">HOST</button><button class="cbtn ghostc" data-a="join">JOIN</button></div>`}</div></article>`).join('')}</div>
+  </div>
+</section>`;
+}
+const TIPS = [
+  ['Read the files', 'Each round unlocks new statements, letters and reports. Anything marked NEW is fresh.'],
+  ['Turn the evidence over', 'Spin every object in 3D. Some details only show up when you tap the right spot.'],
+  ['Pin what matters', 'Pin a clue and it lands on the murder board, on the TV and on every phone.'],
+  ['Tie the thread', 'Connect two cards to show they’re linked. Everyone sees your thread in your colour.'],
+  ['Three rounds, then the lineup', 'Name who did it, how, and why. You score a point for each one you get right.']
+];
+const CASES = [
+  {id:'speckled', no:'0221', n:'The Speckled Band', where:'SURREY · 1883', meta:'4–6 detectives · 30 min · Medium', img:'cover-stoke-moran'},
+  {id:'redheaded', no:'0222', n:'The Red-Headed League', where:'LONDON · 1890', meta:'4–6 detectives · 35 min · Easy', soon:1, hue:'210deg'},
+  {id:'hound', no:'0223', n:'The Hound of the Baskervilles', where:'DARTMOOR · 1889', meta:'5–8 detectives · 45 min · Hard', soon:1, hue:'30deg'},
+  {id:'express', no:'0224', n:'Death on the Midnight Express', where:'CALAIS · 1931', meta:'4–6 detectives · 40 min · Medium', soon:1, hue:'350deg'},
+  {id:'lighthouse', no:'0225', n:'The Last Light at Gull Rock', where:'CORNWALL · 1952', meta:'3–5 detectives · 30 min · Medium', soon:1, hue:'190deg'}
+];
+const SWATCH = ['#FF3B4E', '#5AA9FF', '#FF8A3D', '#7CE38B', '#F2EEE6'];
+function head(k) {
+  return `<div class="hhead"><button class="back" data-a="home" aria-label="Back to title">‹</button><div class="hlogo">${logo()}</div><div class="kick hk">${k}</div></div>`;
+}
+function seats(host) {
+  const list = S.joined.map(P_);
+  const rows = list.map(p => `<div class="det"><span class="pin" style="background:${p.c}"></span><b>${esc(p.n)}${p.id === 'me' && host !== 'me' ? ' <span style="font:700 11px Playfair Display;letter-spacing:2px;color:#8f8f96">(YOU)</span>' : ''}</b><em>${p.id === host ? 'HOST' : 'READY'}</em></div>`);
+  for (let i = list.length; i < 6; i++) rows.push(`<div class="det open"><span class="pin"></span><span style="font:400 16px 'Playfair Display'">${i < 4 ? 'waiting for a detective…' : 'open seat'}</span></div>`);
+  return `<div class="row" style="justify-content:space-between;margin-top:2px"><span class="kick">DETECTIVES</span><span class="kick" style="letter-spacing:2px">${list.length} / 6</span></div><div style="border-top:1px solid #2c2c31;margin-top:-6px">${rows.join('')}</div>`;
+}
+function lobby() {
+  const ok = S.joined.length >= 4;
+  return `<section class="scr noir" style="gap:16px">${head('HOSTING · CASE 0221')}
+    <div class="ticket"><div class="kick" style="color:#4A4740">ROOM CODE</div><div class="rc">KXQZ</div><small>Friends tap <b style="font:900 12px 'Playfair Display';letter-spacing:1px">JOIN WITH A CODE</b> and enter this</small></div>
+    <div><div class="kick" style="margin-bottom:8px">WHERE DOES THE BOARD LIVE?</div>
+    <div class="seg">${[['tv', 'ON THE TV', 'board on the big screen'], ['phones', 'PHONES ONLY', 'everyone holds the board']].map(([k, a, b]) => `<button data-a="mode" data-v="${k}" aria-pressed="${S.mode === k}"><b>${a}</b><small>${b}</small></button>`).join('')}</div></div>
+    ${seats('me')}
+    <div class="grow"></div>
+    <button class="cbtn" data-a="start" ${ok ? '' : 'disabled'}>${ok ? 'OPEN THE CASE' : 'WAITING FOR DETECTIVES…'}</button>
+    <p style="margin:-6px 0 0;text-align:center;font:400 13px 'Playfair Display';color:#8f8f96">4 to 6 detectives · about 30 minutes</p></section>`;
+}
+function join() {
+  const me = P_('me'), code = S.code || '';
+  return `<section class="scr noir" style="gap:18px">${head('JOIN A CASE')}
+    <div><label class="kick" for="jc" style="display:block;margin-bottom:10px">ROOM CODE</label>
+    <div class="boxes">${[0, 1, 2, 3].map(i => `<span class="${i === code.length ? 'on' : ''}">${esc(code[i] || '')}</span>`).join('')}<input id="jc" maxlength="4" autocomplete="off" autocapitalize="characters" spellcheck="false" value="${esc(code)}" aria-label="Room code, 4 letters"></div>
+    <p id="jerr" style="margin:8px 0 0;font:400 14px 'Playfair Display';color:${S.joinErr ? 'var(--red)' : '#8f8f96'}">${S.joinErr ? 'No case with that code. Check the TV or the host’s phone.' : 'It’s on the TV or the host’s phone. Try KXQZ.'}</p></div>
+    <div><label class="kick" for="jn" style="display:block;margin-bottom:10px">YOUR DETECTIVE NAME</label><input id="jn" class="field" maxlength="14" placeholder="e.g. Jess" value="${esc(S.name || '')}"></div>
+    <div><div class="kick" style="margin-bottom:10px">YOUR THREAD</div><div class="sw">${SWATCH.map(c => `<button data-a="swatch" data-v="${c}" style="background:${c}" aria-pressed="${me.c === c}" aria-label="Thread colour"></button>`).join('')}</div></div>
+    <div class="grow"></div>
+    <button class="cbtn" id="jgo" data-a="dojoin" ${code.length === 4 && (S.name || '').trim() ? '' : 'disabled'}>JOIN THE CASE</button></section>`;
+}
+function joined() {
+  const me = P_('me');
+  return `<section class="scr noir" style="gap:16px">${head('CASE 0221')}
+    <div class="tipC" aria-live="polite"><div class="tCrow">${TIPS.map((_, i) => `<button class="tCpin${i === S.tip ? ' on' : i < S.tip ? ' done' : ''}" data-a="tipgo" data-v="${i}" aria-label="Rule ${i + 1}: ${TIPS[i][0]}" aria-current="${i === S.tip}">${i + 1}</button>`).join('<i></i>')}</div>
+      <h3>${TIPS[S.tip][0]}</h3><p>${TIPS[S.tip][1]}</p><button data-a="tipnext" aria-label="Next tip">${S.tip === TIPS.length - 1 ? 'Back to the first clue' : 'Next clue'} ›</button></div>
+    ${seats('jess')}
+    <div class="grow"></div>
+
+    <p style="margin:0;text-align:center;font:400 15px 'Playfair Display';color:#BDB8AE">${S.joined.length >= 4 ? 'Everyone’s here. Waiting for Jess to open the case…' : 'Waiting for more detectives…'} <button data-a="hoststart" style="background:none;border:0;font:700 11px 'Playfair Display';letter-spacing:2px;color:#8f8f96;text-decoration:underline;padding:8px">SKIP ▸</button></p></section>`;
+}
+function brief(inSheet) {
+  return `<section class="scr noir bf${inSheet === 'tab' ? ' bftab' : inSheet ? ' bfsheet' : ''}" style="padding:0;gap:0">
+    <div class="bfhero"><img src="${IMG('cover-stoke-moran')}" alt="Stoke Moran manor at night in a storm">
+      <div class="bftop rv" style="--d:.1s"><span class="kick">CASE 0221</span><span class="kick" style="letter-spacing:2px">SURREY · 1883</span></div>
+      <div class="bftitle rv" style="--d:.25s"><div class="kick" style="color:#d8d4cc">STOKE MORAN MANOR</div><h1>The Speckled Band</h1></div></div>
+    <div class="bfbody">
+      <div class="bfvic rv" style="--d:.45s">
+        <figure class="polaroid"><span class="ppin"></span><img src="${IMG('victim-julia')}" alt="Julia Stoner"><figcaption>Julia Stoner</figcaption></figure>
+        <div><div class="kick" style="color:var(--red)">THE VICTIM</div><h2>Julia Stoner, 30</h2><p>Found dead in her bedroom two years ago, two weeks before her wedding.</p></div></div>
+      <ul class="bffacts rv" style="--d:.6s">
+        <li><b>Door</b><span>locked from the inside</span></li>
+        <li><b>Shutters</b><span>barred with iron</span></li>
+        <li><b>Body</b><span>no wound, no poison</span></li>
+      </ul>
+      <blockquote class="bfquote rv" style="--d:.75s"><div class="kick">HER LAST WORDS</div><q>It was the band! The speckled band!</q></blockquote>
+      <div class="bfnext rv" style="--d:.9s"><img src="${IMG('suspect-helen')}" alt="Helen Stoner"><p>Her twin sister <b>Helen</b> has started hearing the same low whistle at night, just as Julia did. <em>She may be next.</em></p></div>
+      <div class="rv" style="--d:1.05s"><div class="kick" style="margin-bottom:10px">YOUR JOB: FIND OUT</div>
+        <div class="bfask"><span>WHO</span><span>HOW</span><span>WHY</span></div></div>
+      <p class="bfrules rv" style="--d:1.15s">Three rounds of eight minutes. New files open each round. Then the lineup.</p>
+      ${inSheet === 'tab' ? '' : inSheet ? '<button class="cbtn" data-a="close">BACK TO THE CASE</button>' : '<button class="cbtn rv" style="--d:1.25s" data-a="begin">OPEN THE CASE FILE</button>'}
+    </div></section>`;
+}
+function game() {
+  const nf = newCount(['doc']), ne = newCount(['ev', 'photo']);
+  const tab = (k, label, ic, n) => `<button role="tab" aria-selected="${S.tab === k}" data-a="tab" data-v="${k}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ic}</svg>${label}${n ? `<span class="n">${n}</span>` : ''}</button>`;
+  const mm = String(Math.floor(S.t / 60)), ss = String(S.t % 60).padStart(2, '0');
+  return `<div class="top"><h2>Round ${S.round}</h2><span class="mono" style="font-size:11px;color:var(--mute)">${ROUNDS[S.round - 1].n.toUpperCase()}</span>
+    <span class="timer ${S.t < 60 ? 'low' : ''}">${mm}:${ss}</span><button class="skip" data-a="skip" title="Prototype only">SKIP ▸</button></div>
+    ${S.tab === 'brief' ? `<section class="scr" style="padding:0;gap:0">${brief('tab')}</section>` : `<section class="scr" style="padding-top:14px">${{files, evidence, board, suspects}[S.tab]()}</section>`}
+    <nav class="tabs" role="tablist">${tab('brief', 'Briefing', '<rect x="4" y="3" width="16" height="18" rx="1"/><path d="M8 8h8M8 12h8M8 16h5"/>', 0)}${tab('files', 'Files', '<path d="M3 7h6l2 2h10v10H3z"/>', nf)}${tab('evidence', 'Evidence', '<circle cx="11" cy="11" r="6"/><path d="M20 20l-4-4"/>', ne)}${tab('suspects', 'Suspects', '<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/>', 0)}${tab('board', 'Board', '<path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/>', 0)}</nav>`;
+}
+function readyBar() {
+  const n = S.ready.size, last = S.round === 3;
+  return `<button class="btn ghost" data-a="ready" ${S.ready.has('me') ? 'disabled' : ''}>${S.ready.has('me') ? `WAITING FOR OTHERS · ${n}/4 READY` : (last ? 'READY FOR THE LINEUP' : 'READY FOR NEXT ROUND')}${!S.ready.has('me') && n ? ` · ${n}/4` : ''}</button>`;
+}
+function files() {
+  const docs = ITEMS.filter(i => i.kind === 'doc');
+  return `<p class="mono" style="margin:0;font-size:12px;color:var(--amber)">${ROUNDS[S.round - 1].q}</p>
+    <div class="list">${docs.map(d => d.r <= S.round ? `<button class="li" data-a="open" data-v="${d.id}"><span class="mono" style="font-size:12px;color:var(--mute);width:34px">${d.tag}</span><span class="grow"><b class="serif" style="font-size:20px">${d.n}</b><br><small style="color:var(--mute)">${d.sub}</small></span>${!S.seen.has(d.id) ? '<span class="mono" style="background:var(--amber);color:#141414;font-size:10px;padding:2px 6px">NEW</span>' : ''}${pinned(d.id) ? pinDot(pinned(d.id).by) : ''}</button>` : `<div class="li lock"><span class="mono" style="font-size:12px;width:34px">${d.tag}</span><span class="grow"><b class="serif" style="font-size:20px">Sealed</b><br><small>Opens in round ${d.r}</small></span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A3A3AA" stroke-width="2" aria-hidden="true"><rect x="5" y="11" width="14" height="10"/><path d="M8 11V7a4 4 0 018 0v4"/></svg></div>`).join('')}</div>
+    <div class="grow"></div>${readyBar()}`;
+}
+function evidence() {
+  const tile = e => `<button class="ev" data-a="open" data-v="${e.id}" style="position:relative">${!S.seen.has(e.id) ? '<span class="new">NEW</span>' : ''}<div class="im" style="${e.k3d ? `background-image:url(${IMG('3d-' + e.k3d)});filter:none` : e.img ? `background-image:url(${IMG(e.img)})` : ''}">${e.k3d || e.img ? '' : svgI(e.icon)}</div><div class="cap"><small>${e.tag}</small><b>${e.n}</b></div></button>`;
+  const group = (kind, title, note) => { const all = ITEMS.filter(i => i.kind === kind), open = all.filter(i => i.r <= S.round), later = all.length - open.length;
+    return `<div class="evh"><span class="lbl">${title}</span><span class="mono" style="font-size:11px;color:var(--mute)">${note}</span></div>
+      <div class="grid">${open.map(tile).join('')}</div>${later ? `<p class="mono evlater">+${later} more in later rounds</p>` : ''}`; };
+  return `${group('ev', 'BAGGED BY POLICE', '')}${group('photo', 'AT THE SCENE', '')}
+    ${readyBar()}`;
+}
+function suspects() {
+  return SUS.map(s => `<button class="sus" data-a="opensus" data-v="${s.id}"><img src="${IMG(s.img)}" alt=""><div><div class="row"><span class="dot" style="background:${s.c}"></span><b>${s.s}</b>${pinned(s.id) ? pinDot(pinned(s.id).by) : ''}</div><p>${s.who}</p><p class="mono" style="font-size:11px;color:var(--mute);margin-top:6px">ALIBI: ${s.alibi}</p></div></button>`).join('') + readyBar();
+}
+const pinned = id => S.pins.find(p => p.id === id);
+const pinDot = by => `<span title="pinned" class="dot" style="background:${P_(by).c};box-shadow:0 0 0 2px #141414,0 0 0 3px ${P_(by).c}"></span>`;
+function card(p) {
+  const it = ITEMS.find(i => i.id === p.id), s = SUS.find(x => x.id === p.id), v = p.id === 'victim';
+  const img = v ? 'victim-julia' : s ? s.img : it && it.img;
+  const name = v ? 'Julia Stoner' : s ? s.s : p.note ? esc(p.note) : it.n;
+  const sub = v ? 'VICTIM' : s ? 'SUSPECT' : p.note ? '' : it.tag;
+  const cls = p.note ? 'note' : (it && it.kind === 'doc') ? 'doc' : '';
+  return `<button class="bc ${cls} ${S.sel === p.key ? 'sel' : ''}" data-k="${p.key}" style="left:${p.x}%;top:${p.y}%;--r:${p.r}deg" aria-label="${name}"><span class="pin" style="background:${P_(p.by).c}"></span>${img ? `<img src="${IMG(img)}" alt="">` : ''}<b>${name}</b>${sub ? `<small>${sub}</small>` : ''}</button>`;
+}
+function board() {
+  return `<div class="board" id="board"><svg viewBox="0 0 100 100" preserveAspectRatio="none" id="strs"></svg>${S.pins.map(card).join('')}
+    ${S.pins.length < 2 ? '<p class="mono" style="position:absolute;left:0;right:0;bottom:12px;text-align:center;font-size:12px;color:var(--mute)">Pin files, evidence and suspects to see them here</p>' : ''}</div>
+    <div class="btools"><button class="chip" data-a="tie" aria-pressed="${S.tie}">${S.tie ? (S.sel ? 'Tap the second card' : 'Tap the first card') : 'Tie a thread'}</button><button class="chip" data-a="note">Add a note</button>${S.mode === 'tv' ? '<button class="chip" data-a="tvview" title="Preview the TV">TV</button>' : '<button class="chip" data-a="undo" title="Undo my last string">Undo</button>'}</div>
+    <p class="mono" style="margin:0;font-size:11px;color:var(--mute)">${S.strings.length} threads · drag cards to arrange · ${S.mode === 'tv' ? 'mirrored on the TV' : 'synced to every phone'}</p>`;
+}
+function drawStrings() {
+  const svg = $('#strs'); if (!svg) return;
+  svg.innerHTML = S.strings.map(([a, b]) => { const A = S.pins.find(p => p.key === a), B = S.pins.find(p => p.key === b); return A && B ? `<line x1="${A.x}" y1="${A.y}" x2="${B.x}" y2="${B.y}"/>` : ''; }).join('');
+}
+function vote() {
+  const v = S.vote, done = v.who && v.how !== null && v.why !== null;
+  return `<section class="scr"><div class="row"><div class="lbl">THE LINEUP · EVERYONE VOTES</div><span class="timer" style="font-size:18px">${Object.keys(S.bots).length}/3 voted</span></div>
+    <h1 class="serif" style="font:italic 900 48px/1 'Playfair Display'">Who did it?</h1>
+    <div class="lineup">${SUS.map((s, i) => `<button class="lu" data-a="who" data-v="${s.id}" aria-pressed="${v.who === s.id}" style="${v.who === s.id ? `box-shadow:inset 0 -4px 0 ${s.c}` : ''}"><img src="${IMG(s.img)}" alt="${s.s}" style="height:${[220, 190, 205, 212][i]}px;${v.who === s.id ? `outline:2px solid ${s.c}` : ''}"><span class="pl" style="${v.who === s.id ? `background:${s.c}` : ''}">${i + 1}</span><b>${s.s}</b></button>`).join('')}</div>
+    <div class="lbl">HOW?</div><div class="qs">${HOW.map((h, i) => `<button class="q" data-a="how" data-v="${i}" aria-pressed="${v.how === i}">${h}</button>`).join('')}</div>
+    <div class="lbl">WHY?</div><div class="qs">${WHY.map((h, i) => `<button class="q" data-a="why" data-v="${i}" aria-pressed="${v.why === i}">${h}</button>`).join('')}</div>
+    <button class="btn" data-a="lock" ${done ? '' : 'disabled'}>${done ? 'ACCUSE ' + SUS.find(s => s.id === v.who).s.toUpperCase() : 'PICK WHO, HOW AND WHY'}</button></section>`;
+}
+function score(x) { return (x.who === ANSWER.who) + (x.how === ANSWER.how) + (x.why === ANSWER.why); }
+function reveal() {
+  const all = [{p:'me', ...S.vote}, ...Object.entries(S.bots).map(([p, x]) => ({p, ...x}))].map(x => ({...x, pts:score(x)})).sort((a, b) => b.pts - a.pts);
+  const pins = key => all.map(x => `<span class="rpin${x[key] === ANSWER[key] ? '' : ' miss'}" style="--c:${P_(x.p).c}" title="${esc(P_(x.p).n)}"></span>`).join('');
+  const got = key => all.filter(x => x[key] === ANSWER[key]).length;
+  const beat = (n, k, ans, note) => `<div class="beat rv" style="--d:${n * 0.12 + 0.5}s"><div class="bk">${k}</div><div class="ba">${ans}</div><div class="bn">${note}</div><div class="row" style="gap:6px;margin-top:10px">${pins(k.toLowerCase())}<span class="rcount">${got(k.toLowerCase())} of ${all.length} detectives</span></div></div>`;
+  const chain = [
+    ['A-1', 'A-1-ventilator', 'A vent cut through to his room', 'Fitted weeks before she died. It lets in no air, only a way between the rooms.'],
+    ['A-2', 'A-2-bell-rope', 'A bell-rope that rings nothing', 'Hooked under the vent and hanging to her pillow: a ladder down.'],
+    ['A-3', 'A-3-bolted-bed', 'A bed that cannot move', 'Bolted to the floor, right under the rope.'],
+    ['A-4', '3d-saucer', 'Milk on the safe', 'He keeps no cat. Something else was fed here.'],
+    ['A-5', '3d-lash', 'A lash tied into a loop', 'Not for a dog. For catching something by the neck.'],
+    ['A-6', 'A-6-iron-safe', 'The clang in the night', 'Helen heard a whistle, then metal shutting: the safe closing on it.']
+  ];
+  return `<section class="scr noir rvl" style="padding:0;gap:0">
+    <div class="rhero"><img src="${IMG('suspect-roylott')}" alt="Dr. Grimesby Roylott">
+      <div class="rtop rv" style="--d:.1s"><span class="kick">THE SEALED ENVELOPE</span><span class="kick" style="letter-spacing:2px">CASE 0221</span></div>
+      <span class="gstamp">GUILTY</span>
+      <div class="rname rv" style="--d:.3s"><div class="kick" style="color:#d8d4cc">THE KILLER WAS</div><h1>Dr. Grimesby Roylott</h1><p>Julia’s stepfather. He slept in the room next to hers.</p></div></div>
+    <div class="rbody">
+      ${beat(1, 'WHO', 'Dr. Grimesby Roylott', 'Her stepfather, in the room next door.')}
+      ${beat(2, 'HOW', 'A snake through the vent', 'A swamp adder, sent down the bell-rope onto her bed.')}
+      ${beat(3, 'WHY', 'To keep the family money', 'Her wedding would cut into the income he controlled.')}
+      <figure class="rsnake rv" style="--d:.2s"><img src="${IMG('reveal-snake')}" onerror="this.onerror=null;this.src='${IMG('A-2-bell-rope')}'" alt="A speckled snake coiled on the bell-rope under the vent">
+        <figcaption><span class="kick" style="color:var(--red)">THE SPECKLED BAND</span><q>It was the band! The speckled band!</q><p>Julia wasn’t describing a ribbon. She saw the snake: a swamp adder, the deadliest in India, trained to come back to his whistle.</p></figcaption></figure>
+      <h2 class="rh">How he did it</h2>
+      <ol class="rchain">${chain.map(([t, im, h, d], i) => `<li class="rv" style="--d:${0.1 + i * 0.06}s"><img src="${IMG(im)}" onerror="this.onerror=null;this.style.visibility='hidden'" alt=""><div><span class="kick" style="letter-spacing:2px">${t}</span><b>${h}</b><p>${d}</p></div></li>`).join('')}</ol>
+      <p class="rnext">Helen was next. The same whistle had started outside her new room.</p>
+      <h2 class="rh">The detectives</h2>
+      <div class="rboard">${all.map((x, i) => `<div class="rrow${i === 0 ? ' top' : ''}"><span class="rrank">${i + 1}</span><span class="pin" style="background:${P_(x.p).c}"></span><b>${esc(P_(x.p).n)}</b>${i === 0 ? '<span class="rbest">BEST DETECTIVE</span>' : ''}<span class="rpts">${x.pts}<small>/3</small></span></div>`).join('')}</div>
+      <button class="cbtn" data-a="again" style="margin-top:22px">PLAY ANOTHER CASE</button>
+    </div></section>`;
+}
+function overlays() {
+  let h = '';
+  if (S.toast) h += `<div class="toast"><span class="dot" style="background:${P_(S.toast.by).c}"></span><span>${S.toast.t}</span></div>`;
+  if (S.sheet) h += `<div class="scrim" data-a="close"></div><div class="sheet" role="dialog">${S.sheet}</div>`;
+  if (S.ov) h += `<div class="ov">${S.ov}</div>`;
+  if (S.tv) h += tvView();
+  return h;
+}
+function tvView() {
+  return `<div class="tvwrap"><div class="lbl" style="text-align:center">TV PREVIEW · WHAT THE ROOM SEES</div><div class="tv">
+    <div style="position:absolute;inset:0;background:repeating-linear-gradient(-22deg,rgba(0,0,0,.45) 0 10px,transparent 10px 22px),#1A1A1E"></div>
+    <div style="position:absolute;left:3%;top:3%;display:flex;align-items:center;gap:6px"><img src="favicon.svg" alt="Red Thread" style="width:18px;height:18px;border-radius:4px"><span class="mono" style="font-size:8px;color:var(--mute);font-style:normal">ROUND ${S.round}</span></div>
+    <div style="position:absolute;right:3%;top:3%" class="mono amber">${Math.floor(S.t / 60)}:${String(S.t % 60).padStart(2, '0')}</div>
+    <svg viewBox="0 0 100 100" preserveAspectRatio="none" style="position:absolute;left:5%;top:12%;width:90%;height:84%">${S.strings.map(([a, b]) => { const A = S.pins.find(p => p.key === a), B = S.pins.find(p => p.key === b); return A && B ? `<line x1="${A.x}" y1="${A.y}" x2="${B.x}" y2="${B.y}" stroke="#FF3B4E" stroke-width="0.8" vector-effect="non-scaling-stroke"/>` : ''; }).join('')}</svg>
+    <div style="position:absolute;left:5%;top:12%;width:90%;height:84%">${S.pins.map(p => { const s = SUS.find(x => x.id === p.id), it = ITEMS.find(i => i.id === p.id); const nm = p.id === 'victim' ? 'Julia' : s ? s.s : p.note ? esc(p.note) : it.n; return `<div style="position:absolute;left:${p.x}%;top:${p.y}%;transform:translate(-50%,-50%) rotate(${p.r}deg);background:${p.note ? 'var(--amber)' : 'var(--paper)'};color:#141414;font:900 8px 'Playfair Display';padding:3px 5px;box-shadow:0 4px 8px rgba(0,0,0,.6);border-top:2px solid ${P_(p.by).c}">${nm}</div>`; }).join('')}</div></div>
+    <button class="btn ghost" data-a="tvclose">BACK TO MY PHONE</button></div>`;
+}
+
+/* ---------- actions ---------- */
+let K = 0;
+function addPin(id, by, note) {
+  if (!note && pinned(id)) return false;
+  const k = 'p' + (++K);
+  S.pins.push({key:k, id, by, note, x:12 + Math.random() * 76, y:14 + Math.random() * 72, r:Math.round(Math.random() * 8 - 4)});
+  return k;
+}
+function toast(by, t) { S.toast = {by, t}; clearTimeout(toastId); toastId = setTimeout(() => { S.toast = null; render(); }, 2600); }
+function pinMoment(name) { S.sheet = null; S.ov = `<div class="lbl amber">YOU FOUND SOMETHING</div><span class="stamp">PINNED</span><h2 class="serif" style="font:italic 900 34px/1.05 'Playfair Display'">${name}</h2><p class="mono" style="margin:0;color:var(--mute);font-size:12px">${S.mode === 'tv' ? 'Now on the TV board' : 'Now on everyone\'s board'}</p>`; render(); setTimeout(() => { S.ov = null; render(); }, 1300); }
+function openItem(id) {
+  const it = ITEMS.find(i => i.id === id); S.seen.add(id);
+  const pinBtn = pinned(id) ? `<button class="btn ghost" disabled>PINNED BY ${P_(pinned(id).by).n.toUpperCase()}</button>` : `<button class="btn" data-a="pin" data-v="${id}">PIN TO BOARD</button>`;
+  if (it.k3d) S.sheet = `<div class="row" style="align-items:baseline"><div class="grow"><div class="lbl">${it.tag} · BAGGED EVIDENCE</div><h2 class="serif" style="font:900 26px/1.1 'Playfair Display';margin-top:2px">${it.n}</h2></div></div><iframe src="${VIEWER}index.html?item=${it.k3d}&embed=1" title="${it.n} in 3D" style="width:100%;height:min(54vh,460px);border:0;border-radius:6px;background:#08080a" allow="fullscreen"></iframe><p style="margin:0;color:#d8d8dc">${it.d}</p>${pinBtn}<button class="btn ghost" data-a="close">CLOSE</button>`;
+  else if (it.kind === 'doc') S.sheet = `<div class="paper ${it.style || ''}">${it.body}</div>${pinBtn}<button class="btn ghost" data-a="close">CLOSE</button>`;
+  else S.sheet = `${it.paper ? `<div style="background:#121214;border-radius:4px;padding:14px;display:grid;place-items:center"><img id="pimg" src="${IMG(it.img)}" data-f="${IMG(it.img)}" data-b="${IMG(it.back)}" alt="${it.n}, front" style="max-width:100%;max-height:52vh;box-shadow:0 10px 24px rgba(0,0,0,.6);transition:transform .35s"></div><button class="btn ghost" data-a="flip">TURN IT OVER</button>` : it.img ? `<img src="${IMG(it.img)}" alt="${it.n}" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:4px;filter:grayscale(.3)">` : `<div style="aspect-ratio:4/3;display:grid;place-items:center;background:#1c1c20;border-radius:4px">${svgI(it.icon)}</div>`}
+    <div><div class="lbl">${it.tag} · ${it.kind === 'photo' ? 'AT THE SCENE' : 'BAGGED EVIDENCE'}</div><h2 class="serif" style="font:900 28px/1.1 'Playfair Display';margin-top:4px">${it.n}</h2><p style="margin:6px 0 0;color:#d8d8dc">${it.d}</p></div>
+    ${it.v3d ? `<a class="btn ghost" href="${VIEWER}" style="text-decoration:none">INSPECT IN 3D</a>` : ''}${pinBtn}<button class="btn ghost" data-a="close">CLOSE</button>`;
+  render();
+}
+function nextRound() {
+  S.ready.clear();
+  if (S.round === 3) { S.screen = 'vote'; clearInterval(timerId); clearInterval(botId); botsVote(); render(); return; }
+  S.round++; S.t = ROUND_SECS;
+  const n = ITEMS.filter(i => i.r === S.round).length;
+  S.ov = `<div class="lbl amber">ROUND ${S.round} OF 3</div><h2 class="serif" style="font:italic 900 40px/1 'Playfair Display'">${ROUNDS[S.round - 1].n}</h2><p class="mono" style="margin:0;color:var(--mute)">${n} new files unsealed</p><button class="btn" data-a="ovclose" style="max-width:260px">OPEN THEM</button>`;
+  render();
+}
+function botsVote() {
+  const plan = {jess:{who:'roylott', how:1, why:0}, marcus:{who:'croft', how:3, why:2}, priya:{who:'roylott', how:0, why:0}};
+  Object.keys(plan).forEach((b, i) => setTimeout(() => { S.bots[b] = plan[b]; S.ready.add(b); if (S.screen === 'vote') render(); }, 1800 + i * 2200));
+}
+function botTick() {
+  const bots = ['jess', 'marcus', 'priya'], b = bots[Math.floor(Math.random() * 3)];
+  const pool = [...unlocked().filter(i => !pinned(i.id)), ...SUS.filter(s => !pinned(s.id))];
+  if (Math.random() < 0.35 && S.pins.length > 2) {
+    const a = S.pins[Math.floor(Math.random() * S.pins.length)], c = S.pins[Math.floor(Math.random() * S.pins.length)];
+    if (a !== c && !S.strings.some(([x, y]) => (x === a.key && y === c.key) || (x === c.key && y === a.key))) { S.strings.push([a.key, c.key, b]); const nm = p => p.id === 'victim' ? 'Julia' : (SUS.find(s => s.id === p.id) || {}).s || (p.note ? esc(p.note) : ITEMS.find(i => i.id === p.id).n); toast(b, `<b>${P_(b).n}</b> tied ${nm(a)} → ${nm(c)}`); }
+  } else if (pool.length) { const pick = pool[Math.floor(Math.random() * pool.length)]; addPin(pick.id, b); toast(b, `<b>${P_(b).n}</b> pinned ${pick.s || pick.n}`); }
+  if (Math.random() < 0.25 && S.t < ROUND_SECS - 30) S.ready.add(b);
+  if (S.ready.size === 4) nextRound(); else render();
+}
+
+app.addEventListener('click', e => {
+  const t = e.target.closest('[data-a]'); if (!t) return;
+  const a = t.dataset.a, v = t.dataset.v;
+  if (a === 'host') { S.screen = 'lobby'; S.joined = ['me']; P_('me').n = 'You'; render(); ['jess', 'marcus', 'priya'].forEach((b, i) => setTimeout(() => { if (S.screen !== 'lobby' || S.joined.includes(b)) return; S.joined.push(b); render(); }, 900 + i * 1100)); }
+  else if (a === 'case') { const c = CASES.find(x => x.id === v); if (c.soon) { t.classList.remove('nope'); void t.offsetWidth; t.classList.add('nope'); return; } S.case = v; render(); }
+  else if (a === 'join') { S.screen = 'join'; S.joinErr = false; render(); $('#jc').focus(); }
+  else if (a === 'home') { S.screen = 'title'; render(); }
+  else if (a === 'swatch') { P_('me').c = v; S.name = $('#jn').value; S.code = $('#jc').value.toUpperCase(); render(); }
+  else if (a === 'dojoin') { S.code = $('#jc').value.toUpperCase(); S.name = $('#jn').value.trim(); if (S.code !== 'KXQZ') { S.joinErr = true; render(); return; }
+    P_('me').n = S.name; S.screen = 'joined'; S.joined = ['jess', 'marcus', 'me']; S.tip = 0; render();
+    setTimeout(() => { if (S.screen !== 'joined') return; S.joined.push('priya'); render(); }, 2500);
+    clearInterval(tipId); tipId = setInterval(() => { if (S.screen !== 'joined') return clearInterval(tipId); S.tip = (S.tip + 1) % TIPS.length; render(); }, 6000);
+    setTimeout(() => { if (S.screen === 'joined') { clearInterval(tipId); S.screen = 'brief'; render(); } }, 32000); }
+  else if (a === 'tipgo') { S.tip = +v; clearInterval(tipId); tipId = setInterval(() => { if (S.screen !== 'joined') return clearInterval(tipId); S.tip = (S.tip + 1) % TIPS.length; render(); }, 6000); render(); }
+  else if (a === 'tipnext') { S.tip = (S.tip + 1) % TIPS.length; clearInterval(tipId); tipId = setInterval(() => { if (S.screen !== 'joined') return clearInterval(tipId); S.tip = (S.tip + 1) % TIPS.length; render(); }, 6000); render(); }
+  else if (a === 'hoststart') { clearInterval(tipId); S.screen = 'brief'; render(); }
+  else if (a === 'mode') { S.mode = v; render(); }
+  else if (a === 'start') { S.screen = 'brief'; render(); }
+  else if (a === 'begin') { S.screen = 'game'; addPin('victim', 'me'); S.pins[0].x = 50; S.pins[0].y = 16; render();
+    timerId = setInterval(() => { if (S.ov || S.tv) return; S.t--; if (S.t <= 0) nextRound(); else { const el = $('.timer'); if (el && S.screen === 'game') { el.textContent = Math.floor(S.t / 60) + ':' + String(S.t % 60).padStart(2, '0'); el.classList.toggle('low', S.t < 60); } } }, 1000);
+    botId = setInterval(() => { if (!S.ov && !S.sheet && !drag) botTick(); }, 9000); }
+  else if (a === 'tab') { S.tab = v; S.sel = null; S.tie = false; render(); }
+  else if (a === 'open') openItem(v);
+  else if (a === 'opensus') { const s = SUS.find(x => x.id === v); S.sheet = `<img src="${IMG(s.img)}" alt="${s.n}" style="width:100%;aspect-ratio:1;object-fit:cover;object-position:top;filter:grayscale(1);border-radius:4px"><div><div class="row"><span class="dot" style="background:${s.c}"></span><span class="lbl">SUSPECT</span></div><h2 class="serif" style="font:900 28px/1.1 'Playfair Display';margin-top:4px">${s.n}</h2><p style="margin:6px 0;color:#d8d8dc">${s.who}</p><p class="mono" style="margin:0;font-size:12px;color:var(--mute)">ALIBI: ${s.alibi}</p></div>${pinned(v) ? `<button class="btn ghost" disabled>PINNED BY ${P_(pinned(v).by).n.toUpperCase()}</button>` : `<button class="btn" data-a="pin" data-v="${v}">PIN TO BOARD</button>`}<button class="btn ghost" data-a="close">CLOSE</button>`; render(); }
+  else if (a === 'pin') { addPin(v, 'me'); const s = SUS.find(x => x.id === v); pinMoment(s ? s.s : ITEMS.find(i => i.id === v).n); }
+  else if (a === 'openbrief') { S.sheet = brief(true); render(); }
+  else if (a === 'close') { S.sheet = null; render(); }
+  else if (a === 'flip') { const im = $('#pimg'); if (!im) return; const back = im.dataset.side !== 'b'; im.style.transform = 'rotateX(90deg)'; setTimeout(() => { im.src = back ? im.dataset.b : im.dataset.f; im.dataset.side = back ? 'b' : 'f'; im.alt = im.alt.replace(/(front|back)$/, back ? 'back' : 'front'); im.style.transform = 'none'; }, 180); t.textContent = back ? 'TURN IT BACK' : 'TURN IT OVER'; }
+  else if (a === 'ovclose') { S.ov = null; render(); }
+  else if (a === 'skip') { if (S.t > 20) S.t = 15; else nextRound(); render(); }
+  else if (a === 'ready') { S.ready.add('me'); const rnd = S.round; ['jess', 'marcus', 'priya'].forEach((b, i) => setTimeout(() => { if (S.screen !== 'game' || S.round !== rnd) return; S.ready.add(b); if (S.ready.size === 4) nextRound(); else render(); }, 1200 + i * 1300)); render(); }
+  else if (a === 'tie') { S.tie = !S.tie; S.sel = null; render(); }
+  else if (a === 'note') { S.sheet = `<h2 class="serif" style="font:italic 900 26px 'Playfair Display'">Add a note</h2><label for="nt" class="lbl">WHAT ARE YOU THINKING?</label><input id="nt" maxlength="40" placeholder="e.g. 3 a.m. whistle" style="min-height:52px;font-size:16px;padding:0 14px;background:#1c1c20;border:1px solid var(--line);border-radius:4px;color:var(--ink)"><button class="btn" data-a="addnote">PIN THE NOTE</button><button class="btn ghost" data-a="close">CANCEL</button>`; render(); setTimeout(() => $('#nt') && $('#nt').focus(), 50); }
+  else if (a === 'addnote') { const txt = ($('#nt').value || '').trim(); if (!txt) return; addPin('note', 'me', txt); S.sheet = null; render(); }
+  else if (a === 'tvview') { S.tv = true; render(); }
+  else if (a === 'tvclose') { S.tv = false; render(); }
+  else if (a === 'undo') { for (let i = S.strings.length - 1; i >= 0; i--) if (S.strings[i][2] === 'me') { S.strings.splice(i, 1); break; } render(); }
+  else if (a === 'who') { S.vote.who = v; render(); }
+  else if (a === 'how') { S.vote.how = +v; render(); }
+  else if (a === 'why') { S.vote.why = +v; render(); }
+  else if (a === 'lock') { S.ready.add('me'); const go = () => { if (Object.keys(S.bots).length === 3) { S.screen = 'reveal'; S.ov = `<span class="stamp" style="font-size:28px">THE VERDICT</span><p class="mono" style="color:var(--mute);margin:0">Opening the sealed envelope…</p>`; render(); setTimeout(() => { S.ov = null; render(); }, 1600); } else setTimeout(go, 500); }; S.ov = `<div class="lbl amber">VOTE LOCKED</div><h2 class="serif" style="font:italic 900 34px 'Playfair Display'">Waiting for the others…</h2>`; render(); go(); }
+  else if (a === 'again') location.reload();
+});
+
+app.addEventListener('input', e => {
+  if (e.target.id === 'jc') { const v = e.target.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 4); e.target.value = v; S.code = v; S.joinErr = false;
+    document.querySelectorAll('.boxes span').forEach((b, i) => { b.textContent = v[i] || ''; b.className = i === v.length ? 'on' : ''; });
+    const er = $('#jerr'); er.style.color = '#8f8f96'; er.textContent = 'It’s on the TV or the host’s phone. Try KXQZ.'; if (v.length === 4) $('#jn').focus(); }
+  if (e.target.id === 'jc' || e.target.id === 'jn') { if (e.target.id === 'jn') S.name = e.target.value; $('#jgo').disabled = !((S.code || '').length === 4 && (S.name || '').trim()); }
+});
+/* board: drag cards, tap to tie strings */
+let drag = null;
+app.addEventListener('pointerdown', e => {
+  const c = e.target.closest('.bc'); if (!c) return; const b = $('#board').getBoundingClientRect();
+  drag = {k:c.dataset.k, el:c, b, sx:e.clientX, sy:e.clientY, moved:false}; c.setPointerCapture(e.pointerId);
+});
+app.addEventListener('pointermove', e => {
+  if (!drag) return; const d = Math.hypot(e.clientX - drag.sx, e.clientY - drag.sy); if (d > 6) drag.moved = true; if (!drag.moved || S.tie) return;
+  const p = S.pins.find(x => x.key === drag.k); p.x = Math.min(94, Math.max(6, (e.clientX - drag.b.left) / drag.b.width * 100)); p.y = Math.min(94, Math.max(6, (e.clientY - drag.b.top) / drag.b.height * 100));
+  drag.el.style.left = p.x + '%'; drag.el.style.top = p.y + '%'; drawStrings();
+});
+app.addEventListener('pointerup', () => {
+  if (!drag) return; const k = drag.k, moved = drag.moved; drag = null;
+  if (moved && !S.tie) return;
+  if (S.tie) { if (!S.sel) { S.sel = k; } else if (S.sel !== k) { if (!S.strings.some(([x, y]) => (x === S.sel && y === k) || (x === k && y === S.sel))) S.strings.push([S.sel, k, 'me']); S.sel = null; S.tie = false; } render(); }
+});
+
+render();
+}
+</script>
+</body>
+</html>
