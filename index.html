@@ -628,7 +628,7 @@ function checkres() {
 }
 function flips(pid, field) { return Object.keys(((roomData && roomData.overrides) || {})[pid]?.[field] || {}); }
 function judged(pid, field, text) { const others = Math.max(1, Object.keys((roomData && roomData.players) || {}).length - 1); const flipped = flips(pid, field).length >= Math.floor(others / 2) + 1; return autoOk(field, text) !== flipped; }
-function score(x) { return 2 * ((x.who === ANSWER.who) + judged(x.pid, 'how', x.how) + judged(x.pid, 'why', x.why)) + [1, 2, 3].reduce((t, n) => t + ckPoints(x.pid, n), 0); }
+function score(x) { return 2 * ((x.who === ANSWER.who) + judged(x.pid, 'how', x.how) + judged(x.pid, 'why', x.why)); }
 function reveal() {
   const all = Object.entries((roomData && roomData.votes) || {}).map(([pid, x]) => ({pid, p:toLocal(pid), ...x})).map(x => ({...x, ok:{who:x.who === ANSWER.who, how:judged(x.pid, 'how', x.how), why:judged(x.pid, 'why', x.why)}, ck:[1, 2, 3].reduce((t, n) => t + ckPoints(x.pid, n), 0)})).map(x => ({...x, pts:score(x)})).sort((a, b) => b.pts - a.pts);
   const others = Math.max(1, all.length - 1), need = Math.floor(others / 2) + 1;
@@ -661,7 +661,7 @@ function reveal() {
       <ol class="rchain">${chain.map(([t, im, h, d], i) => `<li class="rv" style="--d:${0.1 + i * 0.06}s"><img src="${IMG(im)}" onerror="this.onerror=null;this.style.visibility='hidden'" alt=""><div><span class="kick" style="letter-spacing:2px">${t}</span><b>${h}</b><p>${d}</p></div></li>`).join('')}</ol>
       <p class="rnext">Helen was next. The same whistle had started outside her new room.</p>
       <h2 class="rh">The detectives</h2>
-      <div class="rboard">${all.map((x, i) => `<div class="rrow${i === 0 ? ' top' : ''}"><span class="rrank">${i + 1}</span><span class="pin" style="background:${P_(x.p).c}"></span><b>${esc(P_(x.p).n)}</b>${i === 0 ? '<span class="rbest">BEST DETECTIVE</span>' : ''}<span class="rpts">${x.pts}<small>/12</small></span></div>`).join('')}</div>
+      <div class="rboard">${all.map((x, i) => `<div class="rrow${i === 0 ? ' top' : ''}"><span class="rrank">${i + 1}</span><span class="pin" style="background:${P_(x.p).c}"></span><b>${esc(P_(x.p).n)}</b>${i === 0 ? '<span class="rbest">BEST DETECTIVE</span>' : ''}<span class="rpts">${x.pts}<small>/6</small></span></div>`).join('')}</div>
       ${S.host === 'me' ? '<button class="cbtn" data-a="again" style="margin-top:22px">PLAY AGAIN</button>' : `<p class="bfrules" style="margin:22px 0 0">${esc(P_(S.host).n)} can start another round.</p>`}<button class="cbtn" data-a="leave" style="margin-top:10px;border:1.5px solid #F2EEE6;background:transparent;color:#F2EEE6">LEAVE THE ROOM</button>
     </div></section>`;
 }
@@ -833,7 +833,8 @@ function hostDuties() {
 let advancing = 0;
 function advance() {
   const m = roomData.meta; if (advancing === m.round) return; advancing = m.round;
-  netUpdate('meta', {phase:'check', checkEnds:net.now() + CHECK_SECS * 1000});
+  if (m.round >= 3) netUpdate('meta', {phase:'vote'});
+  else netUpdate('meta', {round:m.round + 1, endsAt:net.now() + ROUND_SECS * 1000});
 }
 function startTips() {
   S.tip = 0; clearInterval(tipId);
