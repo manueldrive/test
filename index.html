@@ -565,7 +565,7 @@ const pinned = id => S.pins.find(p => p.id === id);
 const pinDot = by => `<span title="pinned" class="dot" style="background:${P_(by).c};box-shadow:0 0 0 2px #141414,0 0 0 3px ${P_(by).c}"></span>`;
 function card(p) {
   const it = ITEMS.find(i => i.id === p.id), s = SUS.find(x => x.id === p.id), v = p.id === 'victim';
-  const img = v ? 'victim-julia' : s ? s.img : it && it.img;
+  const img = v ? 'victim-julia' : s ? s.img : it && (it.k3d && !it.paper ? '3d-' + it.k3d : it.img);
   const name = v ? 'Julia Stoner' : s ? s.s : p.note ? esc(p.note) : it.n;
   const sub = v ? 'VICTIM' : s ? 'SUSPECT' : p.note ? '' : it.tag;
   const cls = p.note ? 'note' : (it && it.kind === 'doc') ? 'doc' : '';
